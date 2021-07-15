@@ -46,15 +46,18 @@ const char* getFragmentShaderSource()
 {
     return
                 "#version 330 core\n"
+                "#define LINE_WIDTH 2.5 \n"
+                "uniform vec4 Color; \n"
                 "in vec3 vertexColor;"
                 "out vec4 FragColor;"
                 "void main()"
                 "{"
-                "   FragColor = vec4(vertexColor.r, vertexColor.g, vertexColor.b, 1.0f);"
+                "   FragColor = Color; "
                 "}";
+
+    
 }
-
-
+//vec4(vertexColor.r, vertexColor.g, vertexColor.b, 1.0f);
 int compileAndLinkShaders()
 {
     // compile and link shader program
@@ -213,12 +216,19 @@ int main(int argc, char*argv[])
         // Each frame, reset color of each pixel to glClearColor
         glClear(GL_COLOR_BUFFER_BIT);
         
+        GLfloat redColor[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
+        GLfloat greenColor[4] = { 0.0f, 1.0f, 0.0f, 1.0f };
+        GLfloat blueColor[4] = { 0.0f, 0.0f, 1.0f, 1.0f };
+
         // Draw geometry
         glUseProgram(shaderProgram);
         GLuint worldMatrixLocation = glGetUniformLocation(shaderProgram, "worldMatrix");
+        GLuint colorLocation = glGetUniformLocation(shaderProgram, "Color");
+
         glBindVertexArray(vao);
         glm::mat4 scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
-      
+        glUniform4fv(colorLocation, 1, greenColor);
+
         glm::mat4 translationMatrix;
         for (int i = 0; i < 101; i++) {
              translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-50.0f, 0.0f, -50.0f + i));
@@ -243,6 +253,9 @@ int main(int argc, char*argv[])
         glm::mat4 worldMatrix = scalingMatrix * rotationMatrix;
 
         glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+
+        glUniform4fv(colorLocation, 1, greenColor);
+
         glDrawArrays(GL_LINES, 0, 2);
         
         // + z bar
@@ -251,14 +264,20 @@ int main(int argc, char*argv[])
         worldMatrix = scalingMatrix * rotationMatrix;
 
         glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+
+        glUniform4fv(colorLocation, 1, redColor);
+
         glDrawArrays(GL_LINES, 0, 2);
       
-        // + z bar
+        // + y bar
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 0.05f, 1.0f));
         rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
         worldMatrix = scalingMatrix * rotationMatrix;
 
         glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+
+        glUniform4fv(colorLocation, 1, blueColor);
+
         glDrawArrays(GL_LINES, 0, 2);
 
 
