@@ -335,26 +335,13 @@ int main(int argc, char*argv[])
         }
 
         // perspective Transform
-        if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
-        {
             glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f),  // field of view in degrees
                 1024.0f / 768.0f,      // aspect ratio
                 0.01f, 1000.0f);       // near and far (near > 0)
 
             GLuint projectionMatrixLocation = glGetUniformLocation(shaderProgram, "projectionMatrix");
             glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, &projectionMatrix[0][0]);
-        }
-        // orthographic
-        if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
-        {
-            glm::mat4 projectionMatrix = glm::ortho(-4.0f, 4.0f,    // left/right
-                -3.0f, 3.0f,    // bottom/top
-                -100.0f, 100.0f);  // near/far (near == 0 is ok for ortho)
-
-            GLuint projectionMatrixLocation = glGetUniformLocation(shaderProgram, "projectionMatrix");
-            glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, &projectionMatrix[0][0]);
-        }
-        
+   
     }
     
     // Shutdown GLFWhh
