@@ -20,6 +20,18 @@
 #include <glm/gtc/matrix_transform.hpp> // include this to create transformation matrices
 
 
+// Global variables
+float lastX = 0, lastY = 0;
+float deltaX = 0;       //represents the change in X and Y since last mouse event
+float deltaY = 0;
+float fov = 45.0f;
+
+
+// Mouse callback
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+
+
 const char* getVertexShaderSource()
 {
     // For now, you use a string for your shader code, in the assignment, shaders will be stored in .glsl files
@@ -185,7 +197,12 @@ int main(int argc, char*argv[])
         return -1;
     }
     glfwMakeContextCurrent(window);
-    
+
+    // Setting mouse cursor as input mode
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
+
 
     // Initialize GLEW
     glewExperimental = true; // Needed for core profile
@@ -301,6 +318,7 @@ int main(int argc, char*argv[])
         }
 
         // View Transform
+      
         // right
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         {
@@ -354,13 +372,51 @@ int main(int argc, char*argv[])
         }
 
         // perspective Transform
-            glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f),  // field of view in degrees
-                1024.0f / 768.0f,      // aspect ratio
-                0.01f, 1000.0f);       // near and far (near > 0)
+        glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f),  // field of view in degrees
+            1024.0f / 768.0f,      // aspect ratio
+            0.01f, 1000.0f);       // near and far (near > 0)
 
+        GLuint projectionMatrixLocation = glGetUniformLocation(shaderProgram, "projectionMatrix");
+        glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, &projectionMatrix[0][0]);
+   
+                
+
+
+        //need to change to right mouse btn
+        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) // pan the camera in x axis
+        {
+            
+            eyePosition += glm::vec3(deltaX, 0.0f, 0.0f);
+            glm::mat4 viewMatrix = glm::lookAt(
+                (eyePosition),  // eye
+                glm::vec3(0.0f, 0.0f, 0.0f),    //center
+                glm::vec3(0.0f, 1.0f, 0.0f));   // up
+
+            GLuint viewMatrixLocation = glGetUniformLocation(shaderProgram, "viewMatrix");
+            glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
+        }
+
+        //need to change to middle mouse btn
+        if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS) // tilt the camera in y axis
+        {
+            eyePosition += glm::vec3(0.0f, deltaY, 0.0f);
+            glm::mat4 viewMatrix = glm::lookAt(
+                (eyePosition),  // eye
+                glm::vec3(0.0f, 0.0f, 0.0f),    //center
+                glm::vec3(0.0f, 1.0f, 0.0f));// up
+
+            GLuint viewMatrixLocation = glGetUniformLocation(shaderProgram, "viewMatrix");
+            glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
+        }
+
+       
+        //need to change to left mouse btn
+        if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) // zoom in zoom out
+        {
+            glm::mat4 projectionMatrix = glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.1f, 100.0f);
             GLuint projectionMatrixLocation = glGetUniformLocation(shaderProgram, "projectionMatrix");
             glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, &projectionMatrix[0][0]);
-   
+        }
     }
     
     // Shutdown GLFWhh
@@ -368,3 +424,46 @@ int main(int argc, char*argv[])
     
     return 0;
 }
+
+
+
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    deltaX = xpos - lastX;
+    deltaY = lastY - ypos;
+    lastX = xpos;
+    lastY = ypos;
+
+    float sensitivity = 0.1f;
+    deltaX *= sensitivity;
+    deltaY *= sensitivity;
+}
+
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    fov -= (float)yoffset;
+
+    if (fov < 1.0f)
+        fov = 1.0f;
+}
+
+
+
+
+
+
+
+/*
+            eyePosition = glm::vec3(deltaX, 0.0f,0.0f);
+
+            glm::mat4 viewMatrix = glm::lookAt(
+                eyePosition,  // eye
+                eyePosition+glm::vec3(0.0f, 0.0f, -1.0f),    //center
+                glm::vec3(0.0f, 1.0f, 0.0f));   // up
+
+
+            GLuint viewMatrixLocation = glGetUniformLocation(shaderProgram, "viewMatrix");
+            glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
+            */
