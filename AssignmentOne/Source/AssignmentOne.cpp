@@ -413,7 +413,8 @@ int main(int argc, char*argv[])
         //need to change to left mouse btn
         if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) // zoom in zoom out
         {
-            glm::mat4 projectionMatrix = glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.1f, 100.0f);
+            glm::mat4 projectionMatrix = glm::perspective(glm::radians(fov), 1024.0f / 768.0f, 0.1f, 100.0f);
+            
             GLuint projectionMatrixLocation = glGetUniformLocation(shaderProgram, "projectionMatrix");
             glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, &projectionMatrix[0][0]);
         }
