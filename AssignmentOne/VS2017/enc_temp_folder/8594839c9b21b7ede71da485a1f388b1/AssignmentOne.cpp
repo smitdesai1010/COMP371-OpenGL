@@ -404,6 +404,12 @@ int main(int argc, char*argv[])
                     glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
                     glDrawArrays(GL_TRIANGLES, 0, 36);
                 }
+                glUniform4fv(colorLocation, 1, purpleColor);
+                translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(i, 0.0f, k));
+                worldMatrix = translationMatrix;
+                glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+                glDrawArrays(GL_TRIANGLES, 0, 36);
+
             }
         }
 
