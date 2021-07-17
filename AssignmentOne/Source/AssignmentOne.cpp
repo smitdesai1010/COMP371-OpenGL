@@ -387,8 +387,8 @@ int main(int argc, char*argv[])
         
         glDrawArrays(GL_TRIANGLES, 0, 36);*/
 
-        glm::vec3 baseVector = { 0.0f, 0.0f, 0.0f};
-        float x = 48.0f, z=46.0f;
+        glm::vec3 baseVector = { 48.0f, 0.0f, 46.0f};
+        float x = 0.0f, z = 0.0f;
         baseVector = baseVector + glm::vec3(x, 0.0f, z);
 
         //Draw Object
@@ -447,16 +447,16 @@ int main(int argc, char*argv[])
 
        //sprint movement and default speed
         if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-            speed = 0.5f;
+            speed = 0.8f;
         }
         else {
-            speed = 0.25f;
+            speed = 0.4f;
         }
 
         // View Transform
       
         // right
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
         {
             eyePosition += glm::vec3(speed, 0.0f, 0.0f);
             glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
@@ -468,7 +468,7 @@ int main(int argc, char*argv[])
             glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
         }
         // left
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) // shift camera to the left
+        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) // shift camera to the left
         {
                 eyePosition += glm::vec3(-speed, 0.0f, 0.0f);
                 glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
@@ -481,7 +481,7 @@ int main(int argc, char*argv[])
             glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
         }
         // forwards
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
         {
             eyePosition += glm::vec3(0.0f, 0.0f, -speed);
             glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
@@ -493,7 +493,7 @@ int main(int argc, char*argv[])
             glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
         }
         // backwards
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) // shift camera to the left
+        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) // shift camera to the left
         {
             eyePosition += glm::vec3(0.0f, 0.0f, speed);
             glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
@@ -508,7 +508,7 @@ int main(int argc, char*argv[])
         }
 
         // perspective Transform
-        glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f),  // field of view in degrees
+        glm::mat4 projectionMatrix = glm::perspective(glm::radians(fov),  // field of view in degrees
             1024.0f / 768.0f,      // aspect ratio
             0.01f, 1000.0f);       // near and far (near > 0)
 
@@ -516,7 +516,6 @@ int main(int argc, char*argv[])
         glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, &projectionMatrix[0][0]);
    
                 
-
 
         //need to change to right mouse btn
         if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) // pan the camera in x axis
@@ -544,16 +543,6 @@ int main(int argc, char*argv[])
             GLuint viewMatrixLocation = glGetUniformLocation(shaderProgram, "viewMatrix");
             glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
         }
-
-       
-        //need to change to left mouse btn
-        if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) // zoom in zoom out
-        {
-            glm::mat4 projectionMatrix = glm::perspective(glm::radians(fov), 1024.0f / 768.0f, 0.1f, 1000.0f);
-            
-            GLuint projectionMatrixLocation = glGetUniformLocation(shaderProgram, "projectionMatrix");
-            glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, &projectionMatrix[0][0]);
-        }
     }
     
     // Shutdown GLFWhh
@@ -572,7 +561,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     lastX = xpos;
     lastY = ypos;
 
-    float sensitivity = 0.1f;
+    float sensitivity = 0.3f;
     deltaX *= sensitivity;
     deltaY *= sensitivity;
 }
@@ -580,9 +569,12 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    fov -= (float)yoffset;
+    if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) // zoom in zoom out
+    {
+        fov -= (float)yoffset;
 
-    if (fov < 1.0f)
-        fov = 1.0f;
+        if (fov < 1.0f)
+            fov = 1.0f;
+    }
 }
 
