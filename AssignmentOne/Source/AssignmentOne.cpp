@@ -385,14 +385,18 @@ int main(int argc, char*argv[])
         
 
         
-        //Draw Cube
+
+
+        //Draw Object
         glUseProgram(shaderProgram);
         glBindVertexArray(vaoCube);
 
         glm::vec3 baseVector = { 48.0f, 0.0f, 46.0f};
         baseVector = baseVector + glm::vec3(movementOffsetX[0], 0.0f, movementOffsetZ[0]);
 
-        //Draw Object
+        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[0], scalingOffset[0], scalingOffset[0]));
+        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffset[0]), glm::vec3(0.0f, 1.0f, 0.0f));
+
         for (int k = -3; k <= 3; k++)
         {
             for (int i = -2; i <= 2; i++)
@@ -401,7 +405,9 @@ int main(int argc, char*argv[])
                 {
                     glUniform4fv(colorLocation, 1, whiteColor);
                     translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(i, j, k));
-                    worldMatrix = translationMatrix;
+
+                    worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
+
                     glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
                     glDrawArrays(GL_TRIANGLES, 0, 36);
                 }
@@ -413,7 +419,7 @@ int main(int argc, char*argv[])
                     glUniform4fv(colorLocation, 1, blueColor);
                 }
                 translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(i, 2.0f, k));
-                worldMatrix = translationMatrix;
+                worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
                 glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
                 glDrawArrays(GL_TRIANGLES, 0, 36);
             }
