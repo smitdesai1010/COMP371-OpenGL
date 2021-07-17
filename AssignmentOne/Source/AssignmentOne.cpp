@@ -302,6 +302,13 @@ int main(int argc, char*argv[])
 
     //speed of movement initialisation
     float speed;
+
+    //Offset Declaration
+    float movementOffsetX[4] = { 0.0f };
+    float movementOffsetZ[4] = { 0.0f };
+    float rotationOffset[4] = { 45.0f };
+    float scalingOffset[4] = { 1.0f };
+
     // Entering Main Loop
     while(!glfwWindowShouldClose(window))
     {
@@ -381,15 +388,9 @@ int main(int argc, char*argv[])
         //Draw Cube
         glUseProgram(shaderProgram);
         glBindVertexArray(vaoCube);
-        /*scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
-        worldMatrix = scalingMatrix;
-        glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-        
-        glDrawArrays(GL_TRIANGLES, 0, 36);*/
 
         glm::vec3 baseVector = { 48.0f, 0.0f, 46.0f};
-        float x = 0.0f, z = 0.0f;
-        baseVector = baseVector + glm::vec3(x, 0.0f, z);
+        baseVector = baseVector + glm::vec3(movementOffsetX[0], 0.0f, movementOffsetZ[0]);
 
         //Draw Object
         for (int k = -3; k <= 3; k++)
