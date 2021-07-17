@@ -388,7 +388,7 @@ int main(int argc, char*argv[])
         glDrawArrays(GL_TRIANGLES, 0, 36);*/
 
         glm::vec3 baseVector = { 0.0f, 0.0f, 0.0f};
-        float x = 20.0f, z=30.0f;
+        float x = 48.0f, z=46.0f;
         baseVector = baseVector + glm::vec3(x, 0.0f, z);
 
         //Draw Object
@@ -404,8 +404,30 @@ int main(int argc, char*argv[])
                     glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
                     glDrawArrays(GL_TRIANGLES, 0, 36);
                 }
+                
+                if (k % 2 == 0) {
+                    glUniform4fv(colorLocation, 1, purpleColor);
+                }
+                else {
+                    glUniform4fv(colorLocation, 1, blueColor);
+                }
+                translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(i, 2.0f, k));
+                worldMatrix = translationMatrix;
+                glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+                glDrawArrays(GL_TRIANGLES, 0, 36);
             }
         }
+        for (int i = -2; i <= 2; i++)
+        {
+            if (i % 2 == 0) {
+                glUniform4fv(colorLocation, 1, redColor);
+                translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(i, 3.0f, 0.0f));
+                worldMatrix = translationMatrix;
+                glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+                glDrawArrays(GL_TRIANGLES, 0, 36);
+            }
+        }
+        
 
         
 
