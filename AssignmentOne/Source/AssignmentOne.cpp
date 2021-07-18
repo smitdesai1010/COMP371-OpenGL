@@ -8,7 +8,7 @@
 // - https://learnopengl.com/Getting-started/Hello-Triangle
 
 #include <iostream>
-
+#include<math.h>
 
 #define GLEW_STATIC 1   // This allows linking with Static Library on Windows, without DLL
 #include <GL/glew.h>    // Include GLEW - OpenGL Extension Wrangler
@@ -32,7 +32,7 @@ float speed;
 //Object - Offset Declaration
 float movementOffsetX[4] = { 0.0f };
 float movementOffsetZ[4] = { 0.0f };
-float rotationOffset[4] = { 45.0f };
+float rotationOffset[4] = { 0.0f };
 float scalingOffset[4] = { 1.0f };
 int currObject = 0;     // 0 index mapping
 
@@ -387,63 +387,187 @@ int main(int argc, char*argv[])
         glDrawArrays(GL_LINES, 0, 2);
 
 
-
         glBindVertexArray(0);
         
 
         
-
-
-        //Draw Object
+        //Draw Objects
         glUseProgram(shaderProgram);
         glBindVertexArray(vaoCube);
-
-
-        //Object-1
-        glm::vec3 baseVector = { 48.0f, 0.0f, 46.0f};
-        baseVector = baseVector + glm::vec3(movementOffsetX[0], 0.0f, movementOffsetZ[0]);
 
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[0], scalingOffset[0], scalingOffset[0]));
         rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffset[0]), glm::vec3(0.0f, 1.0f, 0.0f));
 
-        for (int k = -3; k <= 3; k++)
+        //Object-1
+        glm::vec3 baseVector = { 49.5f, 0.0f, 49.5f };
+        baseVector = baseVector + glm::vec3(movementOffsetX[0], 0.0f, movementOffsetZ[0]);
+ 
+        for (int j = 0; j < 4; j++)
         {
-            for (int i = -2; i <= 2; i++)
+            for (int i = 0; i < 4; i++)
             {
-                for (int j = -1; j <= 1; j++)
-                {
-                    glUniform4fv(colorLocation, 1, whiteColor);
-                    translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(i, j, k));
-
-                    worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
-
-                    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-                    glDrawArrays(GL_TRIANGLES, 0, 36);
-                }
+                int x = 0, y = 0, z = 0;
                 
-                if (k % 2 == 0) {
-                    glUniform4fv(colorLocation, 1, purpleColor);
+                if (j == 0) {
+                    x = i;
                 }
-                else {
-                    glUniform4fv(colorLocation, 1, blueColor);
+                else if (j == 1) {
+                    y = i;
                 }
-                translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(i, 2.0f, k));
+                else if (j == 2) {
+                    z = i;
+                }
+                else if (j == 3) {
+                    y = 3;
+                    x = i;
+                    z = i;
+                }
+
+                translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(0.0f - x, 0.0f + y, 0.0f - z));
                 worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
                 glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+                glUniform4fv(colorLocation, 1, whiteColor);
                 glDrawArrays(GL_TRIANGLES, 0, 36);
             }
         }
-        for (int i = -2; i <= 2; i++)
-        {
-            if (i % 2 == 0) {
-                glUniform4fv(colorLocation, 1, redColor);
-                translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(i, 3.0f, 0.0f));
-                worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;;
+
+        for (int i = 0; i < 5; i++) {
+            translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(-4.0f, 0.0f + i, 0.0f));
+            worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
+            glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+            glUniform4fv(colorLocation, 1, whiteColor);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+
+        
+        //Object-2
+        baseVector = { 49.5f, 0.0f, -49.5f };
+        baseVector = baseVector + glm::vec3(movementOffsetX[1], 0.0f, movementOffsetZ[1]);
+
+        for (int j = 0; j < 4; j++) {
+            for (int i = 0; i < 4; i++) {
+
+                int x = 0, y = 0, z = 0;
+                
+                if (j == 0) {
+                    z = i;
+                }
+                else if (j == 1) {
+                    y = i;
+                    z = 2;
+                }
+                else if (j == 2) {
+                    x = i;
+                    y = 2;
+                    z = 2;
+                }
+                else if (j == 3) {
+                    x = 2;
+                    y = 2 - i;
+                    z = 2;
+                }
+
+                translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(0.0f + x, 0.0f + y, 0.0f + z));
+                worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
                 glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+                glUniform4fv(colorLocation, 1, whiteColor);
                 glDrawArrays(GL_TRIANGLES, 0, 36);
+            }
+        }
+
+        translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(3.0f, 3.0f, 2.0f));
+        worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
+        glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+        glUniform4fv(colorLocation, 1, whiteColor);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
+        //Object-3
+        baseVector = { -47.5f, 0.0f, 47.5f };
+        baseVector = baseVector + glm::vec3(movementOffsetX[2], 0.0f, movementOffsetZ[2]);
+
+        int k = 1;
+        for (int j = 0; j < 2; j++)
+        {
+            for (int i = -2; i <= 2; i++) {
+                translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(0.0f + i*k, 0.0f, 0.0f - i));
+                worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
+                glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+                glUniform4fv(colorLocation, 1, whiteColor);
+                glDrawArrays(GL_TRIANGLES, 0, 36);
+            }
+            k = -1;
+        }
+
+        for (int i = -1; i < 3; i++) {
+            translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(0.0f, 0.0f + i, 0.0f));
+            worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
+            glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+            glUniform4fv(colorLocation, 1, whiteColor);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+
+        int x3 = 1, z3 = 1;
+        for (int i = 0; i < 3; i++) {
+
+            if (i > 0 && i % 2 == 1)
+            {
+                x3 *= -1;
+            }
+            else if (i > 0 && i % 2 == 0) {
+                z3 *= -1;
+            }
+
+            translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(0.0f + x3, 0.0f + 1, 0.0f + z3));
+            worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
+            glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+            glUniform4fv(colorLocation, 1, whiteColor);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+
+        //Object-4
+        baseVector = { -0.5f, 0.0f, -0.5f };
+        baseVector = baseVector + glm::vec3(movementOffsetX[3], 0.0f, movementOffsetZ[3]);
+
+        for (int j = 0; j < 3; j++)
+        {
+            for (int i = -2; i <= 2; i++) {
+                if (abs(i % 2 == 0)) {
+                    translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(0.0f + i, 0.0f, 0.0f + j));
+                    worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
+                    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+                    glUniform4fv(colorLocation, 1, whiteColor);
+                    glDrawArrays(GL_TRIANGLES, 0, 36);
+                }
             }
         }
         
+        for (int j = 0; j < 2; j++)
+        {
+            for (int i = -2; i <= 2; i++) {
+                if (abs(i % 2) == 1) {
+                    translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(0.0f + i, 1.0f, 0.0f + j));
+                    worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
+                    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+                    glUniform4fv(colorLocation, 1, whiteColor);
+                    glDrawArrays(GL_TRIANGLES, 0, 36);
+                }
+            }
+        }
+
+            
+        translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(0.0f, 2.0f, 0.0f));
+        worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
+        glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+        glUniform4fv(colorLocation, 1, whiteColor);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        
+    
+     
+
+
+        glBindVertexArray(0);
+
         // End Frame
         glfwSwapBuffers(window);
         glfwPollEvents();
