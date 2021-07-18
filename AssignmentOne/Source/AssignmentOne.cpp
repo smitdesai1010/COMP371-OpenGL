@@ -814,10 +814,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 
     //scaling
-    else if (key == GLFW_KEY_U && action == GLFW_PRESS)
+    else if (key == GLFW_KEY_N && action == GLFW_PRESS)
         scalingOffset[currObject] += 0.25;
 
-    else if (key == GLFW_KEY_J && action == GLFW_PRESS)
+    else if (key == GLFW_KEY_M && action == GLFW_PRESS)
         scalingOffset[currObject] = scalingOffset[currObject] > 0.25 ? scalingOffset[currObject] - 0.25 : 0.25;
 
 
