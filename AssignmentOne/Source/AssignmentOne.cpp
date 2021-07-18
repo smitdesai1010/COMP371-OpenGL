@@ -845,6 +845,14 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
     else if (key == GLFW_KEY_B && action == GLFW_PRESS)
         rotationOffsetZ[currObject] -= 20;
+
+
+    else if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+    {
+        movementOffsetX[currObject] = 0;
+        movementOffsetY[currObject] = 0;
+        movementOffsetZ[currObject] = 0;
+    }
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
