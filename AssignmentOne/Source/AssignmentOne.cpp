@@ -8,11 +8,11 @@
 // - https://learnopengl.com/Getting-started/Hello-Triangle
 
 #include <iostream>
-<<<<<<< HEAD
+
 #include <cmath>
-=======
+
 #include<math.h>
->>>>>>> main
+
 
 #define GLEW_STATIC 1   // This allows linking with Static Library on Windows, without DLL
 #include <GL/glew.h>    // Include GLEW - OpenGL Extension Wrangler
@@ -326,13 +326,13 @@ int main(int argc, char*argv[])
     glm::vec3 eyePosition = glm::vec3(0.0f, 40.0f, 0.0f);
     glm::vec3 focalPoint = glm::vec3(0.0f, 0.0f, 0.0f);
 
-<<<<<<< HEAD
+//<<<<<<< HEAD
     //speed of movement initialisation
     float speed;
     float goesUp = 0;
     float goesUpTwo = 0;
-=======
->>>>>>> main
+//=======
+//>>>>>>> main
     // Entering Main Loop
     while(!glfwWindowShouldClose(window))
     {
@@ -409,8 +409,6 @@ int main(int argc, char*argv[])
         glUseProgram(shaderProgram);
         glBindVertexArray(vaoCube);
 
-        
-
         //Object-1
         glm::vec3 baseVector = { 49.5f, 0.0f, 49.5f };
         baseVector = baseVector + glm::vec3(movementOffsetX[0], movementOffsetY[0], movementOffsetZ[0]);
@@ -457,7 +455,6 @@ int main(int argc, char*argv[])
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
 
-        
         //Object-2
         baseVector = { 49.5f, 0.0f, -49.5f };
         baseVector = baseVector + glm::vec3(movementOffsetX[1], movementOffsetY[1], movementOffsetZ[1]);
@@ -503,7 +500,6 @@ int main(int argc, char*argv[])
         glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
         glUniform4fv(colorLocation, 1, whiteColor);
         glDrawArrays(GL_TRIANGLES, 0, 36);
-
 
         //Object-3
         baseVector = { -47.5f, 0.0f, 47.5f };
@@ -587,18 +583,13 @@ int main(int argc, char*argv[])
                 }
             }
         }
-
-            
+      
         translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(0.0f, 2.0f, 0.0f));
         worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
         glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
         glUniform4fv(colorLocation, 1, whiteColor);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         
-    
-     
-
-
         glBindVertexArray(0);
 
         // End Frame
@@ -610,10 +601,6 @@ int main(int argc, char*argv[])
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, true);
 
-       
-
-
-
         // WORLD-CAMERA INTERACTION
         
         //sprint movement and default speed
@@ -624,63 +611,7 @@ int main(int argc, char*argv[])
             speed = 0.4f;
         }
 
-        // right
-        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-        {
-            eyePosition += glm::vec3(speed, 0.0f, 0.0f);
-            glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
-                eyePosition + glm::vec3(0.0f, -0.5f, -1.0f),  // center
-                //glm::vec3(0.0f, 0.0f, 0.0f),
-                glm::vec3(0.0f, 1.0f, 0.0f));// up
-
-            GLuint viewMatrixLocation = glGetUniformLocation(shaderProgram, "viewMatrix");
-            glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
-        }
-        // left
-        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) // shift camera to the left
-        {
-                eyePosition += glm::vec3(-speed, 0.0f, 0.0f);
-                glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
-                eyePosition + glm::vec3(0.0f, -0.5f, -1.0f),  // center
-                //glm::vec3(0.0f, 0.0f, 0.0f),
-                glm::vec3(0.0f, 1.0f, 0.0f));// up
-                
-
-            GLuint viewMatrixLocation = glGetUniformLocation(shaderProgram, "viewMatrix");
-            glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
-        }
-        // forwards
-        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-        {
-            eyePosition += glm::vec3(0.0f, 0.0f, -speed);
-            glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
-                eyePosition + glm::vec3(0.0f, -0.5f, -1.0f),  // center
-                //glm::vec3(0.0f, 0.0f, 0.0f),
-                glm::vec3(0.0f, 1.0f, 0.0f));// up
-
-            GLuint viewMatrixLocation = glGetUniformLocation(shaderProgram, "viewMatrix");
-            glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
-        }
-        // backwards
-<<<<<<< HEAD
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-=======
-        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) // shift camera to the left
->>>>>>> main
-        {
-            eyePosition += glm::vec3(0.0f, 0.0f, speed);
-            glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
-
-                focalPoint + glm::vec3(0.0f, -0.5f, 0.0f),  // center
-                //glm::vec3(0.0f, 0.0f, 0.0f),
-                glm::vec3(0.0f, 1.0f, 0.0f));// upad
-
-
-            GLuint viewMatrixLocation = glGetUniformLocation(shaderProgram, "viewMatrix");
-            glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
-        }
-
-        //implemetn arrowkeys to rotate around focal point( most likel;y object)
+  
            // backwards
         if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
         {
@@ -736,9 +667,6 @@ int main(int argc, char*argv[])
             GLuint viewMatrixLocation = glGetUniformLocation(shaderProgram, "viewMatrix");
             glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
         }
-
-        
-                
 
         //need to change to right mouse btn
         if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) // pan the camera in x axis
