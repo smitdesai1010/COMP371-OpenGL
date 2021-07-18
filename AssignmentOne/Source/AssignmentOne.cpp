@@ -8,7 +8,11 @@
 // - https://learnopengl.com/Getting-started/Hello-Triangle
 
 #include <iostream>
+<<<<<<< HEAD
 #include <cmath>
+=======
+#include<math.h>
+>>>>>>> main
 
 #define GLEW_STATIC 1   // This allows linking with Static Library on Windows, without DLL
 #include <GL/glew.h>    // Include GLEW - OpenGL Extension Wrangler
@@ -20,16 +24,40 @@
 #include <glm/gtc/matrix_transform.hpp> // include this to create transformation matrices
 
 
-// Global variables
+// Cursor coordinates
 float lastX = 0, lastY = 0;
 float deltaX = 0;       //represents the change in X and Y since last mouse event
 float deltaY = 0;
 float fov = 45.0f;
 
+//speed of camera movement initialisation
+float speed;
 
-// Mouse callback
+//Object - Offset Declaration
+float movementOffsetX[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+float movementOffsetY[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+float movementOffsetZ[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+float rotationOffsetX[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+float rotationOffsetY[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+float rotationOffsetZ[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+
+float scalingOffset[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+int currObject = 0;     // 0 index mapping
+
+
+
+//Colors
+GLfloat redColor[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
+GLfloat greenColor[4] = { 0.0f, 1.0f, 0.0f, 1.0f };
+GLfloat blueColor[4] = { 0.0f, 0.0f, 1.0f, 1.0f };
+GLfloat whiteColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+GLfloat purpleColor[4] = { 1.0f, 0.0f, 1.0f, 1.0f };
+
+
+// Input callback
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 
 const char* getVertexShaderSource()
@@ -52,8 +80,6 @@ const char* getVertexShaderSource()
                 "   gl_Position = modelViewProjection * vec4(aPos.x, aPos.y, aPos.z, 1.0);"
                 "}";
 }
-
-
 const char* getFragmentShaderSource()
 {
     return
@@ -69,7 +95,6 @@ const char* getFragmentShaderSource()
 
     
 }
-//vec4(vertexColor.r, vertexColor.g, vertexColor.b, 1.0f);
 int compileAndLinkShaders()
 {
     // compile and link shader program
@@ -124,8 +149,7 @@ int compileAndLinkShaders()
     
     return shaderProgram;
 }
-
-int createVertexArrayObject()
+int createGridLineVertexArrayObject()
 {
     glm::vec3 vertexArrayLine[] = {
     glm::vec3(0.0f,  0.0f, 0.0f),  // one side
@@ -170,8 +194,7 @@ int createVertexArrayObject()
 
   return vertexArrayObject;
 }
-
-int createCubeVertexArrayObject(/*float x, float y, float z, float r, float g, float b*/)
+int createCubeVertexArrayObject()
 {
 
     GLfloat vertexArray[] = {
@@ -271,7 +294,9 @@ int main(int argc, char*argv[])
     }
     glfwMakeContextCurrent(window);
 
-    // Setting mouse cursor as input mode
+
+    // Setting input callbacks
+    glfwSetKeyCallback(window, key_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
@@ -292,7 +317,7 @@ int main(int argc, char*argv[])
     int shaderProgram = compileAndLinkShaders();
     
     // Define and upload geometry to the GPU here ...
-    int vao = createVertexArrayObject();
+    int vaoGridLine = createGridLineVertexArrayObject();
     int vaoCube = createCubeVertexArrayObject();
 
     
@@ -301,28 +326,35 @@ int main(int argc, char*argv[])
     glm::vec3 eyePosition = glm::vec3(0.0f, 40.0f, 0.0f);
     glm::vec3 focalPoint = glm::vec3(0.0f, 0.0f, 0.0f);
 
+<<<<<<< HEAD
     //speed of movement initialisation
     float speed;
     float goesUp = 0;
     float goesUpTwo = 0;
+=======
+>>>>>>> main
     // Entering Main Loop
     while(!glfwWindowShouldClose(window))
     {
         // Each frame, reset color of each pixel to glClearColor
         glClear(GL_COLOR_BUFFER_BIT);
         
-        GLfloat redColor[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
-        GLfloat greenColor[4] = { 0.0f, 1.0f, 0.0f, 1.0f };
-        GLfloat blueColor[4] = { 0.0f, 0.0f, 1.0f, 1.0f };
-        GLfloat whiteColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-        GLfloat purpleColor[4] = { 1.0f, 0.0f, 1.0f, 1.0f };
+        // perspective Transform
+        glm::mat4 projectionMatrix = glm::perspective(glm::radians(fov),  // field of view in degrees
+            1024.0f / 768.0f,      // aspect ratio
+            0.01f, 1000.0f);       // near and far (near > 0)
 
-        // Draw geometry
+        GLuint projectionMatrixLocation = glGetUniformLocation(shaderProgram, "projectionMatrix");
+        glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, &projectionMatrix[0][0]);
+
+
+
+        // Draw Grid
         glUseProgram(shaderProgram);
         GLuint worldMatrixLocation = glGetUniformLocation(shaderProgram, "worldMatrix");
         GLuint colorLocation = glGetUniformLocation(shaderProgram, "Color");
 
-        glBindVertexArray(vao);
+        glBindVertexArray(vaoGridLine);
         glm::mat4 scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
         glUniform4fv(colorLocation, 1, greenColor);
 
@@ -348,118 +380,252 @@ int main(int argc, char*argv[])
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.05f, 1.0f, 1.0f));
         rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(-1.0f, 0.0f, 0.0f));
         glm::mat4 worldMatrix = scalingMatrix * rotationMatrix;
-
         glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-
-        glUniform4fv(colorLocation, 1, greenColor);
-
+        glUniform4fv(colorLocation, 1, whiteColor);
         glDrawArrays(GL_LINES, 0, 2);
         
         // + z bar
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 0.05f));
         rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         worldMatrix = scalingMatrix * rotationMatrix;
-
         glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-
         glUniform4fv(colorLocation, 1, redColor);
-
         glDrawArrays(GL_LINES, 0, 2);
       
         // + y bar
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 0.05f, 1.0f));
         rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
         worldMatrix = scalingMatrix * rotationMatrix;
-
         glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-
         glUniform4fv(colorLocation, 1, blueColor);
-
         glDrawArrays(GL_LINES, 0, 2);
+
 
         glBindVertexArray(0);
         
 
         
-        //Draw Cube
+        //Draw Objects
         glUseProgram(shaderProgram);
         glBindVertexArray(vaoCube);
-        /*scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
-        worldMatrix = scalingMatrix;
-        glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+
         
-        glDrawArrays(GL_TRIANGLES, 0, 36);*/
 
-        glm::vec3 baseVector = { 0.0f, 0.0f, 0.0f};
-        float x = 48.0f, z=46.0f;
-        baseVector = baseVector + glm::vec3(x, 0.0f, z);
+        //Object-1
+        glm::vec3 baseVector = { 49.5f, 0.0f, 49.5f };
+        baseVector = baseVector + glm::vec3(movementOffsetX[0], movementOffsetY[0], movementOffsetZ[0]);
+        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[0], scalingOffset[0], scalingOffset[0]));
 
-        //Draw Object
-        for (int k = -3; k <= 3; k++)
+        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetX[0]), glm::vec3(1.0f, 0.0f, 0.0f));
+        rotationMatrix += glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetY[0]), glm::vec3(0.0f, 1.0f, 0.0f));
+        rotationMatrix += glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetZ[0]), glm::vec3(0.0f, 0.0f, 1.0f));
+
+        for (int j = 0; j < 4; j++)
         {
-            for (int i = -2; i <= 2; i++)
+            for (int i = 0; i < 4; i++)
             {
-                for (int j = -1; j <= 1; j++)
-                {
-                    glUniform4fv(colorLocation, 1, whiteColor);
-                    translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(i, j, k));
-                    worldMatrix = translationMatrix;
+                int x = 0, y = 0, z = 0;
+                
+                if (j == 0) {
+                    x = i;
+                }
+                else if (j == 1) {
+                    y = i;
+                }
+                else if (j == 2) {
+                    z = i;
+                }
+                else if (j == 3) {
+                    y = 3;
+                    x = i;
+                    z = i;
+                }
+
+                translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(0.0f - x, 0.0f + y, 0.0f - z));
+                worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
+                glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+                glUniform4fv(colorLocation, 1, whiteColor);
+                glDrawArrays(GL_TRIANGLES, 0, 36);
+            }
+        }
+
+        for (int i = 0; i < 5; i++) {
+            translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(-4.0f, 0.0f + i, 0.0f));
+            worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
+            glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+            glUniform4fv(colorLocation, 1, whiteColor);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+
+        
+        //Object-2
+        baseVector = { 49.5f, 0.0f, -49.5f };
+        baseVector = baseVector + glm::vec3(movementOffsetX[1], movementOffsetY[1], movementOffsetZ[1]);
+        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[1], scalingOffset[1], scalingOffset[1]));
+       
+        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetX[1]), glm::vec3(1.0f, 0.0f, 0.0f));
+        rotationMatrix += glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetY[2]), glm::vec3(0.0f, 1.0f, 0.0f));
+        rotationMatrix += glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetZ[3]), glm::vec3(0.0f, 0.0f, 1.0f));
+        
+        for (int j = 0; j < 4; j++) {
+            for (int i = 0; i < 4; i++) {
+
+                int x = 0, y = 0, z = 0;
+                
+                if (j == 0) {
+                    z = i;
+                }
+                else if (j == 1) {
+                    y = i;
+                    z = 2;
+                }
+                else if (j == 2) {
+                    x = i;
+                    y = 2;
+                    z = 2;
+                }
+                else if (j == 3) {
+                    x = 2;
+                    y = 2 - i;
+                    z = 2;
+                }
+
+                translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(0.0f + x, 0.0f + y, 0.0f + z));
+                worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
+                glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+                glUniform4fv(colorLocation, 1, whiteColor);
+                glDrawArrays(GL_TRIANGLES, 0, 36);
+            }
+        }
+
+        translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(3.0f, 3.0f, 2.0f));
+        worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
+        glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+        glUniform4fv(colorLocation, 1, whiteColor);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
+        //Object-3
+        baseVector = { -47.5f, 0.0f, 47.5f };
+        baseVector = baseVector + glm::vec3(movementOffsetX[2], movementOffsetY[2], movementOffsetZ[2]);
+        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[2], scalingOffset[2], scalingOffset[2]));
+
+        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetX[2]), glm::vec3(1.0f, 0.0f, 0.0f));
+        rotationMatrix += glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetY[2]), glm::vec3(0.0f, 1.0f, 0.0f));
+        rotationMatrix += glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetZ[2]), glm::vec3(0.0f, 0.0f, 1.0f));
+
+        int k = 1;
+        for (int j = 0; j < 2; j++)
+        {
+            for (int i = -2; i <= 2; i++) {
+                translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(0.0f + i*k, 0.0f, 0.0f - i));
+                worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
+                glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+                glUniform4fv(colorLocation, 1, whiteColor);
+                glDrawArrays(GL_TRIANGLES, 0, 36);
+            }
+            k = -1;
+        }
+
+        for (int i = -1; i < 3; i++) {
+            translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(0.0f, 0.0f + i, 0.0f));
+            worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
+            glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+            glUniform4fv(colorLocation, 1, whiteColor);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+
+        int x3 = 1, z3 = 1;
+        for (int i = 0; i < 3; i++) {
+
+            if (i > 0 && i % 2 == 1)
+            {
+                x3 *= -1;
+            }
+            else if (i > 0 && i % 2 == 0) {
+                z3 *= -1;
+            }
+
+            translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(0.0f + x3, 0.0f + 1, 0.0f + z3));
+            worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
+            glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+            glUniform4fv(colorLocation, 1, whiteColor);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+
+        //Object-4
+        baseVector = { -0.5f, 0.0f, -0.5f };
+        baseVector = baseVector + glm::vec3(movementOffsetX[3], movementOffsetY[3], movementOffsetZ[3]);
+        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[3], scalingOffset[3], scalingOffset[3]));
+
+        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetX[3]), glm::vec3(1.0f, 0.0f, 0.0f));
+        rotationMatrix += glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetY[3]), glm::vec3(0.0f, 1.0f, 0.0f));
+        rotationMatrix += glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetZ[3]), glm::vec3(0.0f, 0.0f, 1.0f));
+        
+        for (int j = 0; j < 3; j++)
+        {
+            for (int i = -2; i <= 2; i++) {
+                if (abs(i % 2 == 0)) {
+                    translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(0.0f + i, 0.0f, 0.0f + j));
+                    worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
                     glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+                    glUniform4fv(colorLocation, 1, whiteColor);
                     glDrawArrays(GL_TRIANGLES, 0, 36);
                 }
-                
-                if (k % 2 == 0) {
-                    glUniform4fv(colorLocation, 1, purpleColor);
-                }
-                else {
-                    glUniform4fv(colorLocation, 1, blueColor);
-                }
-                translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(i, 2.0f, k));
-                worldMatrix = translationMatrix;
-                glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-                glDrawArrays(GL_TRIANGLES, 0, 36);
             }
         }
-        for (int i = -2; i <= 2; i++)
+        
+        for (int j = 0; j < 2; j++)
         {
-            if (i % 2 == 0) {
-                glUniform4fv(colorLocation, 1, redColor);
-                translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(i, 3.0f, 0.0f));
-                worldMatrix = translationMatrix;
-                glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-                glDrawArrays(GL_TRIANGLES, 0, 36);
+            for (int i = -2; i <= 2; i++) {
+                if (abs(i % 2) == 1) {
+                    translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(0.0f + i, 1.0f, 0.0f + j));
+                    worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
+                    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+                    glUniform4fv(colorLocation, 1, whiteColor);
+                    glDrawArrays(GL_TRIANGLES, 0, 36);
+                }
             }
         }
+
+            
+        translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(0.0f, 2.0f, 0.0f));
+        worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
+        glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+        glUniform4fv(colorLocation, 1, whiteColor);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
         
+    
+     
 
-        
 
-
-        
-
+        glBindVertexArray(0);
 
         // End Frame
         glfwSwapBuffers(window);
         glfwPollEvents();
         
-        //inputs
  
         // close window
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, true);
 
-       //sprint movement and default speed
+       
+
+
+
+        // WORLD-CAMERA INTERACTION
+        
+        //sprint movement and default speed
         if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-            speed = 0.5f;
+            speed = 0.8f;
         }
         else {
-            speed = 0.25f;
+            speed = 0.4f;
         }
 
-        // View Transform
-      
         // right
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
         {
             eyePosition += glm::vec3(speed, 0.0f, 0.0f);
             glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
@@ -471,7 +637,7 @@ int main(int argc, char*argv[])
             glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
         }
         // left
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) // shift camera to the left
+        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) // shift camera to the left
         {
                 eyePosition += glm::vec3(-speed, 0.0f, 0.0f);
                 glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
@@ -484,7 +650,7 @@ int main(int argc, char*argv[])
             glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
         }
         // forwards
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
         {
             eyePosition += glm::vec3(0.0f, 0.0f, -speed);
             glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
@@ -496,7 +662,11 @@ int main(int argc, char*argv[])
             glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
         }
         // backwards
+<<<<<<< HEAD
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+=======
+        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) // shift camera to the left
+>>>>>>> main
         {
             eyePosition += glm::vec3(0.0f, 0.0f, speed);
             glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
@@ -567,21 +737,12 @@ int main(int argc, char*argv[])
             glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
         }
 
-        // perspective Transform
-        glm::mat4 projectionMatrix = glm::perspective(glm::radians(45.0f),  // field of view in degrees
-            1024.0f / 768.0f,      // aspect ratio
-            0.01f, 1000.0f);       // near and far (near > 0)
-
-        GLuint projectionMatrixLocation = glGetUniformLocation(shaderProgram, "projectionMatrix");
-        glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, &projectionMatrix[0][0]);
-   
+        
                 
-
 
         //need to change to right mouse btn
         if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) // pan the camera in x axis
         {
-            
             eyePosition += glm::vec3(deltaX, 0.0f, 0.0f);
             glm::mat4 viewMatrix = glm::lookAt(
                 (eyePosition),  // eye
@@ -605,17 +766,14 @@ int main(int argc, char*argv[])
             glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
         }
 
-       
-        //need to change to left mouse btn
-        if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) // zoom in zoom out
-        {
-            glm::mat4 projectionMatrix = glm::perspective(glm::radians(fov), 1024.0f / 768.0f, 0.1f, 1000.0f);
-            
-            GLuint projectionMatrixLocation = glGetUniformLocation(shaderProgram, "projectionMatrix");
-            glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, &projectionMatrix[0][0]);
-        }
+        //continous translation along z axis
+        if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)       
+            movementOffsetZ[currObject] += 1;
+
+        if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+            movementOffsetZ[currObject] -= 1;
     }
-    
+  
     // Shutdown GLFWhh
     glfwTerminate();
     
@@ -623,7 +781,72 @@ int main(int argc, char*argv[])
 }
 
 
+//The callback will make the object move one unit at one press AND RELEASE
+//it WON'T move continuously till the key is press
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    //object selection
+    if (key == GLFW_KEY_1 && action == GLFW_PRESS)
+        currObject = 0;
 
+    else if (key == GLFW_KEY_2 && action == GLFW_PRESS)
+        currObject = 1;
+
+    else if (key == GLFW_KEY_3 && action == GLFW_PRESS)
+        currObject = 2;
+
+    else if (key == GLFW_KEY_4 && action == GLFW_PRESS)
+        currObject = 3;
+
+
+
+    //scaling
+    else if (key == GLFW_KEY_U && action == GLFW_PRESS)
+        scalingOffset[currObject] += 0.25;
+
+    else if (key == GLFW_KEY_J && action == GLFW_PRESS)
+        scalingOffset[currObject] = scalingOffset[currObject] > 0.25 ? scalingOffset[currObject] - 0.25 : 0.25;
+
+
+    //translation
+    else if (key == GLFW_KEY_W && action == GLFW_PRESS)
+        movementOffsetY[currObject] += 1;
+
+    else if (key == GLFW_KEY_S && action == GLFW_PRESS)
+        movementOffsetY[currObject] -= 1;
+
+    else if (key == GLFW_KEY_D && action == GLFW_PRESS)
+        movementOffsetX[currObject] += 1;
+
+    else if (key == GLFW_KEY_A && action == GLFW_PRESS)
+        movementOffsetX[currObject] -= 1;
+
+    else if (key == GLFW_KEY_Q && action == GLFW_PRESS)
+        movementOffsetZ[currObject] += 1;
+
+    else if (key == GLFW_KEY_E && action == GLFW_PRESS)
+        movementOffsetZ[currObject] -= 1;
+
+
+    //rotation
+    else if (key == GLFW_KEY_R && action == GLFW_PRESS) //x-axis
+        rotationOffsetX[currObject] += 20;
+
+    else if (key == GLFW_KEY_T && action == GLFW_PRESS)
+        rotationOffsetX[currObject] -= 20;
+
+    else if (key == GLFW_KEY_F && action == GLFW_PRESS) //y-axis
+        rotationOffsetY[currObject] += 20;
+
+    else if (key == GLFW_KEY_G && action == GLFW_PRESS)
+        rotationOffsetY[currObject] -= 20;
+
+    else if (key == GLFW_KEY_V && action == GLFW_PRESS) //z-axis
+        rotationOffsetZ[currObject] += 20;
+
+    else if (key == GLFW_KEY_B && action == GLFW_PRESS)
+        rotationOffsetZ[currObject] -= 20;
+}
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
@@ -632,7 +855,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     lastX = xpos;
     lastY = ypos;
 
-    float sensitivity = 0.1f;
+    float sensitivity = 0.3f;
     deltaX *= sensitivity;
     deltaY *= sensitivity;
 }
@@ -640,9 +863,12 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    fov -= (float)yoffset;
+    if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) // zoom in zoom out
+    {
+        fov -= (float)yoffset;
 
-    if (fov < 1.0f)
-        fov = 1.0f;
+        if (fov < 1.0f)
+            fov = 1.0f;
+    }
 }
 
