@@ -693,7 +693,8 @@ int main(int argc, char*argv[])
             glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
         }
 
-        if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+        //continous translation along z axis
+        if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)       
             movementOffsetZ[currObject] += 1;
 
         if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
@@ -755,19 +756,19 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 
     //rotation
-    else if (key == GLFW_KEY_R && action == GLFW_PRESS)
+    else if (key == GLFW_KEY_R && action == GLFW_PRESS) //x-axis
         rotationOffsetX[currObject] += 20;
 
     else if (key == GLFW_KEY_T && action == GLFW_PRESS)
         rotationOffsetX[currObject] -= 20;
 
-    else if (key == GLFW_KEY_F && action == GLFW_PRESS)
+    else if (key == GLFW_KEY_F && action == GLFW_PRESS) //y-axis
         rotationOffsetY[currObject] += 20;
 
     else if (key == GLFW_KEY_G && action == GLFW_PRESS)
         rotationOffsetY[currObject] -= 20;
 
-    else if (key == GLFW_KEY_V && action == GLFW_PRESS)
+    else if (key == GLFW_KEY_V && action == GLFW_PRESS) //z-axis
         rotationOffsetZ[currObject] += 20;
 
     else if (key == GLFW_KEY_B && action == GLFW_PRESS)
