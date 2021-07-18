@@ -30,10 +30,10 @@ float fov = 45.0f;
 float speed;
 
 //Object - Offset Declaration
-float movementOffsetX[4] = { 0.0f };
-float movementOffsetZ[4] = { 0.0f };
-float rotationOffset[4] = { 0.0f };
-float scalingOffset[4] = { 1.0f };
+float movementOffsetX[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+float movementOffsetZ[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+float rotationOffset[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+float scalingOffset[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 int currObject = 0;     // 0 index mapping
 
 
@@ -395,13 +395,14 @@ int main(int argc, char*argv[])
         glUseProgram(shaderProgram);
         glBindVertexArray(vaoCube);
 
-        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[0], scalingOffset[0], scalingOffset[0]));
-        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffset[0]), glm::vec3(0.0f, 1.0f, 0.0f));
+        
 
         //Object-1
         glm::vec3 baseVector = { 49.5f, 0.0f, 49.5f };
         baseVector = baseVector + glm::vec3(movementOffsetX[0], 0.0f, movementOffsetZ[0]);
- 
+        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[0], scalingOffset[0], scalingOffset[0]));
+        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffset[0]), glm::vec3(0.0f, 1.0f, 0.0f));
+
         for (int j = 0; j < 4; j++)
         {
             for (int i = 0; i < 4; i++)
@@ -443,6 +444,8 @@ int main(int argc, char*argv[])
         //Object-2
         baseVector = { 49.5f, 0.0f, -49.5f };
         baseVector = baseVector + glm::vec3(movementOffsetX[1], 0.0f, movementOffsetZ[1]);
+        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[1], scalingOffset[1], scalingOffset[1]));
+        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffset[1]), glm::vec3(0.0f, 1.0f, 0.0f));
 
         for (int j = 0; j < 4; j++) {
             for (int i = 0; i < 4; i++) {
@@ -485,7 +488,8 @@ int main(int argc, char*argv[])
         //Object-3
         baseVector = { -47.5f, 0.0f, 47.5f };
         baseVector = baseVector + glm::vec3(movementOffsetX[2], 0.0f, movementOffsetZ[2]);
-
+        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[2], scalingOffset[2], scalingOffset[2]));
+        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffset[2]), glm::vec3(0.0f, 1.0f, 0.0f));
         int k = 1;
         for (int j = 0; j < 2; j++)
         {
@@ -528,6 +532,8 @@ int main(int argc, char*argv[])
         //Object-4
         baseVector = { -0.5f, 0.0f, -0.5f };
         baseVector = baseVector + glm::vec3(movementOffsetX[3], 0.0f, movementOffsetZ[3]);
+        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[3], scalingOffset[3], scalingOffset[3]));
+        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffset[3]), glm::vec3(0.0f, 1.0f, 0.0f));
 
         for (int j = 0; j < 3; j++)
         {
@@ -701,10 +707,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
     //scaling
     else if (key == GLFW_KEY_U && action == GLFW_PRESS)
-        scalingOffset[currObject] += 1;
+        scalingOffset[currObject] += 0.25;
 
     else if (key == GLFW_KEY_J && action == GLFW_PRESS)
-        scalingOffset[currObject] -= 1;
+        scalingOffset[currObject] = scalingOffset[currObject] > 0.25 ? scalingOffset[currObject] - 0.25 : 0.25;
 
 
     //translation
