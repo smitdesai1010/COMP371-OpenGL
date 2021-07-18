@@ -749,8 +749,9 @@ int main(int argc, char*argv[])
             glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
         }
 
-        //need to change to right mouse btn
-        if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS) // pan the camera in x axis
+
+        // pan the camera in x axis
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) 
         {
             eyePosition += glm::vec3(deltaX, 0.0f, 0.0f);
             glm::mat4 viewMatrix = glm::lookAt(
@@ -762,8 +763,8 @@ int main(int argc, char*argv[])
             glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
         }
 
-        //need to change to middle mouse btn
-        if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS) // tilt the camera in y axis
+        // tilt the camera in y axis
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS)
         {
             //eyePosition += glm::vec3(0.0f, deltaY, 0.0f);
             glm::mat4 viewMatrix = glm::lookAt(
@@ -884,7 +885,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) // zoom in zoom out
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT)) // zoom in zoom out
     {
         fov -= (float)yoffset;
 
