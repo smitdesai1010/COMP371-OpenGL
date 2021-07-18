@@ -332,6 +332,7 @@ int main(int argc, char*argv[])
     float speed;
     float goesUp = 0;
     float goesUpTwo = 0;
+    GLenum render = GL_TRIANGLES;
 //=======
 //>>>>>>> main
     // Entering Main Loop
@@ -459,7 +460,7 @@ int main(int argc, char*argv[])
                 worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
                 glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
                 glUniform4fv(colorLocation, 1, whiteColor);
-                glDrawArrays(GL_TRIANGLES, 0, 36);
+                glDrawArrays(render, 0, 36);
             }
         }
 
@@ -468,7 +469,7 @@ int main(int argc, char*argv[])
             worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
             glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
             glUniform4fv(colorLocation, 1, whiteColor);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+            glDrawArrays(render, 0, 36);
         }
         //wall 2
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
@@ -522,7 +523,7 @@ int main(int argc, char*argv[])
                 worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
                 glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
                 glUniform4fv(colorLocation, 1, whiteColor);
-                glDrawArrays(GL_TRIANGLES, 0, 36);
+                glDrawArrays(render, 0, 36);
             }
         }
 
@@ -530,7 +531,7 @@ int main(int argc, char*argv[])
         worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
         glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
         glUniform4fv(colorLocation, 1, whiteColor);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glDrawArrays(render, 0, 36);
         //wall 3
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
         //rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
@@ -564,7 +565,7 @@ int main(int argc, char*argv[])
                 worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
                 glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
                 glUniform4fv(colorLocation, 1, whiteColor);
-                glDrawArrays(GL_TRIANGLES, 0, 36);
+                glDrawArrays(render, 0, 36);
             }
             k = -1;
         }
@@ -574,7 +575,7 @@ int main(int argc, char*argv[])
             worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
             glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
             glUniform4fv(colorLocation, 1, whiteColor);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+            glDrawArrays(render, 0, 36);
         }
 
         int x3 = 1, z3 = 1;
@@ -592,7 +593,7 @@ int main(int argc, char*argv[])
             worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
             glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
             glUniform4fv(colorLocation, 1, whiteColor);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
+            glDrawArrays(render, 0, 36);
         }
 
         //wall 4
@@ -629,7 +630,7 @@ int main(int argc, char*argv[])
                     worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
                     glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
                     glUniform4fv(colorLocation, 1, whiteColor);
-                    glDrawArrays(GL_TRIANGLES, 0, 36);
+                    glDrawArrays(render, 0, 36);
                 }
             }
         }
@@ -642,7 +643,7 @@ int main(int argc, char*argv[])
                     worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
                     glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
                     glUniform4fv(colorLocation, 1, whiteColor);
-                    glDrawArrays(GL_TRIANGLES, 0, 36);
+                    glDrawArrays(render, 0, 36);
                 }
             }
         }
@@ -651,7 +652,7 @@ int main(int argc, char*argv[])
         worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
         glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
         glUniform4fv(colorLocation, 1, whiteColor);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glDrawArrays(render, 0, 36);
         
    
 
@@ -675,6 +676,19 @@ int main(int argc, char*argv[])
         }
         else {
             speed = 0.4f;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) // pan the camera in x axis
+        {
+            render = GL_POINTS;
+        }
+        if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) // pan the camera in x axis
+        {
+            render = GL_LINES;
+        }
+        if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) // pan the camera in x axis
+        {
+            render = GL_TRIANGLES;
         }
 
   
@@ -736,7 +750,7 @@ int main(int argc, char*argv[])
         }
 
         //need to change to right mouse btn
-        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) // pan the camera in x axis
+        if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS) // pan the camera in x axis
         {
             eyePosition += glm::vec3(deltaX, 0.0f, 0.0f);
             glm::mat4 viewMatrix = glm::lookAt(
