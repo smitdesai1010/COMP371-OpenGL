@@ -8,7 +8,7 @@
 // - https://learnopengl.com/Getting-started/Hello-Triangle
 
 #include <iostream>
-
+#include <cmath>
 
 #define GLEW_STATIC 1   // This allows linking with Static Library on Windows, without DLL
 #include <GL/glew.h>    // Include GLEW - OpenGL Extension Wrangler
@@ -299,9 +299,12 @@ int main(int argc, char*argv[])
     // Enable Backface culling
     glEnable(GL_CULL_FACE);
     glm::vec3 eyePosition = glm::vec3(0.0f, 40.0f, 0.0f);
+    glm::vec3 focalPoint = glm::vec3(0.0f, 0.0f, 0.0f);
 
     //speed of movement initialisation
     float speed;
+    float goesUp = 0;
+    float goesUpTwo = 0;
     // Entering Main Loop
     while(!glfwWindowShouldClose(window))
     {
@@ -460,8 +463,8 @@ int main(int argc, char*argv[])
         {
             eyePosition += glm::vec3(speed, 0.0f, 0.0f);
             glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
-               // eyePosition + glm::vec3(0.0f, -0.5f, -1.0f),  // center
-                glm::vec3(0.0f, 0.0f, 0.0f),
+                eyePosition + glm::vec3(0.0f, -0.5f, -1.0f),  // center
+                //glm::vec3(0.0f, 0.0f, 0.0f),
                 glm::vec3(0.0f, 1.0f, 0.0f));// up
 
             GLuint viewMatrixLocation = glGetUniformLocation(shaderProgram, "viewMatrix");
@@ -472,8 +475,8 @@ int main(int argc, char*argv[])
         {
                 eyePosition += glm::vec3(-speed, 0.0f, 0.0f);
                 glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
-                //    eyePosition + glm::vec3(0.0f, -0.5f, -1.0f),  // center
-                    glm::vec3(0.0f, 0.0f, 0.0f),
+                eyePosition + glm::vec3(0.0f, -0.5f, -1.0f),  // center
+                //glm::vec3(0.0f, 0.0f, 0.0f),
                 glm::vec3(0.0f, 1.0f, 0.0f));// up
                 
 
@@ -485,22 +488,79 @@ int main(int argc, char*argv[])
         {
             eyePosition += glm::vec3(0.0f, 0.0f, -speed);
             glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
-               // eyePosition + glm::vec3(0.0f, -0.5f, -1.0f),  // center
-                glm::vec3(0.0f, 0.0f, 0.0f),
+                eyePosition + glm::vec3(0.0f, -0.5f, -1.0f),  // center
+                //glm::vec3(0.0f, 0.0f, 0.0f),
                 glm::vec3(0.0f, 1.0f, 0.0f));// up
 
             GLuint viewMatrixLocation = glGetUniformLocation(shaderProgram, "viewMatrix");
             glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
         }
         // backwards
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) // shift camera to the left
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
         {
             eyePosition += glm::vec3(0.0f, 0.0f, speed);
             glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
 
-               // eyePosition + glm::vec3(0.0f, -0.5f, -1.0f),  // center
-                glm::vec3(0.0f, 0.0f, 0.0f),
+                focalPoint + glm::vec3(0.0f, -0.5f, 0.0f),  // center
+                //glm::vec3(0.0f, 0.0f, 0.0f),
                 glm::vec3(0.0f, 1.0f, 0.0f));// upad
+
+
+            GLuint viewMatrixLocation = glGetUniformLocation(shaderProgram, "viewMatrix");
+            glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
+        }
+
+        //implemetn arrowkeys to rotate around focal point( most likel;y object)
+           // backwards
+        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+        {
+            goesUp += 0.01;
+            float radius = sqrt(pow((eyePosition - focalPoint).x, 2) + pow((eyePosition - focalPoint).z, 2));
+            eyePosition = glm::vec3(sin(goesUp) * radius  ,eyePosition.y, cos(goesUp) * radius);
+            glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
+                focalPoint,  // center
+                glm::vec3(0.0f, 1.0f, 0.0f));// up
+
+
+            GLuint viewMatrixLocation = glGetUniformLocation(shaderProgram, "viewMatrix");
+            glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+        {
+            goesUp -= 0.01;
+            float radius = sqrt(pow((eyePosition - focalPoint).x, 2) + pow((eyePosition - focalPoint).z, 2));
+            eyePosition = glm::vec3(sin(goesUp) * radius, eyePosition.y, cos(goesUp) * radius);
+            glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
+                focalPoint,  // center
+                glm::vec3(0.0f, 1.0f, 0.0f));// upad
+
+
+            GLuint viewMatrixLocation = glGetUniformLocation(shaderProgram, "viewMatrix");
+            glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+        {
+            goesUpTwo += 0.01;
+            float radius = sqrt(pow((eyePosition - focalPoint).y, 2) + pow((eyePosition - focalPoint).z, 2));
+            eyePosition = glm::vec3(eyePosition.x, cos(goesUpTwo) * radius, -sin(goesUpTwo) * radius);
+            glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
+                focalPoint,  // center
+                glm::vec3(0.0f, 1.0f, 0.0f));// up
+
+
+            GLuint viewMatrixLocation = glGetUniformLocation(shaderProgram, "viewMatrix");
+            glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
+        }
+        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+        {
+            goesUpTwo -= 0.01;
+            float radius = sqrt(pow((eyePosition - focalPoint).y, 2) + pow((eyePosition - focalPoint).z, 2));
+            eyePosition = glm::vec3(eyePosition.x, cos(goesUpTwo) * radius, -sin(goesUpTwo) * radius);
+            glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
+                focalPoint,  // center
+                glm::vec3(0.0f, 1.0f, 0.0f));// up
 
 
             GLuint viewMatrixLocation = glGetUniformLocation(shaderProgram, "viewMatrix");
@@ -535,10 +595,10 @@ int main(int argc, char*argv[])
         //need to change to middle mouse btn
         if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS) // tilt the camera in y axis
         {
-            eyePosition += glm::vec3(0.0f, deltaY, 0.0f);
+            //eyePosition += glm::vec3(0.0f, deltaY, 0.0f);
             glm::mat4 viewMatrix = glm::lookAt(
                 (eyePosition),  // eye
-                glm::vec3(0.0f, 0.0f, 0.0f),    //center
+                focalPoint += glm::vec3(0.0f, deltaY, 0.0f),    //center
                 glm::vec3(0.0f, 1.0f, 0.0f));// up
 
             GLuint viewMatrixLocation = glGetUniformLocation(shaderProgram, "viewMatrix");
