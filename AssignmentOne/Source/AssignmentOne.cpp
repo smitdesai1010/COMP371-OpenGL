@@ -31,8 +31,12 @@ float speed;
 
 //Object - Offset Declaration
 float movementOffsetX[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+float movementOffsetY[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 float movementOffsetZ[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-float rotationOffset[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+float rotationOffsetX[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+float rotationOffsetY[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+float rotationOffsetZ[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+
 float scalingOffset[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 int currObject = 0;     // 0 index mapping
 
@@ -72,8 +76,6 @@ const char* getVertexShaderSource()
                 "   gl_Position = modelViewProjection * vec4(aPos.x, aPos.y, aPos.z, 1.0);"
                 "}";
 }
-
-
 const char* getFragmentShaderSource()
 {
     return
@@ -399,9 +401,12 @@ int main(int argc, char*argv[])
 
         //Object-1
         glm::vec3 baseVector = { 49.5f, 0.0f, 49.5f };
-        baseVector = baseVector + glm::vec3(movementOffsetX[0], 0.0f, movementOffsetZ[0]);
+        baseVector = baseVector + glm::vec3(movementOffsetX[0], movementOffsetY[0], movementOffsetZ[0]);
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[0], scalingOffset[0], scalingOffset[0]));
-        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffset[0]), glm::vec3(0.0f, 1.0f, 0.0f));
+
+        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetX[0]), glm::vec3(1.0f, 0.0f, 0.0f));
+        rotationMatrix += glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetY[0]), glm::vec3(0.0f, 1.0f, 0.0f));
+        rotationMatrix += glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetZ[0]), glm::vec3(0.0f, 0.0f, 1.0f));
 
         for (int j = 0; j < 4; j++)
         {
@@ -443,10 +448,13 @@ int main(int argc, char*argv[])
         
         //Object-2
         baseVector = { 49.5f, 0.0f, -49.5f };
-        baseVector = baseVector + glm::vec3(movementOffsetX[1], 0.0f, movementOffsetZ[1]);
+        baseVector = baseVector + glm::vec3(movementOffsetX[1], movementOffsetY[1], movementOffsetZ[1]);
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[1], scalingOffset[1], scalingOffset[1]));
-        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffset[1]), glm::vec3(0.0f, 1.0f, 0.0f));
-
+       
+        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetX[1]), glm::vec3(1.0f, 0.0f, 0.0f));
+        rotationMatrix += glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetY[2]), glm::vec3(0.0f, 1.0f, 0.0f));
+        rotationMatrix += glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetZ[3]), glm::vec3(0.0f, 0.0f, 1.0f));
+        
         for (int j = 0; j < 4; j++) {
             for (int i = 0; i < 4; i++) {
 
@@ -487,9 +495,13 @@ int main(int argc, char*argv[])
 
         //Object-3
         baseVector = { -47.5f, 0.0f, 47.5f };
-        baseVector = baseVector + glm::vec3(movementOffsetX[2], 0.0f, movementOffsetZ[2]);
+        baseVector = baseVector + glm::vec3(movementOffsetX[2], movementOffsetY[2], movementOffsetZ[2]);
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[2], scalingOffset[2], scalingOffset[2]));
-        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffset[2]), glm::vec3(0.0f, 1.0f, 0.0f));
+
+        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetX[2]), glm::vec3(1.0f, 0.0f, 0.0f));
+        rotationMatrix += glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetY[2]), glm::vec3(0.0f, 1.0f, 0.0f));
+        rotationMatrix += glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetZ[2]), glm::vec3(0.0f, 0.0f, 1.0f));
+
         int k = 1;
         for (int j = 0; j < 2; j++)
         {
@@ -531,10 +543,13 @@ int main(int argc, char*argv[])
 
         //Object-4
         baseVector = { -0.5f, 0.0f, -0.5f };
-        baseVector = baseVector + glm::vec3(movementOffsetX[3], 0.0f, movementOffsetZ[3]);
+        baseVector = baseVector + glm::vec3(movementOffsetX[3], movementOffsetY[3], movementOffsetZ[3]);
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[3], scalingOffset[3], scalingOffset[3]));
-        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffset[3]), glm::vec3(0.0f, 1.0f, 0.0f));
 
+        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetX[3]), glm::vec3(1.0f, 0.0f, 0.0f));
+        rotationMatrix += glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetY[3]), glm::vec3(0.0f, 1.0f, 0.0f));
+        rotationMatrix += glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetZ[3]), glm::vec3(0.0f, 0.0f, 1.0f));
+        
         for (int j = 0; j < 3; j++)
         {
             for (int i = -2; i <= 2; i++) {
@@ -677,6 +692,12 @@ int main(int argc, char*argv[])
             GLuint viewMatrixLocation = glGetUniformLocation(shaderProgram, "viewMatrix");
             glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
         }
+
+        if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+            movementOffsetZ[currObject] += 1;
+
+        if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+            movementOffsetZ[currObject] -= 1;
     }
   
     // Shutdown GLFWhh
@@ -686,10 +707,10 @@ int main(int argc, char*argv[])
 }
 
 
+//The callback will make the object move one unit at one press AND RELEASE
+//it WON'T move continuously till the key is press
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-    // MODEL INTERACTION
-
     //object selection
     if (key == GLFW_KEY_1 && action == GLFW_PRESS)
         currObject = 0;
@@ -715,10 +736,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
     //translation
     else if (key == GLFW_KEY_W && action == GLFW_PRESS)
-        movementOffsetZ[currObject] += 1;
+        movementOffsetY[currObject] += 1;
 
     else if (key == GLFW_KEY_S && action == GLFW_PRESS)
-        movementOffsetZ[currObject] -= 1;
+        movementOffsetY[currObject] -= 1;
 
     else if (key == GLFW_KEY_D && action == GLFW_PRESS)
         movementOffsetX[currObject] += 1;
@@ -726,13 +747,31 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     else if (key == GLFW_KEY_A && action == GLFW_PRESS)
         movementOffsetX[currObject] -= 1;
 
-
-    //rotation
     else if (key == GLFW_KEY_Q && action == GLFW_PRESS)
-        rotationOffset[currObject] += 20;
+        movementOffsetZ[currObject] += 1;
 
     else if (key == GLFW_KEY_E && action == GLFW_PRESS)
-        rotationOffset[currObject] -= 20;
+        movementOffsetZ[currObject] -= 1;
+
+
+    //rotation
+    else if (key == GLFW_KEY_R && action == GLFW_PRESS)
+        rotationOffsetX[currObject] += 20;
+
+    else if (key == GLFW_KEY_T && action == GLFW_PRESS)
+        rotationOffsetX[currObject] -= 20;
+
+    else if (key == GLFW_KEY_F && action == GLFW_PRESS)
+        rotationOffsetY[currObject] += 20;
+
+    else if (key == GLFW_KEY_G && action == GLFW_PRESS)
+        rotationOffsetY[currObject] -= 20;
+
+    else if (key == GLFW_KEY_V && action == GLFW_PRESS)
+        rotationOffsetZ[currObject] += 20;
+
+    else if (key == GLFW_KEY_B && action == GLFW_PRESS)
+        rotationOffsetZ[currObject] -= 20;
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
