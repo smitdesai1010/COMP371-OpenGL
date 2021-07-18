@@ -842,10 +842,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 
     //rotation
-    else if (key == GLFW_KEY_R && action == GLFW_PRESS) //x-axis
+    else if (key == GLFW_KEY_H && action == GLFW_PRESS) //x-axis
         rotationOffsetX[currObject] += 20;
 
-    else if (key == GLFW_KEY_T && action == GLFW_PRESS)
+    else if (key == GLFW_KEY_J && action == GLFW_PRESS)
         rotationOffsetX[currObject] -= 20;
 
     else if (key == GLFW_KEY_F && action == GLFW_PRESS) //y-axis
