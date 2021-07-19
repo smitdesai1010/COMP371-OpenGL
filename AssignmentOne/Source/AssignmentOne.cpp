@@ -266,6 +266,8 @@ int createCubeVertexArrayObject()
 }
 
 
+glm::vec3 focalPoint = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 baseVectorArray[4];
 
 
 int main(int argc, char*argv[])
@@ -324,17 +326,14 @@ int main(int argc, char*argv[])
     // Enable Backface culling
     glEnable(GL_CULL_FACE);
     glm::vec3 eyePosition = glm::vec3(0.0f, 40.0f, 0.0f);
-    glm::vec3 focalPoint = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 baseVectorArray[4];
 
-//<<<<<<< HEAD
+
     //speed of movement initialisation
     float speed;
     float goesUp = 0;
     float goesUpTwo = 0;
     GLenum render = GL_TRIANGLES;
-//=======
-//>>>>>>> main
+
     // Entering Main Loop
     while(!glfwWindowShouldClose(window))
     {
@@ -749,23 +748,29 @@ int main(int argc, char*argv[])
             glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
         }
 
-        //need to change to right mouse btn
-        if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS) // pan the camera in x axis
+        //reset the world orientation to origin
+        if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS)
         {
-            eyePosition += glm::vec3(deltaX, 0.0f, 0.0f);
+            eyePosition = { 0.0f,40.0f,0.0f };
+            focalPoint = { 0.0f,0.0f,0.0f };
+        }
+
+
+        // pan the camera in x axis
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) 
+        {
             glm::mat4 viewMatrix = glm::lookAt(
                 (eyePosition),  // eye
-                glm::vec3(0.0f, 0.0f, 0.0f),    //center
+                focalPoint += glm::vec3(deltaX, 0.0f, 0.0f),    //center
                 glm::vec3(0.0f, 1.0f, 0.0f));   // up
 
             GLuint viewMatrixLocation = glGetUniformLocation(shaderProgram, "viewMatrix");
             glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
         }
 
-        //need to change to middle mouse btn
-        if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS) // tilt the camera in y axis
+        // tilt the camera in y axis
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS)
         {
-            //eyePosition += glm::vec3(0.0f, deltaY, 0.0f);
             glm::mat4 viewMatrix = glm::lookAt(
                 (eyePosition),  // eye
                 focalPoint += glm::vec3(0.0f, deltaY, 0.0f),    //center
@@ -782,7 +787,6 @@ int main(int argc, char*argv[])
         if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
             movementOffsetZ[currObject] -= 1;
 
-        focalPoint = baseVectorArray[currObject];
     }
 
     
@@ -800,16 +804,28 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 {
     //object selection
     if (key == GLFW_KEY_1 && action == GLFW_PRESS)
+    {
         currObject = 0;
+        focalPoint = baseVectorArray[currObject];
+    }
 
     else if (key == GLFW_KEY_2 && action == GLFW_PRESS)
+    {
         currObject = 1;
+        focalPoint = baseVectorArray[currObject];
+    }
 
     else if (key == GLFW_KEY_3 && action == GLFW_PRESS)
+    {
         currObject = 2;
+        focalPoint = baseVectorArray[currObject];
+    }
 
     else if (key == GLFW_KEY_4 && action == GLFW_PRESS)
+    {
         currObject = 3;
+        focalPoint = baseVectorArray[currObject];
+    }
 
 
 
@@ -884,7 +900,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS) // zoom in zoom out
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT)) // zoom in zoom out
     {
         fov -= (float)yoffset;
 
