@@ -748,6 +748,13 @@ int main(int argc, char*argv[])
             glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
         }
 
+        //reset the world orientation to origin
+        if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS)
+        {
+            eyePosition = { 0.0f,40.0f,0.0f };
+            focalPoint = { 0.0f,0.0f,0.0f };
+        }
+
 
         // pan the camera in x axis
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) 
@@ -780,7 +787,6 @@ int main(int argc, char*argv[])
         if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
             movementOffsetZ[currObject] -= 1;
 
-       // if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS && glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
     }
 
     
