@@ -426,14 +426,11 @@ int main(int argc, char*argv[])
                 }
             }
         }
+
         //Object-1
         baseVectorArray[0] = { 45.5f, 2.5f, 45.5f };
         baseVectorArray[0] += glm::vec3(movementOffsetX[0], movementOffsetY[0], movementOffsetZ[0]);
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[0], scalingOffset[0], scalingOffset[0]));
-
-        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetX[0]), glm::vec3(1.0f, 0.0f, 0.0f));
-        rotationMatrix += glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetY[0]), glm::vec3(0.0f, 1.0f, 0.0f));
-        rotationMatrix += glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetZ[0]), glm::vec3(0.0f, 0.0f, 1.0f));
 
         for (int j = 0; j < 4; j++)
         {
@@ -455,24 +452,39 @@ int main(int argc, char*argv[])
                     x = i;
                     z = i;
                 }
+                
+                translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[0]);
+                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[0]), glm::vec3(1.0f, 0.0f, 0.0f));
+                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[0]), glm::vec3(0.0f, 1.0f, 0.0f));
+                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[0]), glm::vec3(0.0f, 0.0f, 1.0f));
+                translationMatrix = glm::translate(translationMatrix, glm::vec3(-x, y, -z) * scalingOffset[0]);
 
-                translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[0] + glm::vec3(- x,  y, - z) * scalingOffset[0]);
-                worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
+                worldMatrix = translationMatrix * scalingMatrix;
+
                 glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
                 glUniform4fv(colorLocation, 1, whiteColor);
                 glDrawArrays(render, 0, 36);
             }
         }
 
+        
         for (int i = 0; i < 5; i++) {
-            translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[0] + glm::vec3(-4.0f, 0.0f + i, 0.0f) * scalingOffset[0]);
-            worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
+
+            translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[0]);
+            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[0]), glm::vec3(1.0f, 0.0f, 0.0f));
+            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[0]), glm::vec3(0.0f, 1.0f, 0.0f));
+            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[0]), glm::vec3(0.0f, 0.0f, 1.0f));
+            translationMatrix = glm::translate(translationMatrix, glm::vec3(-4.0f, i, 0.0f) * scalingOffset[0]);
+
+            worldMatrix = translationMatrix * scalingMatrix;
             glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
             glUniform4fv(colorLocation, 1, whiteColor);
             glDrawArrays(render, 0, 36);
         }
 
+        
 
+      
 
         //wall 2
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
@@ -491,15 +503,36 @@ int main(int argc, char*argv[])
             }
         }
 
+
+        /*
+        //dummy object 2
+
+        baseVectorArray[1] = { 45.5f, 2.5f, -35.5f };
+        baseVectorArray[1] += glm::vec3(movementOffsetX[1], movementOffsetY[1], movementOffsetZ[1]);
+
+        for (int j = 0; j < 4; j++) {
+            for (int i = j; i < 4; i++) {
+
+                translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[1]);
+                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[1]), glm::vec3(1.0f, 0.0f, 0.0f));
+                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[1]), glm::vec3(0.0f, 1.0f, 0.0f));
+                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[1]), glm::vec3(0.0f, 0.0f, 1.0f));
+                translationMatrix = glm::translate(translationMatrix, glm::vec3(i, j, 0) * scalingOffset[1]);
+
+                worldMatrix = translationMatrix * scalingMatrix;
+               
+                glUniform4fv(colorLocation, 1, whiteColor);
+                glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+                glDrawArrays(render, 0, 36);
+            }
+        }
+        
+         */
+
         //Object-2
         baseVectorArray[1] = { 45.5f, 2.5f, -35.5f };
         baseVectorArray[1] += glm::vec3(movementOffsetX[1], movementOffsetY[1], movementOffsetZ[1]);
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[1], scalingOffset[1], scalingOffset[1]));
-       
-        //rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetX[1]+center pos of X of pivot cube), glm::vec3(1.0f, 0.0f, 0.0f));
-        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetX[1]), glm::vec3(1.0f, 0.0f, 0.0f));
-        rotationMatrix += glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetY[1]), glm::vec3(0.0f, 1.0f, 0.0f));
-        rotationMatrix += glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetZ[1]), glm::vec3(0.0f, 0.0f, 1.0f));
         
         for (int j = 0; j < 4; j++) {
             for (int i = 0; i < 4; i++) {
@@ -524,16 +557,27 @@ int main(int argc, char*argv[])
                     z = 2;
                 }
 
-                translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[1] + glm::vec3(x, y, z) * scalingOffset[1]);
-                worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
+                translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[1]);
+                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[1]), glm::vec3(1.0f, 0.0f, 0.0f));
+                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[1]), glm::vec3(0.0f, 1.0f, 0.0f));
+                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[1]), glm::vec3(0.0f, 0.0f, 1.0f));
+                translationMatrix = glm::translate(translationMatrix, glm::vec3(x, y, z) * scalingOffset[1]);
+
+                worldMatrix = translationMatrix * scalingMatrix;
+                
                 glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
                 glUniform4fv(colorLocation, 1, whiteColor);
                 glDrawArrays(render, 0, 36);
             }
         }
 
-        translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[1] + glm::vec3(3.0f, 3.0f, 2.0f) * scalingOffset[1]);
-        worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
+        translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[1]);
+        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[1]), glm::vec3(1.0f, 0.0f, 0.0f));
+        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[1]), glm::vec3(0.0f, 1.0f, 0.0f));
+        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[1]), glm::vec3(0.0f, 0.0f, 1.0f));
+        translationMatrix = glm::translate(translationMatrix, glm::vec3(3.0f, 3.0f, 2.0f) * scalingOffset[1]);
+
+        worldMatrix = translationMatrix * scalingMatrix;
         glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
         glUniform4fv(colorLocation, 1, whiteColor);
         glDrawArrays(render, 0, 36);
@@ -565,16 +609,19 @@ int main(int argc, char*argv[])
         baseVectorArray[2] += glm::vec3(movementOffsetX[2], movementOffsetY[2], movementOffsetZ[2]);
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[2], scalingOffset[2], scalingOffset[2]));
 
-        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetX[2]), glm::vec3(1.0f, 0.0f, 0.0f));
-        rotationMatrix += glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetY[2]), glm::vec3(0.0f, 1.0f, 0.0f));
-        rotationMatrix += glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetZ[2]), glm::vec3(0.0f, 0.0f, 1.0f));
-
         int k = 1;
         for (int j = 0; j < 2; j++)
         {
             for (int i = -2; i <= 2; i++) {
-                translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[2] + glm::vec3(i*k, 0.0f, - i) * scalingOffset[2]);
-                worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
+                
+                translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[2]);
+                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[2]), glm::vec3(1.0f, 0.0f, 0.0f));
+                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[2]), glm::vec3(0.0f, 1.0f, 0.0f));
+                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[2]), glm::vec3(0.0f, 0.0f, 1.0f));
+                translationMatrix = glm::translate(translationMatrix, glm::vec3(i * k, 0.0f, -i) * scalingOffset[2]);
+
+                
+                worldMatrix = translationMatrix * scalingMatrix;
                 glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
                 glUniform4fv(colorLocation, 1, whiteColor);
                 glDrawArrays(render, 0, 36);
@@ -583,8 +630,14 @@ int main(int argc, char*argv[])
         }
 
         for (int i = -1; i < 3; i++) {
-            translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[2] + glm::vec3(0.0f, i, 0.0f) * scalingOffset[2]);
-            worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
+            
+            translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[2]);
+            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[2]), glm::vec3(1.0f, 0.0f, 0.0f));
+            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[2]), glm::vec3(0.0f, 1.0f, 0.0f));
+            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[2]), glm::vec3(0.0f, 0.0f, 1.0f));
+            translationMatrix = glm::translate(translationMatrix, glm::vec3(0.0f, i, 0.0f) * scalingOffset[2]);
+
+            worldMatrix = translationMatrix * scalingMatrix;
             glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
             glUniform4fv(colorLocation, 1, whiteColor);
             glDrawArrays(render, 0, 36);
@@ -601,8 +654,14 @@ int main(int argc, char*argv[])
                 z3 *= -1;
             }
 
-            translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[2] + glm::vec3(x3, 1, z3) * scalingOffset[2]);
-            worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
+            translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[2]);
+            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[2]), glm::vec3(1.0f, 0.0f, 0.0f));
+            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[2]), glm::vec3(0.0f, 1.0f, 0.0f));
+            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[2]), glm::vec3(0.0f, 0.0f, 1.0f));
+            translationMatrix = glm::translate(translationMatrix, glm::vec3(x3, 1, z3) * scalingOffset[2]);
+
+
+            worldMatrix = translationMatrix * scalingMatrix;
             glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
             glUniform4fv(colorLocation, 1, whiteColor);
             glDrawArrays(render, 0, 36);
@@ -633,16 +692,19 @@ int main(int argc, char*argv[])
         baseVectorArray[3] += glm::vec3(movementOffsetX[3], movementOffsetY[3], movementOffsetZ[3]);
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[3], scalingOffset[3], scalingOffset[3]));
 
-        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetX[3]), glm::vec3(1.0f, 0.0f, 0.0f));
-        rotationMatrix += glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetY[3]), glm::vec3(0.0f, 1.0f, 0.0f));
-        rotationMatrix += glm::rotate(glm::mat4(1.0f), glm::radians(rotationOffsetZ[3]), glm::vec3(0.0f, 0.0f, 1.0f));
-        
+ 
         for (int j = 0; j < 3; j++)
         {
             for (int i = -2; i <= 2; i++) {
                 if (abs(i % 2 == 0)) {
-                    translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[3] + glm::vec3(i, 0.0f, j) * scalingOffset[3]);
-                    worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
+                    
+                    translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[3]);
+                    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[3]), glm::vec3(1.0f, 0.0f, 0.0f));
+                    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[3]), glm::vec3(0.0f, 1.0f, 0.0f));
+                    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[3]), glm::vec3(0.0f, 0.0f, 1.0f));
+                    translationMatrix = glm::translate(translationMatrix, glm::vec3(i, 0.0f, j) * scalingOffset[3]);
+
+                    worldMatrix = translationMatrix * scalingMatrix;
                     glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
                     glUniform4fv(colorLocation, 1, whiteColor);
                     glDrawArrays(render, 0, 36);
@@ -654,22 +716,35 @@ int main(int argc, char*argv[])
         {
             for (int i = -2; i <= 2; i++) {
                 if (abs(i % 2) == 1) {
-                    translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[3] + glm::vec3(i, 1.0f, j) * scalingOffset[3]);
-                    worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
+                    
+                    translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[3]);
+                    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[3]), glm::vec3(1.0f, 0.0f, 0.0f));
+                    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[3]), glm::vec3(0.0f, 1.0f, 0.0f));
+                    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[3]), glm::vec3(0.0f, 0.0f, 1.0f));
+                    translationMatrix = glm::translate(translationMatrix, glm::vec3(i, 1.0f, j) * scalingOffset[3]);
+
+                    worldMatrix = translationMatrix * scalingMatrix;
                     glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
                     glUniform4fv(colorLocation, 1, whiteColor);
                     glDrawArrays(render, 0, 36);
                 }
             }
         }
-      
-        translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[3] + glm::vec3(0.0f, 2.0f, 0.0f) * scalingOffset[3]);
-        worldMatrix = translationMatrix * rotationMatrix * scalingMatrix;
+              
+        translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[3]);
+        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[3]), glm::vec3(1.0f, 0.0f, 0.0f));
+        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[3]), glm::vec3(0.0f, 1.0f, 0.0f));
+        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[3]), glm::vec3(0.0f, 0.0f, 1.0f));
+        translationMatrix = glm::translate(translationMatrix, glm::vec3(0.0f, 2.0f, 0.0f) * scalingOffset[3]);
+
+
+        worldMatrix = translationMatrix * scalingMatrix;
         glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
         glUniform4fv(colorLocation, 1, whiteColor);
         glDrawArrays(render, 0, 36);
         
-   
+
+
 
         glBindVertexArray(0);
 
@@ -845,10 +920,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 
     //scaling
-    else if (key == GLFW_KEY_U && action == GLFW_PRESS)
+    else if (key == GLFW_KEY_N && action == GLFW_PRESS)
         scalingOffset[currObject] += 0.25;
 
-    else if (key == GLFW_KEY_J && action == GLFW_PRESS)
+    else if (key == GLFW_KEY_M && action == GLFW_PRESS)
         scalingOffset[currObject] = scalingOffset[currObject] > 0.25 ? scalingOffset[currObject] - 0.25 : 0.25;
 
 
