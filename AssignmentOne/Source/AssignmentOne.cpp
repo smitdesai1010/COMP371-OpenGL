@@ -334,11 +334,15 @@ int main(int argc, char*argv[])
     float goesUpTwo = 0;
     GLenum render = GL_TRIANGLES;
 
+    //enable depth test
+    glEnable(GL_DEPTH_TEST);
+
     // Entering Main Loop
     while(!glfwWindowShouldClose(window))
     {
         // Each frame, reset color of each pixel to glClearColor
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //glClear(GL_COLOR_BUFFER_BIT);
         
         // perspective Transform
         glm::mat4 projectionMatrix = glm::perspective(glm::radians(fov),  // field of view in degrees
