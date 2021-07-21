@@ -44,7 +44,7 @@ float rotationOffsetZ[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 float scalingOffset[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 int currObject = 0;     // 0 index mapping
 
-
+glm::vec3 eyePosition = glm::vec3(0.0f, 40.0f, 0.0f);
 
 //Colors
 GLfloat redColor[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
@@ -325,7 +325,7 @@ int main(int argc, char*argv[])
     
     // Enable Backface culling
     glEnable(GL_CULL_FACE);
-    glm::vec3 eyePosition = glm::vec3(0.0f, 40.0f, 0.0f);
+    glm::vec3 eyePosition = glm::vec3(0.0f, 40.0f, 10.0f);
 
 
     //speed of movement initialisation
@@ -351,8 +351,14 @@ int main(int argc, char*argv[])
 
         GLuint projectionMatrixLocation = glGetUniformLocation(shaderProgram, "projectionMatrix");
         glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, &projectionMatrix[0][0]);
-
-
+        
+        //update look at function as soon as we switch object
+        glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
+            focalPoint,  // center
+            glm::vec3(0.0f, 1.0f, 0.0f));// up
+        GLuint viewMatrixLocation = glGetUniformLocation(shaderProgram, "viewMatrix");
+        glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
+        
 
         // Draw Grid
         glUseProgram(shaderProgram);
@@ -492,7 +498,6 @@ int main(int argc, char*argv[])
 
         //wall 2
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
-        //rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
         for (int y = 0; y < 10; y++) {
             for (int x = 0; x < 10; x++) {
@@ -507,31 +512,6 @@ int main(int argc, char*argv[])
             }
         }
 
-
-        /*
-        //dummy object 2
-
-        baseVectorArray[1] = { 45.5f, 2.5f, -35.5f };
-        baseVectorArray[1] += glm::vec3(movementOffsetX[1], movementOffsetY[1], movementOffsetZ[1]);
-
-        for (int j = 0; j < 4; j++) {
-            for (int i = j; i < 4; i++) {
-
-                translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[1]);
-                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[1]), glm::vec3(1.0f, 0.0f, 0.0f));
-                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[1]), glm::vec3(0.0f, 1.0f, 0.0f));
-                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[1]), glm::vec3(0.0f, 0.0f, 1.0f));
-                translationMatrix = glm::translate(translationMatrix, glm::vec3(i, j, 0) * scalingOffset[1]);
-
-                worldMatrix = translationMatrix * scalingMatrix;
-               
-                glUniform4fv(colorLocation, 1, whiteColor);
-                glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-                glDrawArrays(render, 0, 36);
-            }
-        }
-        
-         */
 
         //Object-2
         baseVectorArray[1] = { 45.5f, 2.5f, -35.5f };
@@ -843,10 +823,12 @@ int main(int argc, char*argv[])
         }
 
         //reset the world orientation to origin
-        if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS)
+        if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS)
         {
-            eyePosition = { 0.0f,40.0f,0.0f };
+            eyePosition = { 0.0f, 40.0f, 10.0f };
             focalPoint = { 0.0f,0.0f,0.0f };
+            goesUp = 0;
+            goesUpTwo = 0;
         }
 
 
@@ -882,6 +864,7 @@ int main(int argc, char*argv[])
             movementOffsetZ[currObject] -= 1;
 
     }
+    
 
     
   
@@ -901,24 +884,29 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     {
         currObject = 0;
         focalPoint = baseVectorArray[currObject];
+        eyePosition = focalPoint + glm::vec3(0.0f, 0.0f, 2000.0f);
+        
     }
 
     else if (key == GLFW_KEY_2 && action == GLFW_PRESS)
     {
         currObject = 1;
         focalPoint = baseVectorArray[currObject];
+        eyePosition = focalPoint + glm::vec3(0.0f, 0.0f, 2000.0f);
     }
 
     else if (key == GLFW_KEY_3 && action == GLFW_PRESS)
     {
         currObject = 2;
         focalPoint = baseVectorArray[currObject];
+        eyePosition = focalPoint + glm::vec3(0.0f, 0.0f, 2000.0f);
     }
 
     else if (key == GLFW_KEY_4 && action == GLFW_PRESS)
     {
         currObject = 3;
         focalPoint = baseVectorArray[currObject];
+        eyePosition = focalPoint + glm::vec3(0.0f, 0.0f, 2000.0f);
     }
 
 
