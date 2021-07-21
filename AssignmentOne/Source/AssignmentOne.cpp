@@ -44,7 +44,7 @@ float rotationOffsetZ[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 float scalingOffset[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 int currObject = 0;     // 0 index mapping
 
-glm::vec3 eyePosition = glm::vec3(0.0f, 40.0f, 0.0f);
+glm::vec3 eyePosition = glm::vec3(0.0f, 40.0f, 10.0f);
 
 //Colors
 GLfloat redColor[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
@@ -325,7 +325,7 @@ int main(int argc, char*argv[])
     
     // Enable Backface culling
     glEnable(GL_CULL_FACE);
-    glm::vec3 eyePosition = glm::vec3(0.0f, 40.0f, 10.0f);
+ 
 
 
     //speed of movement initialisation
@@ -884,7 +884,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     {
         currObject = 0;
         focalPoint = baseVectorArray[currObject];
-        eyePosition = focalPoint + glm::vec3(0.0f, 0.0f, 2000.0f);
+        eyePosition = focalPoint + glm::vec3(0.0f, 0.0f, 20.0f);
         
     }
 
@@ -892,21 +892,21 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     {
         currObject = 1;
         focalPoint = baseVectorArray[currObject];
-        eyePosition = focalPoint + glm::vec3(0.0f, 0.0f, 2000.0f);
+        eyePosition = focalPoint + glm::vec3(0.0f, 0.0f, 20.0f);
     }
 
     else if (key == GLFW_KEY_3 && action == GLFW_PRESS)
     {
         currObject = 2;
         focalPoint = baseVectorArray[currObject];
-        eyePosition = focalPoint + glm::vec3(0.0f, 0.0f, 2000.0f);
+        eyePosition = focalPoint + glm::vec3(0.0f, 0.0f, 20.0f);
     }
 
     else if (key == GLFW_KEY_4 && action == GLFW_PRESS)
     {
         currObject = 3;
         focalPoint = baseVectorArray[currObject];
-        eyePosition = focalPoint + glm::vec3(0.0f, 0.0f, 2000.0f);
+        eyePosition = focalPoint + glm::vec3(0.0f, 0.0f, 20.0f);
     }
 
 
