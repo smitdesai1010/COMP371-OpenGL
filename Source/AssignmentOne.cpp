@@ -206,7 +206,7 @@ const char* getFragmentShaderSource()
         "   vec3 viewDir = normalize(viewPos - FragPos);"
         "   vec3 reflectDir = reflect(-lightDir, norm);"
         "   float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);"
-        "   vec3 specular = specularStrength * spec * vec3(lightColor) * 0;"
+        "   vec3 specular = specularStrength * spec * vec3(lightColor);"
         ""
         ""
         "   vec3 result = (ambient + diffuse + specular) * vec3(objectColor);"
@@ -513,10 +513,9 @@ int main(int argc, char*argv[])
 
 
         //Setting up light source
-
-        float lightX = 2.0f * sin(glfwGetTime());
-        float lightY = -0.3f;
-        float lightZ = 1.5f * cos(glfwGetTime());
+        float lightX = 5.0f * sin(glfwGetTime());
+        float lightY = 10.0f;
+        float lightZ = 5.5f * cos(glfwGetTime());
         GLfloat lightPosition[3] = { lightX, lightY, lightZ };
 
         GLuint LightColor = glGetUniformLocation(shaderProgram, "lightColor");
@@ -527,7 +526,7 @@ int main(int argc, char*argv[])
 
         GLuint ViewPos = glGetUniformLocation(shaderProgram, "viewPos");
         GLfloat viewPostion[3] = { focalPoint.x, focalPoint.y, focalPoint.z };
-        glUniform4fv(ViewPos, 1, lightPosition);
+        glUniform4fv(ViewPos, 1, viewPostion);
 
    
 
