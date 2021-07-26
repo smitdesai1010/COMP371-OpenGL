@@ -508,11 +508,11 @@ int main(int argc, char*argv[])
 
         GLuint LightPos = glGetUniformLocation(shaderProgram, "lightPos");
         GLfloat lightPosition[3] = { 0.0f, 20.0f, 0.0f };
-        glUniform4fv(LightPos, 1, lightPosition);
+        glUniform3fv(LightPos, 1, lightPosition);
 
         GLuint ViewPos = glGetUniformLocation(shaderProgram, "viewPos");
         GLfloat viewPostion[3] = { eyePosition.x, eyePosition.y, eyePosition.z };
-        glUniform4fv(ViewPos, 1, lightPosition);
+        glUniform3fv(ViewPos, 1, lightPosition);
 
 
 
@@ -579,6 +579,7 @@ int main(int argc, char*argv[])
 
 
         //Drawing cube around light source
+
         translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f,50.0f,0.0f));
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(4, 4, 4));
         worldMatrix = translationMatrix* scalingMatrix;
