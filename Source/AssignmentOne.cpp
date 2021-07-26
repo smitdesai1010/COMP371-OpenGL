@@ -60,6 +60,96 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 
+
+const char* get_LightCube_VertexShaderSource()
+{
+    // For now, you use a string for your shader code, in the assignment, shaders will be stored in .glsl files
+    return
+        "#version 330 core\n"
+        "layout (location = 0) in vec3 aPos;"
+        ""
+        "uniform mat4 worldMatrix;"
+        "uniform mat4 viewMatrix = mat4(1.0);"
+        "uniform mat4 projectionMatrix = mat4(1.0);"
+        ""
+        "void main()"
+        "{"
+        "   mat4 modelViewProjection = projectionMatrix * viewMatrix * worldMatrix;"
+        "   gl_Position = modelViewProjection * vec4(aPos.x, aPos.y, aPos.z, 1.0);"
+        "}";
+}
+const char* get_LightCube_FragmentShaderSource()
+{
+    return
+        "#version 330 core\n"
+        "#define LINE_WIDTH 2.5 \n"
+        ""
+        "uniform vec4 objectColor; \n"
+        "out vec4 FragColor;"
+        ""
+        "void main()"
+        "{"
+        "   FragColor = objectColor; "
+        "}";
+
+
+}
+int compileAndLink_LightCube_Shaders()
+{
+    // compile and link shader program
+    // return shader program id
+    // ------------------------------------
+
+    // vertex shader
+    int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    const char* vertexShaderSource = get_LightCube_VertexShaderSource();
+    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    glCompileShader(vertexShader);
+
+    // check for shader compile errors
+    int success;
+    char infoLog[512];
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        std::cerr << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
+
+    // fragment shader
+    int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    const char* fragmentShaderSource = get_LightCube_FragmentShaderSource();
+    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    glCompileShader(fragmentShader);
+
+    // check for shader compile errors
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        std::cerr << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
+
+    // link shaders
+    int shaderProgram = glCreateProgram();
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+
+    // check for linking errors
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if (!success) {
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+    }
+
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+
+    return shaderProgram;
+}
+
+
 const char* getVertexShaderSource()
 {
     // For now, you use a string for your shader code, in the assignment, shaders will be stored in .glsl files
@@ -68,12 +158,18 @@ const char* getVertexShaderSource()
                 "layout (location = 0) in vec3 aPos;"
                 "layout (location = 1) in vec3 aNormal;"
                 ""
+                "out vec3 FragPos;"
+                "out vec3 Normal;"
+                ""
                 "uniform mat4 worldMatrix;"
                 "uniform mat4 viewMatrix = mat4(1.0);"
                 "uniform mat4 projectionMatrix = mat4(1.0);"
                 ""
                 "void main()"
                 "{"
+                "    FragPos = vec3(worldMatrix * vec4(aPos, 1.0));"
+                "    Normal = mat3(transpose(inverse(worldMatrix))) * aNormal;"
+                ""
                 "   mat4 modelViewProjection = projectionMatrix * viewMatrix * worldMatrix;"
                 "   gl_Position = modelViewProjection * vec4(aPos.x, aPos.y, aPos.z, 1.0);"
                 "}";
@@ -81,14 +177,41 @@ const char* getVertexShaderSource()
 const char* getFragmentShaderSource()
 {
     return
-                "#version 330 core\n"
-                "#define LINE_WIDTH 2.5 \n"
-                "uniform vec4 Color; \n"
-                "out vec4 FragColor;"
-                "void main()"
-                "{"
-                "   FragColor = Color; "
-                "}";
+        "#version 330 core\n"
+        "#define LINE_WIDTH 2.5 \n"
+        ""
+        "out vec4 FragColor;"
+        ""
+        ""
+        "in vec3 Normal;"
+        "in vec3 FragPos;"
+        ""
+        "uniform vec3 lightPos;"
+        "uniform vec3 viewPos;"
+        "uniform vec4 lightColor;"
+        "uniform vec4 objectColor;"
+        ""
+        "void main()"
+        "{"
+        ""
+        "   float ambientStrength = 0.1;"
+        "   vec3 ambient = ambientStrength * vec3(lightColor);"
+        ""
+        "   vec3 norm = normalize(Normal);"
+        "   vec3 lightDir = normalize(lightPos - FragPos);"
+        "   float diff = max(dot(norm, lightDir), 0.0);"
+        "   vec3 diffuse = diff * vec3(lightColor);"
+        ""
+        "   float specularStrength = 0.5;"
+        "   vec3 viewDir = normalize(viewPos - FragPos);"
+        "   vec3 reflectDir = reflect(-lightDir, norm);"
+        "   float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);"
+        "   vec3 specular = specularStrength * spec * vec3(lightColor);"
+        ""
+        ""
+        "   vec3 result = (ambient + diffuse + specular) * vec3(objectColor);"
+        "   FragColor = vec4(result, 1.0);"
+        "}";
 
     
 }
@@ -146,6 +269,8 @@ int compileAndLinkShaders()
     
     return shaderProgram;
 }
+
+
 int createGridLineVertexArrayObject()
 {
     glm::vec3 vertexArrayLine[] = {
@@ -355,9 +480,8 @@ int main(int argc, char*argv[])
     // Entering Main Loop
     while(!glfwWindowShouldClose(window))
     {
-        // Each frame, reset color of each pixel to glClearColor
+        // Each frame, reset color of each pixel to glClearColor and depth
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        //glClear(GL_COLOR_BUFFER_BIT);
         
         // perspective Transform
         glm::mat4 projectionMatrix = glm::perspective(glm::radians(fov),  // field of view in degrees
@@ -369,10 +493,25 @@ int main(int argc, char*argv[])
 
 
 
+        //Setting up light source
+        GLuint LightColor = glGetUniformLocation(shaderProgram, "lightColor");
+        glUniform4fv(LightColor, 1, whiteColor);
+
+        GLuint LightPos = glGetUniformLocation(shaderProgram, "lightPos");
+        GLfloat lightPosition[3] = { 0.0f, 20.0f, 0.0f };
+        glUniform4fv(LightPos, 1, lightPosition);
+
+        GLuint ViewPos = glGetUniformLocation(shaderProgram, "viewPos");
+        GLfloat viewPostion[3] = { eyePosition.x, eyePosition.y, eyePosition.z };
+        glUniform4fv(ViewPos, 1, lightPosition);
+
+
+
+
         // Draw Grid
         glUseProgram(shaderProgram);
         GLuint worldMatrixLocation = glGetUniformLocation(shaderProgram, "worldMatrix");
-        GLuint colorLocation = glGetUniformLocation(shaderProgram, "Color");
+        GLuint colorLocation = glGetUniformLocation(shaderProgram, "objectColor");
 
         glBindVertexArray(vaoGridLine);
         glm::mat4 scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
@@ -429,9 +568,18 @@ int main(int argc, char*argv[])
         glUseProgram(shaderProgram);
         glBindVertexArray(vaoCube);
 
+
+        //Drawing cube around light source
+        translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f,50.0f,0.0f));
+        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(4, 4, 4));
+        worldMatrix = translationMatrix* scalingMatrix;
+        glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+        glUniform4fv(colorLocation, 1, whiteColor);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
         //wall 1
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
-        //rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
         for (int y = 0; y < 10; y++) {
             for (int x = 0; x < 10; x++) {
