@@ -513,16 +513,16 @@ int main(int argc, char*argv[])
 
 
         //Setting up light source
-        float lightX = 5.0f * sin(glfwGetTime());
-        float lightY = 10.0f;
-        float lightZ = 5.5f * cos(glfwGetTime());
+        float lightX = 0;
+        float lightY = 30.0f;
+        float lightZ = 0;
         GLfloat lightPosition[3] = { lightX, lightY, lightZ };
 
         GLuint LightColor = glGetUniformLocation(shaderProgram, "lightColor");
         glUniform4fv(LightColor, 1, whiteColor);
 
         GLuint LightPos = glGetUniformLocation(shaderProgram, "lightPos");
-        GLfloat lightPosition[3] = { 0.0f, 20.0f, 0.0f };
+        //lightPosition[] = { 0.0f, 20.0f, 0.0f };
         glUniform3fv(LightPos, 1, lightPosition);
 
         GLuint ViewPos = glGetUniformLocation(shaderProgram, "viewPos");
