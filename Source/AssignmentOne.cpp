@@ -408,6 +408,8 @@ int createCubeVertexArrayObject()
 glm::vec3 focalPoint = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 baseVectorArray[4];
 
+glm::vec3 eyePosition = glm::vec3(0.0f, 40.0f, 0.0f);
+
 
 int main(int argc, char*argv[])
 {
@@ -465,7 +467,7 @@ int main(int argc, char*argv[])
     // Disable Backface culling
     glDisable(GL_CULL_FACE);
 
-    glm::vec3 eyePosition = glm::vec3(0.0f, 40.0f, 0.0f);
+   
 
 
     //speed of movement initialisation
@@ -487,6 +489,13 @@ int main(int argc, char*argv[])
         glm::mat4 projectionMatrix = glm::perspective(glm::radians(fov),  // field of view in degrees
             1024.0f / 768.0f,      // aspect ratio
             0.01f, 100000.0f);       // near and far (near > 0)
+
+        //update look at function as soon as we switch object
+        glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
+            focalPoint,  // center
+            glm::vec3(0.0f, 1.0f, 0.0f));// up
+        GLuint viewMatrixLocation = glGetUniformLocation(shaderProgram, "viewMatrix");
+        glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
 
         GLuint projectionMatrixLocation = glGetUniformLocation(shaderProgram, "projectionMatrix");
         glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, &projectionMatrix[0][0]);
@@ -1038,24 +1047,29 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     {
         currObject = 0;
         focalPoint = baseVectorArray[currObject];
+        eyePosition = focalPoint + glm::vec3(0.0f, 0.0f, 20.0f);
+
     }
 
     else if (key == GLFW_KEY_2 && action == GLFW_PRESS)
     {
         currObject = 1;
         focalPoint = baseVectorArray[currObject];
+        eyePosition = focalPoint + glm::vec3(0.0f, 0.0f, 20.0f);
     }
 
     else if (key == GLFW_KEY_3 && action == GLFW_PRESS)
     {
         currObject = 2;
         focalPoint = baseVectorArray[currObject];
+        eyePosition = focalPoint + glm::vec3(0.0f, 0.0f, 20.0f);
     }
 
     else if (key == GLFW_KEY_4 && action == GLFW_PRESS)
     {
         currObject = 3;
         focalPoint = baseVectorArray[currObject];
+        eyePosition = focalPoint + glm::vec3(0.0f, 0.0f, 20.0f);
     }
 
 
