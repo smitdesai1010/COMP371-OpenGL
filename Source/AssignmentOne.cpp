@@ -66,16 +66,14 @@ const char* getVertexShaderSource()
     return
                 "#version 330 core\n"
                 "layout (location = 0) in vec3 aPos;"
-                "layout (location = 1) in vec3 aColor;"
+                "layout (location = 1) in vec3 aNormal;"
                 ""
                 "uniform mat4 worldMatrix;"
                 "uniform mat4 viewMatrix = mat4(1.0);"
                 "uniform mat4 projectionMatrix = mat4(1.0);"
                 ""
-                "out vec3 vertexColor;"
                 "void main()"
                 "{"
-                "   vertexColor = aColor;"
                 "   mat4 modelViewProjection = projectionMatrix * viewMatrix * worldMatrix;"
                 "   gl_Position = modelViewProjection * vec4(aPos.x, aPos.y, aPos.z, 1.0);"
                 "}";
@@ -86,7 +84,6 @@ const char* getFragmentShaderSource()
                 "#version 330 core\n"
                 "#define LINE_WIDTH 2.5 \n"
                 "uniform vec4 Color; \n"
-                "in vec3 vertexColor;"
                 "out vec4 FragColor;"
                 "void main()"
                 "{"
@@ -198,42 +195,47 @@ int createCubeVertexArrayObject()
 {
 
     GLfloat vertexArray[] = {
-    -0.5f,-0.5f, 0.0f, // triangle 1 : begin
-    -0.5f,-0.5f, 1.0f,
-    -0.5f, 0.5f, 1.0f, // triangle 1 : end
-    0.5f, 0.5f, 0.0f, // triangle 2 : begin
-    -0.5f,-0.5f,0.0f,
-    -0.5f, 0.5f,0.0f, // triangle 2 : end
-    0.5f,-0.5f, 1.0f,
-    -0.5f,-0.5f,0.0f,
-    0.5f,-0.5f,0.0f,
-    0.5f, 0.5f,0.0f,
-    0.5f,-0.5f,0.0f,
-    -0.5f,-0.5f,0.0f,
-    -0.5f,-0.5f,0.0f,
-    -0.5f, 0.5f, 1.0f,
-    -0.5f, 0.5f,0.0f,
-    0.5f,-0.5f, 1.0f,
-    -0.5f,-0.5f, 1.0f,
-    -0.5f,-0.5f,0.0f,
-    -0.5f, 0.5f, 1.0f,
-    -0.5f,-0.5f, 1.0f,
-    0.5f,-0.5f, 1.0f,
-    0.5f, 0.5f, 1.0f,
-    0.5f,-0.5f,0.0f,
-    0.5f, 0.5f,0.0f,
-    0.5f,-0.5f,0.0f,
-    0.5f, 0.5f, 1.0f,
-    0.5f,-0.5f, 1.0f,
-    0.5f, 0.5f, 1.0f,
-    0.5f, 0.5f,0.0f,
-    -0.5f, 0.5f,0.0f,
-    0.5f, 0.5f, 1.0f,
-    -0.5f, 0.5f,0.0f,
-    -0.5f, 0.5f, 1.0f,
-    0.5f, 0.5f, 1.0f,
-    -0.5f, 0.5f, 1.0f,
-    0.5f,-0.5f, 1.0f
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+
+         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
     };
 
     // Create a vertex array
@@ -250,14 +252,26 @@ int createCubeVertexArrayObject()
 
 
 
-    glVertexAttribPointer(0,                   // attribute 0 matches aPos in Vertex Shader
+    glVertexAttribPointer(
+        0,                   // attribute 0 matches aPos in Vertex Shader
         3,                   // size
         GL_FLOAT,            // type
         GL_FALSE,            // normalized?
-        0, // stride - each vertex contain 2 vec3 (position, color)
+        6 * sizeof(GLfloat), // stride - each vertex contain 2 vec3 (position, normal)
         (void*)0             // array buffer offset
     );
     glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(
+        1,                   // attribute 0 matches aNormal in Vertex Shader
+        3,                   // size
+        GL_FLOAT,            // type
+        GL_FALSE,            // normalized?
+        6 * sizeof(GLfloat), // stride - each vertex contain 2 vec3 (position, normal)
+        (void*)(3 * sizeof(GLfloat))            // array buffer offset
+    );
+    glEnableVertexAttribArray(1);
+
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
@@ -323,8 +337,9 @@ int main(int argc, char*argv[])
     int vaoCube = createCubeVertexArrayObject();
 
     
-    // Enable Backface culling
-    glEnable(GL_CULL_FACE);
+    // Disable Backface culling
+    glDisable(GL_CULL_FACE);
+
     glm::vec3 eyePosition = glm::vec3(0.0f, 40.0f, 0.0f);
 
 
@@ -506,32 +521,6 @@ int main(int argc, char*argv[])
                 }
             }
         }
-
-
-        /*
-        //dummy object 2
-
-        baseVectorArray[1] = { 45.5f, 2.5f, -35.5f };
-        baseVectorArray[1] += glm::vec3(movementOffsetX[1], movementOffsetY[1], movementOffsetZ[1]);
-
-        for (int j = 0; j < 4; j++) {
-            for (int i = j; i < 4; i++) {
-
-                translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[1]);
-                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[1]), glm::vec3(1.0f, 0.0f, 0.0f));
-                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[1]), glm::vec3(0.0f, 1.0f, 0.0f));
-                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[1]), glm::vec3(0.0f, 0.0f, 1.0f));
-                translationMatrix = glm::translate(translationMatrix, glm::vec3(i, j, 0) * scalingOffset[1]);
-
-                worldMatrix = translationMatrix * scalingMatrix;
-               
-                glUniform4fv(colorLocation, 1, whiteColor);
-                glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-                glDrawArrays(render, 0, 36);
-            }
-        }
-        
-         */
 
         //Object-2
         baseVectorArray[1] = { 45.5f, 2.5f, -35.5f };
@@ -788,7 +777,7 @@ int main(int argc, char*argv[])
            // backwards
         if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
         {
-            goesUp += 0.01;
+            goesUp += 0.04;
             
             float radius = sqrt(pow((eyePosition - focalPoint).x, 2) + pow((eyePosition - focalPoint).z, 2));
             eyePosition = glm::vec3((sin(goesUp) * radius) + focalPoint.x  ,eyePosition.y, (cos(goesUp) * radius)+focalPoint.z);
@@ -803,7 +792,7 @@ int main(int argc, char*argv[])
 
         if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
         {
-            goesUp -= 0.01;
+            goesUp -= 0.04;
             float radius = sqrt(pow((eyePosition - focalPoint).x, 2) + pow((eyePosition - focalPoint).z, 2));
             eyePosition = glm::vec3((sin(goesUp) * radius) + focalPoint.x, eyePosition.y, (cos(goesUp) * radius) + focalPoint.z);
             glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
@@ -817,7 +806,7 @@ int main(int argc, char*argv[])
 
         if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
         {
-            goesUpTwo += 0.01;
+            goesUpTwo += 0.04;
             float radius = sqrt(pow((eyePosition - focalPoint).y, 2) + pow((eyePosition - focalPoint).z, 2));
             eyePosition = glm::vec3(eyePosition.x, (cos(goesUpTwo) * radius) + focalPoint.y, (-sin(goesUpTwo) * radius)+focalPoint.z);
             glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
@@ -830,7 +819,7 @@ int main(int argc, char*argv[])
         }
         if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
         {
-            goesUpTwo -= 0.01;
+            goesUpTwo -= 0.04;
             float radius = sqrt(pow((eyePosition - focalPoint).y, 2) + pow((eyePosition - focalPoint).z, 2));
             eyePosition = glm::vec3(eyePosition.x, (cos(goesUpTwo) * radius) + focalPoint.y, (-sin(goesUpTwo) * radius) + focalPoint.z);
             glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
