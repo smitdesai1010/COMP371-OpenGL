@@ -60,7 +60,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 
-
+/*
 const char* get_LightCube_VertexShaderSource()
 {
     // For now, you use a string for your shader code, in the assignment, shaders will be stored in .glsl files
@@ -148,7 +148,7 @@ int compileAndLink_LightCube_Shaders()
 
     return shaderProgram;
 }
-
+*/
 
 const char* getVertexShaderSource()
 {
