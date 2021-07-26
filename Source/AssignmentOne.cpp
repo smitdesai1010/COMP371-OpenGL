@@ -60,7 +60,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 
-/*
+
 const char* get_LightCube_VertexShaderSource()
 {
     // For now, you use a string for your shader code, in the assignment, shaders will be stored in .glsl files
@@ -148,7 +148,7 @@ int compileAndLink_LightCube_Shaders()
 
     return shaderProgram;
 }
-*/
+
 
 const char* getVertexShaderSource()
 {
@@ -206,7 +206,7 @@ const char* getFragmentShaderSource()
         "   vec3 viewDir = normalize(viewPos - FragPos);"
         "   vec3 reflectDir = reflect(-lightDir, norm);"
         "   float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);"
-        "   vec3 specular = specularStrength * spec * vec3(lightColor);"
+        "   vec3 specular = specularStrength * spec * vec3(lightColor) * 0;"
         ""
         ""
         "   vec3 result = (ambient + diffuse + specular) * vec3(objectColor);"
@@ -458,6 +458,7 @@ int main(int argc, char*argv[])
     
     // Compile and link shaders here ...
     int shaderProgram = compileAndLinkShaders();
+    int LightCube_shaderProgram = compileAndLink_LightCube_Shaders();
     
     // Define and upload geometry to the GPU here ...
     int vaoGridLine = createGridLineVertexArrayObject();
@@ -479,6 +480,14 @@ int main(int argc, char*argv[])
     //enable depth test
     glEnable(GL_DEPTH_TEST);
 
+    glm::mat4 translationMatrix;
+    glm::mat4 rotationMatrix;
+    glm::mat4 scalingMatrix;
+    glm::mat4 worldMatrix;
+    GLuint worldMatrixLocation;
+    GLuint colorLocation;
+
+
     // Entering Main Loop
     while(!glfwWindowShouldClose(window))
     {
@@ -486,9 +495,10 @@ int main(int argc, char*argv[])
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         // perspective Transform
-        glm::mat4 projectionMatrix = glm::perspective(glm::radians(fov),  // field of view in degrees
+        glm::mat4 projectionMatrix = glm::perspective(
+            glm::radians(fov),     // field of view in degrees
             1024.0f / 768.0f,      // aspect ratio
-            0.01f, 100000.0f);       // near and far (near > 0)
+            0.01f, 100000.0f);     // near and far (near > 0)
 
         //update look at function as soon as we switch object
         glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
@@ -503,41 +513,49 @@ int main(int argc, char*argv[])
 
 
         //Setting up light source
+
+        float lightX = 2.0f * sin(glfwGetTime());
+        float lightY = -0.3f;
+        float lightZ = 1.5f * cos(glfwGetTime());
+        GLfloat lightPosition[3] = { lightX, lightY, lightZ };
+
         GLuint LightColor = glGetUniformLocation(shaderProgram, "lightColor");
         glUniform4fv(LightColor, 1, whiteColor);
 
         GLuint LightPos = glGetUniformLocation(shaderProgram, "lightPos");
-        GLfloat lightPosition[3] = { 0.0f, 20.0f, 0.0f };
         glUniform4fv(LightPos, 1, lightPosition);
 
         GLuint ViewPos = glGetUniformLocation(shaderProgram, "viewPos");
-        GLfloat viewPostion[3] = { eyePosition.x, eyePosition.y, eyePosition.z };
+        GLfloat viewPostion[3] = { focalPoint.x, focalPoint.y, focalPoint.z };
         glUniform4fv(ViewPos, 1, lightPosition);
+
+   
+
 
 
 
 
         // Draw Grid
         glUseProgram(shaderProgram);
-        GLuint worldMatrixLocation = glGetUniformLocation(shaderProgram, "worldMatrix");
-        GLuint colorLocation = glGetUniformLocation(shaderProgram, "objectColor");
+        worldMatrixLocation = glGetUniformLocation(shaderProgram, "worldMatrix");
+        colorLocation = glGetUniformLocation(shaderProgram, "objectColor");
 
         glBindVertexArray(vaoGridLine);
-        glm::mat4 scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
         glUniform4fv(colorLocation, 1, greenColor);
 
-        glm::mat4 translationMatrix;
         for (int i = 0; i < 101; i++) {
              translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-50.0f, 0.0f, -50.0f + i));
-             glm::mat4 worldMatrix = translationMatrix * scalingMatrix;
+             worldMatrix = translationMatrix * scalingMatrix;
 
              glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
              glDrawArrays(GL_LINES, 0, 2);
         }
-        glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         for (int i = 0; i < 101; i++) {
             translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-50.0f + i, 0.0f, 50.0f));
-            glm::mat4 worldMatrix = translationMatrix * scalingMatrix * rotationMatrix;
+            worldMatrix = translationMatrix * scalingMatrix * rotationMatrix;
 
             glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
             
@@ -547,7 +565,7 @@ int main(int argc, char*argv[])
         // + x bar
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.05f, 1.0f, 1.0f));
         rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(-1.0f, 0.0f, 0.0f));
-        glm::mat4 worldMatrix = scalingMatrix * rotationMatrix;
+        worldMatrix = scalingMatrix * rotationMatrix;
         glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
         glUniform4fv(colorLocation, 1, whiteColor);
         glDrawArrays(GL_LINES, 0, 2);
@@ -570,21 +588,25 @@ int main(int argc, char*argv[])
 
 
         glBindVertexArray(0);
-        
 
-        
+
+
         //Draw Objects
         glUseProgram(shaderProgram);
         glBindVertexArray(vaoCube);
 
-
         //Drawing cube around light source
-        translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f,50.0f,0.0f));
-        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(4, 4, 4));
-        worldMatrix = translationMatrix* scalingMatrix;
+
+        GLuint worldMatrixLocation = glGetUniformLocation(shaderProgram, "worldMatrix");
+        GLuint colorLocation = glGetUniformLocation(shaderProgram, "objectColor");
+
+        translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(lightPosition[0], lightPosition[1], lightPosition[2]));
+        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(3, 3, 3));
+        worldMatrix = translationMatrix * scalingMatrix;
         glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-        glUniform4fv(colorLocation, 1, whiteColor);
+        glUniform4fv(colorLocation, 1, greenColor);
         glDrawArrays(GL_TRIANGLES, 0, 36);
+
 
 
         //wall 1
@@ -664,7 +686,6 @@ int main(int argc, char*argv[])
 
         //wall 2
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
-        //rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
         for (int y = 0; y < 10; y++) {
             for (int x = 0; x < 10; x++) {
@@ -739,7 +760,6 @@ int main(int argc, char*argv[])
 
         //wall 3
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
-        //rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
         for (int y = 0; y < 10; y++) {
             for (int x = 0; x < 10; x++) {
@@ -822,7 +842,6 @@ int main(int argc, char*argv[])
 
         //wall 4
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
-        //rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
         for (int y = 0; y < 10; y++) {
             for (int x = 0; x < 10; x++) {
