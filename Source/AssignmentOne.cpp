@@ -30,8 +30,6 @@ float deltaX = 0;       //represents the change in X and Y since last mouse even
 float deltaY = 0;
 float fov = 45.0f;
 
-//speed of camera movement initialisation
-float speed;
 
 //Object - Offset Declaration
 float movementOffsetX[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
@@ -40,10 +38,14 @@ float movementOffsetZ[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 float rotationOffsetX[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 float rotationOffsetY[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 float rotationOffsetZ[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-
 float scalingOffset[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-int currObject = 0;     // 0 index mapping
 
+int currObject = 3;     // 0 index mapping
+
+
+//Window Size
+float WindowWidth = 1024.0f;
+float WindowHeight = 768.0f;
 
 
 //Colors
@@ -58,7 +60,7 @@ GLfloat purpleColor[4] = { 1.0f, 0.0f, 1.0f, 1.0f };
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-
+void window_size_callback(GLFWwindow* window, int width, int height);
 
 
 const char* get_LightCube_VertexShaderSource()
@@ -404,10 +406,9 @@ int createCubeVertexArrayObject()
     return vertexArrayObject;
 }
 
-
-glm::vec3 focalPoint = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 baseVectorArray[4];
 
+glm::vec3 focalPoint = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 eyePosition = glm::vec3(0.0f, 40.0f, 0.0f);
 
 
@@ -443,7 +444,7 @@ int main(int argc, char*argv[])
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
-
+    glfwSetWindowSizeCallback(window, window_size_callback);
 
     // Initialize GLEW
     glewExperimental = true; // Needed for core profile
@@ -470,9 +471,6 @@ int main(int argc, char*argv[])
 
    
 
-
-    //speed of movement initialisation
-    float speed;
     float goesUp = 0;
     float goesUpTwo = 0;
     GLenum render = GL_TRIANGLES;
@@ -494,40 +492,42 @@ int main(int argc, char*argv[])
         // Each frame, reset color of each pixel to glClearColor and depth
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
+
         // perspective Transform
         glm::mat4 projectionMatrix = glm::perspective(
             glm::radians(fov),     // field of view in degrees
-            1024.0f / 768.0f,      // aspect ratio
-            0.01f, 100000.0f);     // near and far (near > 0)
-
-        //update look at function as soon as we switch object
-        glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
-            focalPoint,  // center
-            glm::vec3(0.0f, 1.0f, 0.0f));// up
-        GLuint viewMatrixLocation = glGetUniformLocation(shaderProgram, "viewMatrix");
-        glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
+            WindowWidth / WindowHeight,      // aspect ratio
+            0.01f, 
+            100000.0f              // near and far (near > 0)
+        );    
 
         GLuint projectionMatrixLocation = glGetUniformLocation(shaderProgram, "projectionMatrix");
         glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, &projectionMatrix[0][0]);
 
 
 
-        //Setting up light source
-        float lightX = 0;
-        float lightY = 30.0f;
-        float lightZ = 0;
-        GLfloat lightPosition[3] = { lightX, lightY, lightZ };
+        //update look at function as soon as we switch object
+        glm::mat4 viewMatrix = glm::lookAt(
+            (eyePosition),      // eye
+            focalPoint,         // center
+            glm::vec3(0.0f, 1.0f, 0.0f) // up
+        );
+        GLuint viewMatrixLocation = glGetUniformLocation(shaderProgram, "viewMatrix");
+        glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
 
+
+
+        //Setting up light source
         GLuint LightColor = glGetUniformLocation(shaderProgram, "lightColor");
         glUniform4fv(LightColor, 1, whiteColor);
 
         GLuint LightPos = glGetUniformLocation(shaderProgram, "lightPos");
-        //lightPosition[] = { 0.0f, 20.0f, 0.0f };
+        GLfloat lightPosition[3] = { 0.0f, 30.0f, 0.0f };
         glUniform3fv(LightPos, 1, lightPosition);
 
         GLuint ViewPos = glGetUniformLocation(shaderProgram, "viewPos");
         GLfloat viewPostion[3] = { eyePosition.x, eyePosition.y, eyePosition.z };
-        glUniform3fv(ViewPos, 1, lightPosition);
+        glUniform3fv(ViewPos, 1, viewPostion);
 
    
 
@@ -591,18 +591,28 @@ int main(int argc, char*argv[])
 
 
 
-        //Draw Objects
-        glUseProgram(shaderProgram);
+        //Draw Cubes
         glBindVertexArray(vaoCube);
 
-        //Drawing cube around light source
+        glUseProgram(shaderProgram);
+        worldMatrixLocation = glGetUniformLocation(shaderProgram, "worldMatrix");
+        colorLocation = glGetUniformLocation(shaderProgram, "objectColor");
+
+        /*
+        * THE LIGHT CUBE SHOULD DRAWN USING THE LIGHTCUBE_SHADER - BUT IT IS NOT WORKING :(
+        * SO CURRENTLY DRAWING IT USING THE NORMAL SHADER
+        * 
+            glUseProgram(LightCube_shaderProgram);
+            worldMatrixLocation = glGetUniformLocation(LightCube_shaderProgram, "worldMatrix");
+            colorLocation = glGetUniformLocation(LightCube_shaderProgram, "objectColor");
+        */
 
         //Drawing cube around light source
-        translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f,50.0f,0.0f));
+        translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(lightPosition[0], lightPosition[1], lightPosition[2]));
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(4, 4, 4));
-        worldMatrix = translationMatrix* scalingMatrix;
+        worldMatrix = translationMatrix * scalingMatrix;
         glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-        glUniform4fv(colorLocation, 1, greenColor);
+        glUniform4fv(colorLocation, 1, whiteColor);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
@@ -924,31 +934,27 @@ int main(int argc, char*argv[])
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, true);
 
-        // WORLD-CAMERA INTERACTION
-        
-        //sprint movement and default speed
-        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-            speed = 0.8f;
-        }
-        else {
-            speed = 0.4f;
-        }
 
-        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) // pan the camera in x axis
+        //Change render mode
+
+        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) 
         {
             render = GL_POINTS;
         }
-        if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) // pan the camera in x axis
+        if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) 
         {
             render = GL_LINES;
         }
-        if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS) // pan the camera in x axis
+        if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
         {
             render = GL_TRIANGLES;
         }
 
-  
-           // backwards
+
+
+        // WORLD-CAMERA INTERACTION
+
+        // backwards
         if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
         {
             goesUp += 0.04;
@@ -1171,3 +1177,9 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
     }
 }
 
+
+void window_size_callback(GLFWwindow* window, int width, int height)
+{
+    WindowWidth = width;
+    WindowHeight = height;
+}
