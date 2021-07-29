@@ -38,6 +38,7 @@ float lastX = 0, lastY = 0;
 float deltaX = 0;       //represents the change in X and Y since last mouse event
 float deltaY = 0;
 float fov = 45.0f;
+bool textureState = true;
 
 
 //Object - Offset Declaration
@@ -228,6 +229,7 @@ const char* getTexturedFragmentShaderSource()
         "uniform vec4 lightColor;"
         "uniform vec4 objectColor;"
         "uniform sampler2D textureSampler;"
+        "uniform bool stateOfTexture;"
         ""
         "in vec3 vertexColor;"
         "in vec2 vertexUV;"
@@ -253,7 +255,8 @@ const char* getTexturedFragmentShaderSource()
         ""
         "   vec4 textureColor = texture( textureSampler, vertexUV );"
         "   vec3 result = (ambient + diffuse + specular) * vec3(objectColor);"
-        "   FragColor = textureColor * vec4(result, 1.0);"
+        "   if (stateOfTexture)FragColor = textureColor * vec4(result, 1.0); "
+        "   else FragColor =  vec4(result, 1.0);"
         "}";
 }
 
@@ -684,7 +687,7 @@ int createTexturedCubeVertexArrayObject()
         GL_FLOAT,
         GL_TRUE,
         sizeof(TexturedColoredVertex),
-        (void*)(3 * sizeof(GLfloat))      // uv is offseted by 2 vec3 (comes after position and color)
+        (void*)(3 * sizeof(GLfloat)) /*(void*)(2* sizeof(glm::vec3)+sizeof(glm::vec2))   */  // uv is offseted by 2 vec3 (comes after position and color)
     );
     glEnableVertexAttribArray(3);
 
@@ -804,9 +807,12 @@ int main(int argc, char*argv[])
     // Entering Main Loop
     while(!glfwWindowShouldClose(window))
     {
+       
         // Each frame, reset color of each pixel to glClearColor and depth
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        GLuint StateOfTexture = glGetUniformLocation(texturedShaderProgram, "stateOfTexture");
+        glUniform1i(StateOfTexture, textureState);
 
         // perspective Transform
         glm::mat4 projectionMatrix = glm::perspective(
@@ -818,7 +824,8 @@ int main(int argc, char*argv[])
 
         GLuint projectionMatrixLocation = glGetUniformLocation(texturedShaderProgram, "projectionMatrix");
         glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, &projectionMatrix[0][0]);
-
+       
+      
 
 
         //update look at function as soon as we switch object
@@ -829,7 +836,7 @@ int main(int argc, char*argv[])
         );
 
         setViewMatrix(texturedShaderProgram, viewMatrix);
-        glBindTexture(GL_TEXTURE_2D, brickTextureID);
+        if (textureState)glBindTexture(GL_TEXTURE_2D, brickTextureID);
 
         GLuint viewMatrixLocation = glGetUniformLocation(texturedShaderProgram, "viewMatrix");
         glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
@@ -934,7 +941,8 @@ int main(int argc, char*argv[])
         glDrawArrays(GL_TRIANGLES, 0, 36);
         
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(100, 1, 100));
-       
+        
+
         glBindTexture(GL_TEXTURE_2D, tilesTextureID);
         //floor
         translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
@@ -1280,6 +1288,7 @@ int main(int argc, char*argv[])
             render = GL_TRIANGLES;
         }
 
+   
 
 
         // WORLD-CAMERA INTERACTION
@@ -1423,6 +1432,11 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         currObject = 3;
         focalPoint = baseVectorArray[currObject];
         eyePosition = focalPoint + glm::vec3(0.0f, 0.0f, 20.0f);
+    }
+    //switch texturing modes
+    else if (key == GLFW_KEY_C && action == GLFW_PRESS)
+    {
+        textureState = !textureState;
     }
 
 
