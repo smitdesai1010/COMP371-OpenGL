@@ -86,93 +86,6 @@ struct TexturedColoredVertex
     glm::vec2 uv;
 };
 
-const char* get_LightCube_VertexShaderSource()
-{
-    // For now, you use a string for your shader code, in the assignment, shaders will be stored in .glsl files
-    return
-        "#version 330 core\n"
-        "layout (location = 0) in vec3 aPos;"
-        ""
-        "uniform mat4 worldMatrix;"
-        "uniform mat4 viewMatrix = mat4(1.0);"
-        "uniform mat4 projectionMatrix = mat4(1.0);"
-        ""
-        "void main()"
-        "{"
-        "   mat4 modelViewProjection = projectionMatrix * viewMatrix * worldMatrix;"
-        "   gl_Position = modelViewProjection * vec4(aPos.x, aPos.y, aPos.z, 1.0);"
-        "}";
-}
-const char* get_LightCube_FragmentShaderSource()
-{
-    return
-        "#version 330 core\n"
-        "#define LINE_WIDTH 2.5 \n"
-        ""
-        "uniform vec4 objectColor; \n"
-        "out vec4 FragColor;"
-        ""
-        "void main()"
-        "{"
-        "   FragColor = objectColor; "
-        "}";
-
-
-}
-int compileAndLink_LightCube_Shaders()
-{
-    // compile and link shader program
-    // return shader program id
-    // ------------------------------------
-
-    // vertex shader
-    int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    const char* vertexShaderSource = get_LightCube_VertexShaderSource();
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-
-    // check for shader compile errors
-    int success;
-    char infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cerr << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-
-    // fragment shader
-    int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    const char* fragmentShaderSource = get_LightCube_FragmentShaderSource();
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-
-    // check for shader compile errors
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cerr << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-
-    // link shaders
-    int shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-    // check for linking errors
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-    }
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-
-    return shaderProgram;
-}
 
 // Textured Cube model
 const TexturedColoredVertex texturedCubeVertexArray[] = {  // position,                            color
@@ -277,22 +190,6 @@ int compileAndLinkShaders(const char* vertexShaderSource, const char* fragmentSh
 
     return shaderProgram;
 }
-
-void setWorldMatrix(int shaderProgram, glm::mat4 worldMatrix)
-{
-    glUseProgram(shaderProgram);
-    GLuint worldMatrixLocation = glGetUniformLocation(shaderProgram, "worldMatrix");
-    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-}
-
-void setViewMatrix(int shaderProgram, glm::mat4 viewMatrix)
-{
-    glUseProgram(shaderProgram);
-    GLuint viewMatrixLocation = glGetUniformLocation(shaderProgram, "viewMatrix");
-    glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
-}
-
-
 const char* getTexturedVertexShaderSource()
 {
     // For now, you use a string for your shader code, in the assignment, shaders will be stored in .glsl files
@@ -314,7 +211,7 @@ const char* getTexturedVertexShaderSource()
         ""
         "void main()"
         "{"
-        "    FragPos = vec3(worldMatrix * vec4(aPos, 1.0));"
+        "   FragPos = vec3(worldMatrix * vec4(aPos, 1.0));"
         "   Normal = mat3(transpose(inverse(worldMatrix))) * aNormal;"
         "   vertexColor = aColor;"
         "   mat4 modelViewProjection = projectionMatrix * viewMatrix * worldMatrix;"
@@ -322,7 +219,6 @@ const char* getTexturedVertexShaderSource()
         "   vertexUV = aUV;"
         "}";
 }
-
 const char* getTexturedFragmentShaderSource()
 {
     return
@@ -332,9 +228,10 @@ const char* getTexturedFragmentShaderSource()
         "uniform vec3 viewPos;"
         "uniform vec4 lightColor;"
         "uniform vec4 objectColor;"
+        "uniform sampler2D textureSampler;"
+        ""
         "in vec3 vertexColor;"
         "in vec2 vertexUV;"
-        "uniform sampler2D textureSampler;"
         "in vec3 Normal;"
         "in vec3 FragPos;"
         ""
@@ -401,6 +298,95 @@ GLuint loadTexture(const char* filename)
     return textureId;
 }
 
+
+/*
+const char* get_LightCube_VertexShaderSource()
+{
+    // For now, you use a string for your shader code, in the assignment, shaders will be stored in .glsl files
+    return
+        "#version 330 core\n"
+        "layout (location = 0) in vec3 aPos;"
+        ""
+        "uniform mat4 worldMatrix;"
+        "uniform mat4 viewMatrix = mat4(1.0);"
+        "uniform mat4 projectionMatrix = mat4(1.0);"
+        ""
+        "void main()"
+        "{"
+        "   mat4 modelViewProjection = projectionMatrix * viewMatrix * worldMatrix;"
+        "   gl_Position = modelViewProjection * vec4(aPos.x, aPos.y, aPos.z, 1.0);"
+        "}";
+}
+const char* get_LightCube_FragmentShaderSource()
+{
+    return
+        "#version 330 core\n"
+        "#define LINE_WIDTH 2.5 \n"
+        ""
+        "uniform vec4 objectColor; \n"
+        "out vec4 FragColor;"
+        ""
+        "void main()"
+        "{"
+        "   FragColor = objectColor; "
+        "}";
+
+
+}
+int compileAndLink_LightCube_Shaders()
+{
+    // compile and link shader program
+    // return shader program id
+    // ------------------------------------
+
+    // vertex shader
+    int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    const char* vertexShaderSource = get_LightCube_VertexShaderSource();
+    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    glCompileShader(vertexShader);
+
+    // check for shader compile errors
+    int success;
+    char infoLog[512];
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+        std::cerr << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
+
+    // fragment shader
+    int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    const char* fragmentShaderSource = get_LightCube_FragmentShaderSource();
+    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    glCompileShader(fragmentShader);
+
+    // check for shader compile errors
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+        std::cerr << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
+
+    // link shaders
+    int shaderProgram = glCreateProgram();
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+
+    // check for linking errors
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if (!success) {
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+    }
+
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+
+    return shaderProgram;
+}
 
 const char* getVertexShaderSource()
 {
@@ -520,99 +506,6 @@ int compileAndLinkShaders()
     
     return shaderProgram;
 }
-
-
-int createGridLineVertexArrayObject()
-{
-    glm::vec3 vertexArrayLine[] = {
-    glm::vec3(0.0f,  0.0f, 0.0f),  // one side
-    glm::vec3(1.0f,  0.0f, 0.0f),  // top center color (red)
-    glm::vec3(100.0f, 0.0f, 0.0f),  // the other
-    glm::vec3(0.0f,  1.0f, 0.0f),  // bottom right color (green)
-    };
-    // Create a vertex array
-    GLuint vertexArrayObject;
-    glGenVertexArrays(1, &vertexArrayObject);
-    glBindVertexArray(vertexArrayObject);
-    
-    
-    // Upload Vertex Buffer to the GPU, keep a reference to it (vertexBufferObject)
-    GLuint vertexBufferObject;
-    glGenBuffers(1, &vertexBufferObject);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-    //glBufferData(GL_ARRAY_BUFFER, sizeof(vertexArray), vertexArray, GL_STATIC_DRAW);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertexArrayLine), vertexArrayLine, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0,                   // attribute 0 matches aPos in Vertex Shader
-                          3,                   // size
-                          GL_FLOAT,            // type
-                          GL_FALSE,            // normalized?
-                          2*sizeof(glm::vec3), // stride - each vertex contain 2 vec3 (position, color)
-                          (void*)0             // array buffer offset
-                          );
-    glEnableVertexAttribArray(0);
-
-
-    glVertexAttribPointer(1,                            // attribute 1 matches aColor in Vertex Shader
-                          3,
-                          GL_FLOAT,
-                          GL_FALSE,
-                          2*sizeof(glm::vec3),
-                          (void*)sizeof(glm::vec3)      // color is offseted a vec3 (comes after position)
-                          );
-    glEnableVertexAttribArray(1);
-
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
-
-  return vertexArrayObject;
-}
-
-int createTexturedCubeVertexArrayObject()
-{
-    // Create a vertex array
-    GLuint vertexArrayObject;
-    glGenVertexArrays(1, &vertexArrayObject);
-    glBindVertexArray(vertexArrayObject);
-
-    // Upload Vertex Buffer to the GPU, keep a reference to it (vertexBufferObject)
-    GLuint vertexBufferObject;
-    glGenBuffers(1, &vertexBufferObject);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(texturedCubeVertexArray), texturedCubeVertexArray, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0,                   // attribute 0 matches aPos in Vertex Shader
-        3,                   // size
-        GL_FLOAT,            // type
-        GL_FALSE,            // normalized?
-        sizeof(TexturedColoredVertex), // stride - each vertex contain 2 vec3 (position, color)
-        (void*)0             // array buffer offset
-    );
-    glEnableVertexAttribArray(0);
-
-
-    glVertexAttribPointer(1,                            // attribute 1 matches aColor in Vertex Shader
-        3,
-        GL_FLOAT,
-        GL_FALSE,
-        sizeof(TexturedColoredVertex),
-        (void*)sizeof(glm::vec3)      // color is offseted a vec3 (comes after position)
-    );
-    glEnableVertexAttribArray(1);
-
-    glVertexAttribPointer(2,                            // attribute 2 matches aUV in Vertex Shader
-        2,
-        GL_FLOAT,
-        GL_FALSE,
-        sizeof(TexturedColoredVertex),
-        (void*)(2 * sizeof(glm::vec3))      // uv is offseted by 2 vec3 (comes after position and color)
-    );
-    glEnableVertexAttribArray(2);
-
-    return vertexArrayObject;
-}
-
-
 int createCubeVertexArrayObject()
 {
 
@@ -700,9 +593,113 @@ int createCubeVertexArrayObject()
 
     return vertexArrayObject;
 }
+*/
+int createGridLineVertexArrayObject()
+{
+    glm::vec3 vertexArrayLine[] = {
+    glm::vec3(0.0f,  0.0f, 0.0f),  // one side
+    glm::vec3(1.0f,  0.0f, 0.0f),  // top center color (red)
+    glm::vec3(100.0f, 0.0f, 0.0f),  // the other
+    glm::vec3(0.0f,  1.0f, 0.0f),  // bottom right color (green)
+    };
+    // Create a vertex array
+    GLuint vertexArrayObject;
+    glGenVertexArrays(1, &vertexArrayObject);
+    glBindVertexArray(vertexArrayObject);
+    
+    
+    // Upload Vertex Buffer to the GPU, keep a reference to it (vertexBufferObject)
+    GLuint vertexBufferObject;
+    glGenBuffers(1, &vertexBufferObject);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+    //glBufferData(GL_ARRAY_BUFFER, sizeof(vertexArray), vertexArray, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertexArrayLine), vertexArrayLine, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0,                   // attribute 0 matches aPos in Vertex Shader
+                          3,                   // size
+                          GL_FLOAT,            // type
+                          GL_FALSE,            // normalized?
+                          2*sizeof(glm::vec3), // stride - each vertex contain 2 vec3 (position, color)
+                          (void*)0             // array buffer offset
+                          );
+    glEnableVertexAttribArray(0);
+
+
+    glVertexAttribPointer(1,                            // attribute 1 matches aColor in Vertex Shader
+                          3,
+                          GL_FLOAT,
+                          GL_FALSE,
+                          2*sizeof(glm::vec3),
+                          (void*)sizeof(glm::vec3)      // color is offseted a vec3 (comes after position)
+                          );
+    glEnableVertexAttribArray(1);
+
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
+
+  return vertexArrayObject;
+}
+int createTexturedCubeVertexArrayObject()
+{
+    // Create a vertex array
+    GLuint vertexArrayObject;
+    glGenVertexArrays(1, &vertexArrayObject);
+    glBindVertexArray(vertexArrayObject);
+
+    // Upload Vertex Buffer to the GPU, keep a reference to it (vertexBufferObject)
+    GLuint vertexBufferObject;
+    glGenBuffers(1, &vertexBufferObject);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(texturedCubeVertexArray), texturedCubeVertexArray, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0,                   // attribute 0 matches aPos in Vertex Shader
+        3,                   // size
+        GL_FLOAT,            // type
+        GL_FALSE,            // normalized?
+        sizeof(TexturedColoredVertex), // stride - each vertex contain 2 vec3 (position, color)
+        (void*)0             // array buffer offset
+    );
+    glEnableVertexAttribArray(0);
+
+
+    glVertexAttribPointer(1,                            // attribute 1 matches aColor in Vertex Shader
+        3,
+        GL_FLOAT,
+        GL_FALSE,
+        sizeof(TexturedColoredVertex),
+        (void*)sizeof(glm::vec3)      // color is offseted a vec3 (comes after position)
+    );
+    glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2,                            // attribute 2 matches aUV in Vertex Shader
+        2,
+        GL_FLOAT,
+        GL_FALSE,
+        sizeof(TexturedColoredVertex),
+        (void*)(2 * sizeof(glm::vec3))      // uv is offseted by 2 vec3 (comes after position and color)
+    );
+    glEnableVertexAttribArray(2);
+
+    return vertexArrayObject;
+}
+
+
+
+void setWorldMatrix(int shaderProgram, glm::mat4 worldMatrix)
+{
+    glUseProgram(shaderProgram);
+    GLuint worldMatrixLocation = glGetUniformLocation(shaderProgram, "worldMatrix");
+    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+}
+void setViewMatrix(int shaderProgram, glm::mat4 viewMatrix)
+{
+    glUseProgram(shaderProgram);
+    GLuint viewMatrixLocation = glGetUniformLocation(shaderProgram, "viewMatrix");
+    glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
+}
+
 
 glm::vec3 baseVectorArray[4];
-
 glm::vec3 focalPoint = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 eyePosition = glm::vec3(0.0f, 40.0f, 0.0f);
 
@@ -753,14 +750,10 @@ int main(int argc, char*argv[])
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     
     // Compile and link shaders here ...
-    int shaderProgram = compileAndLinkShaders();
     int texturedShaderProgram = compileAndLinkShaders(getTexturedVertexShaderSource(), getTexturedFragmentShaderSource());
-
-    int LightCube_shaderProgram = compileAndLink_LightCube_Shaders();
     
     // Define and upload geometry to the GPU here ...
     int vaoGridLine = createGridLineVertexArrayObject();
-    int vaoCube = createCubeVertexArrayObject();
     int texturedCubeVAO = createTexturedCubeVertexArrayObject();
     
     // Load Textures
