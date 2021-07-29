@@ -56,7 +56,6 @@ int currObject = 3;     // 0 index mapping
 float WindowWidth = 1024.0f;
 float WindowHeight = 768.0f;
 
-
 //Colors
 GLfloat redColor[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
 GLfloat greenColor[4] = { 0.0f, 1.0f, 0.0f, 1.0f };
@@ -720,8 +719,13 @@ int main(int argc, char*argv[])
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 #endif
 
-    // Create Window and rendering context using GLFW, resolution is 800x600
-    GLFWwindow* window = glfwCreateWindow(1024, 768, "Assignment 1", NULL, NULL);
+    const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+    WindowWidth = mode->width;
+    WindowHeight = mode->height;
+
+    // Create Window and rendering context using GLFW, resolution is set to the current screen size
+    GLFWwindow* window = glfwCreateWindow(WindowWidth, WindowHeight, "Assignment 1", NULL, NULL);
     if (window == NULL)
     {
         std::cerr << "Failed to create GLFW window" << std::endl;
