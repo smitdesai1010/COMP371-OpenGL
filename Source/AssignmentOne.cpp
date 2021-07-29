@@ -767,9 +767,11 @@ int main(int argc, char*argv[])
 #if defined(PLATFORM_OSX)
     GLuint brickTextureID = loadTexture("Textures/brick.jpg");
     GLuint cementTextureID = loadTexture("Textures/cement.jpg");
+    GLuint tilesTextureID = loadTexture("Textures/tiles.jpg");
 #else
     GLuint brickTextureID = loadTexture("../Assets/Textures/brick.jpg");
     GLuint cementTextureID = loadTexture("../Assets/Textures/cement.jpg");
+    GLuint tilesTextureID = loadTexture("../Assets/Textures/tiles.jpg");
 #endif
 
     
@@ -925,10 +927,19 @@ int main(int argc, char*argv[])
         glUniform4fv(colorLocation, 1, whiteColor);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         
-
-
-        //wall 1
+        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(100, 1, 100));
+       
+        glBindTexture(GL_TEXTURE_2D, tilesTextureID);
+        //floor
+        translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+        worldMatrix = translationMatrix * scalingMatrix;
+        glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+ 
+        glBindTexture(GL_TEXTURE_2D, brickTextureID);
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
+        //wall 1
+        
 
         for (int y = 0; y < 10; y++) {
             for (int x = 0; x < 10; x++) {
