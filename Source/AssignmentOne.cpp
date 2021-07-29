@@ -678,6 +678,15 @@ int createTexturedCubeVertexArrayObject()
         (void*)(2 * sizeof(glm::vec3))      // uv is offseted by 2 vec3 (comes after position and color)
     );
     glEnableVertexAttribArray(2);
+    
+    glVertexAttribPointer(3,                            // attribute 2 matches aUV in Vertex Shader
+        3,
+        GL_FLOAT,
+        GL_TRUE,
+        sizeof(TexturedColoredVertex),
+        (void*)(3 * sizeof(GLfloat))      // uv is offseted by 2 vec3 (comes after position and color)
+    );
+    glEnableVertexAttribArray(3);
 
     return vertexArrayObject;
 }
