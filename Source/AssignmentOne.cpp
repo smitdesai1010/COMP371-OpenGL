@@ -295,7 +295,7 @@ const char* getTexturedFragmentShaderSource()
         "out vec4 FragColor;"
         "void main()"
         "{"
-        "   float ambientStrength = 0.0;"
+        "   float ambientStrength = 0.3;"
         "   vec3 ambient = ambientStrength * vec3(lightColor);"
         ""
         "   vec3 norm = normalize(Normal);"
@@ -701,12 +701,13 @@ int main(int argc, char*argv[])
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(100, 1, 100));
         
 
-        glBindTexture(GL_TEXTURE_2D, tilesTextureID);
+        
         //floor
-        translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
-        worldMatrix = translationMatrix * scalingMatrix;
-        glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+            glBindTexture(GL_TEXTURE_2D, tilesTextureID);
+            translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.5, 0));
+            worldMatrix = translationMatrix * scalingMatrix;
+            glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
  
         glBindTexture(GL_TEXTURE_2D, brickTextureID);
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
