@@ -250,6 +250,7 @@ int compileAndLinkShaders(const char* vertexShaderSource, const char* fragmentSh
 
     return shaderProgram;
 }
+
 const char* getTexturedVertexShaderSource()
 {
     // For now, you use a string for your shader code, in the assignment, shaders will be stored in .glsl files
@@ -314,6 +315,38 @@ const char* getTexturedFragmentShaderSource()
         ""
         "   if (stateOfTexture)FragColor = textureColor * vec4(result, 1.0); "
         "   else FragColor =  vec4(result * vec3(objectColor), 1.0);"
+        "}";
+}
+
+const char* getLightCubeVertexShaderSource()
+{
+    // For now, you use a string for your shader code, in the assignment, shaders will be stored in .glsl files
+    return
+        "#version 330 core\n"
+        "layout (location = 0) in vec3 aPos;"
+        ""
+        "uniform mat4 worldMatrix;"
+        "uniform mat4 viewMatrix = mat4(1.0);"
+        "uniform mat4 projectionMatrix = mat4(1.0);"
+        ""
+        "void main()"
+        "{"
+        "   mat4 modelViewProjection = projectionMatrix * viewMatrix * worldMatrix;"
+        "   gl_Position = modelViewProjection * vec4(aPos.x, aPos.y, aPos.z, 1.0);"
+        "}";
+}
+const char* getLightCubeFragmentShaderSource()
+{
+    return
+        "#version 330 core\n"
+        "#define LINE_WIDTH 2.5 \n"
+        ""
+        "uniform vec4 objectColor; \n"
+        "out vec4 FragColor;"
+        ""
+        "void main()"
+        "{"
+        "   FragColor = objectColor; "
         "}";
 }
 
@@ -525,7 +558,8 @@ int main(int argc, char*argv[])
     
     // Compile and link shaders here ...
     int texturedShaderProgram = compileAndLinkShaders(getTexturedVertexShaderSource(), getTexturedFragmentShaderSource());
-    
+    int lightCubeShaderProgram = compileAndLinkShaders(getTexturedVertexShaderSource(), getTexturedFragmentShaderSource());
+
     // Define and upload geometry to the GPU here ...
     int vaoGridLine = createGridLineVertexArrayObject();
     int texturedCubeVAO = createTexturedCubeVertexArrayObject();
@@ -677,43 +711,35 @@ int main(int argc, char*argv[])
         glUseProgram(texturedShaderProgram);
         worldMatrixLocation = glGetUniformLocation(texturedShaderProgram, "worldMatrix");
         colorLocation = glGetUniformLocation(texturedShaderProgram, "objectColor");
-        
 
-   
-        /*
-        * THE LIGHT CUBE SHOULD DRAWN USING THE LIGHTCUBE_SHADER - BUT IT IS NOT WORKING :(
-        * SO CURRENTLY DRAWING IT USING THE NORMAL SHADER
-        * 
-            glUseProgram(LightCube_shaderProgram);
-            worldMatrixLocation = glGetUniformLocation(LightCube_shaderProgram, "worldMatrix");
-            colorLocation = glGetUniformLocation(LightCube_shaderProgram, "objectColor");
-        */
 
         //Drawing cube around light source
-        
         translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(lightPosition[0], lightPosition[1], lightPosition[2]));
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(4, 4, 4));
         worldMatrix = translationMatrix * scalingMatrix;
         glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
         glUniform4fv(colorLocation, 1, whiteColor);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        
-        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(100, 1, 100));
-        
+        glDrawArrays(GL_TRIANGLES, 0, 36);        
 
         
         //floor
+        if (textureState)
+        {
             glBindTexture(GL_TEXTURE_2D, tilesTextureID);
+            scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(100, 1, 100));
             translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.5, 0));
             worldMatrix = translationMatrix * scalingMatrix;
             glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
             glDrawArrays(GL_TRIANGLES, 0, 36);
- 
+        }
+
+
+
         glBindTexture(GL_TEXTURE_2D, brickTextureID);
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
-        //wall 1
         
-
+        
+        //wall 1
         for (int y = 0; y < 10; y++) {
             for (int x = 0; x < 10; x++) {
                 if (!((y == 3 && x == 3) || (y == 3 && x == 4) || (y == 3 && x == 5) || (y == 3 && x == 6) || (y == 3 && x == 7) || (y == 4 && x == 3) || (y == 4 && x == 7) || (y == 5 && x == 3) || (y == 5 && x == 7) || (y == 6 && x == 3) || (y == 6 && x == 4) || (y == 6 && x == 5) || (y == 6 && x == 6) || (y == 6 && x == 7) || (y == 7 && x == 3))) {
