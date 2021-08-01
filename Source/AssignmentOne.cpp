@@ -90,53 +90,57 @@ struct TexturedColoredVertex
 
 // Textured Cube model
 const TexturedColoredVertex texturedCubeVertexArray[] = {  // position,                            
-    TexturedColoredVertex(glm::vec3(-0.5f,-0.5f,-0.5f),glm::vec2(0.0f, 0.0f)), //left - red
-    TexturedColoredVertex(glm::vec3(-0.5f,-0.5f, 0.5f), glm::vec2(0.0f, 1.0f)),
-    TexturedColoredVertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f)),
+    TexturedColoredVertex(glm::vec3(-0.5f,-0.5f,-0.5f),glm::vec2(0.0f, 0.0f), calculateNormal(glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,0.5f), glm::vec3(-0.5f,0.5f,0.5f)) ), //left - red
+    TexturedColoredVertex(glm::vec3(-0.5f,-0.5f, 0.5f), glm::vec2(0.0f, 1.0f), calculateNormal(glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,0.5f), glm::vec3(-0.5f,0.5f,0.5f))),
+    TexturedColoredVertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f), calculateNormal(glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,0.5f), glm::vec3(-0.5f,0.5f,0.5f))),
 
-    TexturedColoredVertex(glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec2(0.0f, 0.0f)),
-    TexturedColoredVertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f)),
-    TexturedColoredVertex(glm::vec3(-0.5f, 0.5f,-0.5f), glm::vec2(1.0f, 0.0f)),
+    TexturedColoredVertex(glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec2(0.0f, 0.0f), calculateNormal(glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,0.5f), glm::vec3(-0.5f,0.5f,-0.5f))),
+    TexturedColoredVertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f), calculateNormal(glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,0.5f), glm::vec3(-0.5f,0.5f,-0.5f))),
+    TexturedColoredVertex(glm::vec3(-0.5f, 0.5f,-0.5f), glm::vec2(1.0f, 0.0f), calculateNormal(glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,0.5f), glm::vec3(-0.5f,0.5f,-0.5f))),
 
-    TexturedColoredVertex(glm::vec3(0.5f, 0.5f,-0.5f), glm::vec2(1.0f, 1.0f)), // far - blue
-    TexturedColoredVertex(glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec2(0.0f, 0.0f)),
-    TexturedColoredVertex(glm::vec3(-0.5f, 0.5f,-0.5f), glm::vec2(0.0f, 1.0f)),
+    TexturedColoredVertex(glm::vec3(0.5f, 0.5f,-0.5f), glm::vec2(1.0f, 1.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))), // far - blue
+    TexturedColoredVertex(glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec2(0.0f, 0.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))),
+    TexturedColoredVertex(glm::vec3(-0.5f, 0.5f,-0.5f), glm::vec2(0.0f, 1.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))),
 
-    TexturedColoredVertex(glm::vec3(0.5f, 0.5f,-0.5f), glm::vec2(1.0f, 1.0f)),
-    TexturedColoredVertex(glm::vec3(0.5f,-0.5f,-0.5f), glm::vec2(1.0f, 0.0f)),
-    TexturedColoredVertex(glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec2(0.0f, 0.0f)),
 
-    TexturedColoredVertex(glm::vec3(0.5f,-0.5f, 0.5f), glm::vec2(1.0f, 1.0f)), // bottom - turquoise
-    TexturedColoredVertex(glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec2(0.0f, 0.0f)),
-    TexturedColoredVertex(glm::vec3(0.5f,-0.5f,-0.5f), glm::vec2(1.0f, 0.0f)),
+    //asfasfasf
 
-    TexturedColoredVertex(glm::vec3(0.5f,-0.5f, 0.5f), glm::vec2(1.0f, 1.0f)),
-    TexturedColoredVertex(glm::vec3(-0.5f,-0.5f, 0.5f), glm::vec2(0.0f, 1.0f)),
-    TexturedColoredVertex(glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec2(0.0f, 0.0f)),
 
-    TexturedColoredVertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec2(0.0f, 1.0f)), // near - green
-    TexturedColoredVertex(glm::vec3(-0.5f,-0.5f, 0.5f), glm::vec2(0.0f, 0.0f)),
-    TexturedColoredVertex(glm::vec3(0.5f,-0.5f, 0.5f), glm::vec2(1.0f, 0.0f)),
+    TexturedColoredVertex(glm::vec3(0.5f, 0.5f,-0.5f), glm::vec2(1.0f, 1.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))),
+    TexturedColoredVertex(glm::vec3(0.5f,-0.5f,-0.5f), glm::vec2(1.0f, 0.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))),
+    TexturedColoredVertex(glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec2(0.0f, 0.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))),
 
-    TexturedColoredVertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f)),
-    TexturedColoredVertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec2(0.0f, 1.0f)),
-    TexturedColoredVertex(glm::vec3(0.5f,-0.5f, 0.5f), glm::vec2(1.0f, 0.0f)),
+    TexturedColoredVertex(glm::vec3(0.5f,-0.5f, 0.5f), glm::vec2(1.0f, 1.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))), // bottom - turquoise
+    TexturedColoredVertex(glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec2(0.0f, 0.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))),
+    TexturedColoredVertex(glm::vec3(0.5f,-0.5f,-0.5f), glm::vec2(1.0f, 0.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))),
 
-    TexturedColoredVertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f)), // right - purple
-    TexturedColoredVertex(glm::vec3(0.5f,-0.5f,-0.5f), glm::vec2(0.0f, 0.0f)),
-    TexturedColoredVertex(glm::vec3(0.5f, 0.5f,-0.5f), glm::vec2(1.0f, 0.0f)),
+    TexturedColoredVertex(glm::vec3(0.5f,-0.5f, 0.5f), glm::vec2(1.0f, 1.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))),
+    TexturedColoredVertex(glm::vec3(-0.5f,-0.5f, 0.5f), glm::vec2(0.0f, 1.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))),
+    TexturedColoredVertex(glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec2(0.0f, 0.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))),
 
-    TexturedColoredVertex(glm::vec3(0.5f,-0.5f,-0.5f), glm::vec2(0.0f, 0.0f)),
-    TexturedColoredVertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f)),
-    TexturedColoredVertex(glm::vec3(0.5f,-0.5f, 0.5f), glm::vec2(0.0f, 1.0f)),
+    TexturedColoredVertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec2(0.0f, 1.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))), // near - green
+    TexturedColoredVertex(glm::vec3(-0.5f,-0.5f, 0.5f), glm::vec2(0.0f, 0.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))),
+    TexturedColoredVertex(glm::vec3(0.5f,-0.5f, 0.5f), glm::vec2(1.0f, 0.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))),
 
-    TexturedColoredVertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f)), // top - yellow
-    TexturedColoredVertex(glm::vec3(0.5f, 0.5f,-0.5f), glm::vec2(1.0f, 0.0f)),
-    TexturedColoredVertex(glm::vec3(-0.5f, 0.5f,-0.5f), glm::vec2(0.0f, 0.0f)),
+    TexturedColoredVertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))),
+    TexturedColoredVertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec2(0.0f, 1.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))),
+    TexturedColoredVertex(glm::vec3(0.5f,-0.5f, 0.5f), glm::vec2(1.0f, 0.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))),
 
-    TexturedColoredVertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f)),
-    TexturedColoredVertex(glm::vec3(-0.5f, 0.5f,-0.5f), glm::vec2(0.0f, 0.0f)),
-    TexturedColoredVertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec2(0.0f, 1.0f))
+    TexturedColoredVertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))), // right - purple
+    TexturedColoredVertex(glm::vec3(0.5f,-0.5f,-0.5f), glm::vec2(0.0f, 0.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))),
+    TexturedColoredVertex(glm::vec3(0.5f, 0.5f,-0.5f), glm::vec2(1.0f, 0.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))),
+
+    TexturedColoredVertex(glm::vec3(0.5f,-0.5f,-0.5f), glm::vec2(0.0f, 0.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))),
+    TexturedColoredVertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))),
+    TexturedColoredVertex(glm::vec3(0.5f,-0.5f, 0.5f), glm::vec2(0.0f, 1.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))),
+
+    TexturedColoredVertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))), // top - yellow
+    TexturedColoredVertex(glm::vec3(0.5f, 0.5f,-0.5f), glm::vec2(1.0f, 0.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))),
+    TexturedColoredVertex(glm::vec3(-0.5f, 0.5f,-0.5f), glm::vec2(0.0f, 0.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))),
+
+    TexturedColoredVertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))),
+    TexturedColoredVertex(glm::vec3(-0.5f, 0.5f,-0.5f), glm::vec2(0.0f, 0.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f))),
+    TexturedColoredVertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec2(0.0f, 1.0f), calculateNormal(glm::vec3(0.5f,0.5f,-0.5f), glm::vec3(-0.5f,-0.5f,-0.5f), glm::vec3(-0.5f,0.5f,-0.5f)))
 };
 
 
