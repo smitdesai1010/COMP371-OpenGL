@@ -29,6 +29,9 @@
 
 #include <list>
 #include <algorithm>
+#include <../VS2017/Shader.h>
+#include <vector>
+#include <../VS2017/Camera.h>
 
 
 
@@ -58,12 +61,12 @@ float WindowWidth = 1024.0f;
 float WindowHeight = 768.0f;
 
 //Colors
-GLfloat redColor[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
-GLfloat greenColor[4] = { 0.0f, 1.0f, 0.0f, 1.0f };
-GLfloat blueColor[4] = { 0.0f, 0.0f, 1.0f, 1.0f };
-GLfloat whiteColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-GLfloat purpleColor[4] = { 1.0f, 0.0f, 1.0f, 1.0f };
-GLfloat bitchColor[4] = { 1.0f, 1.0f, 1.0f, 0.0f };
+glm::vec4 redColor = { 1.0f, 0.0f, 0.0f, 1.0f };
+glm::vec4 greenColor = { 0.0f, 1.0f, 0.0f, 1.0f };
+glm::vec4 blueColor = { 0.0f, 0.0f, 1.0f, 1.0f };
+glm::vec4 whiteColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+glm::vec4 purpleColor = { 1.0f, 0.0f, 1.0f, 1.0f };
+glm::vec4 bitchColor = { 1.0f, 1.0f, 1.0f, 0.0f };
 
 
 // Input callback
@@ -198,58 +201,58 @@ const TexturedColoredVertex texturedCubeVertexArray[] = {  // position,
     TexturedColoredVertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(0.0f,1.0f,0.0f)),
     TexturedColoredVertex(glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(0.0f,1.0f,0.0f))*/
 
-int compileAndLinkShaders(const char* vertexShaderSource, const char* fragmentShaderSource)
-{
-    // compile and link shader program
-    // return shader program id
-    // ------------------------------------
-
-    // vertex shader
-    int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-
-    // check for shader compile errors
-    int success;
-    char infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cerr << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-
-    // fragment shader
-    int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-
-    // check for shader compile errors
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cerr << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-
-    // link shaders
-    int shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-    // check for linking errors
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-    }
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-
-    return shaderProgram;
-}
+//int compileAndLinkShaders(const char* vertexShaderSource, const char* fragmentShaderSource)
+//{
+//    // compile and link shader program
+//    // return shader program id
+//    // ------------------------------------
+//
+//    // vertex shader
+//    int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+//    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+//    glCompileShader(vertexShader);
+//
+//    // check for shader compile errors
+//    int success;
+//    char infoLog[512];
+//    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+//    if (!success)
+//    {
+//        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+//        std::cerr << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+//    }
+//
+//    // fragment shader
+//    int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+//    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+//    glCompileShader(fragmentShader);
+//
+//    // check for shader compile errors
+//    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+//    if (!success)
+//    {
+//        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+//        std::cerr << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+//    }
+//
+//    // link shaders
+//    int shaderProgram = glCreateProgram();
+//    glAttachShader(shaderProgram, vertexShader);
+//    glAttachShader(shaderProgram, fragmentShader);
+//    glLinkProgram(shaderProgram);
+//
+//    // check for linking errors
+//    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+//    if (!success) {
+//        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+//        std::cerr << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+//    }
+//
+//    glDeleteShader(vertexShader);
+//    glDeleteShader(fragmentShader);
+//
+//    return shaderProgram;
+//}
 
 const char* getTexturedVertexShaderSource()
 {
@@ -391,120 +394,635 @@ GLuint loadTexture(const char* filename)
 }
 
 
-int createGridLineVertexArrayObject()
+//int createGridLineVertexArrayObject()
+//{
+//    glm::vec3 vertexArrayLine[] = {
+//    glm::vec3(0.0f,  0.0f, 0.0f),  // one side
+//    glm::vec3(1.0f,  0.0f, 0.0f),  // top center color (red)
+//    glm::vec3(100.0f, 0.0f, 0.0f),  // the other
+//    glm::vec3(0.0f,  1.0f, 0.0f),  // bottom right color (green)
+//    };
+//    // Create a vertex array
+//    GLuint vertexArrayObject;
+//    glGenVertexArrays(1, &vertexArrayObject);
+//    glBindVertexArray(vertexArrayObject);
+//    
+//    
+//    // Upload Vertex Buffer to the GPU, keep a reference to it (vertexBufferObject)
+//    GLuint vertexBufferObject;
+//    glGenBuffers(1, &vertexBufferObject);
+//    glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+//    //glBufferData(GL_ARRAY_BUFFER, sizeof(vertexArray), vertexArray, GL_STATIC_DRAW);
+//    glBufferData(GL_ARRAY_BUFFER, sizeof(vertexArrayLine), vertexArrayLine, GL_STATIC_DRAW);
+//
+//    glVertexAttribPointer(0,                   // attribute 0 matches aPos in Vertex Shader
+//                          3,                   // size
+//                          GL_FLOAT,            // type
+//                          GL_FALSE,            // normalized?
+//                          2*sizeof(glm::vec3), // stride - each vertex contain 2 vec3 (position, color)
+//                          (void*)0             // array buffer offset
+//                          );
+//    glEnableVertexAttribArray(0);
+//
+//
+//    glVertexAttribPointer(1,                            // attribute 1 matches aColor in Vertex Shader
+//                          3,
+//                          GL_FLOAT,
+//                          GL_FALSE,
+//                          2*sizeof(glm::vec3),
+//                          (void*)sizeof(glm::vec3)      // color is offseted a vec3 (comes after position)
+//                          );
+//    glEnableVertexAttribArray(1);
+//
+//  glBindBuffer(GL_ARRAY_BUFFER, 0);
+//  glBindVertexArray(0);
+//
+//  return vertexArrayObject;
+//}
+
+
+//int createTexturedCubeVertexArrayObject()
+//{
+//    // Create a vertex array
+//    GLuint vertexArrayObject;
+//    glGenVertexArrays(1, &vertexArrayObject);
+//    glBindVertexArray(vertexArrayObject);
+//
+//    // Upload Vertex Buffer to the GPU, keep a reference to it (vertexBufferObject)
+//    GLuint vertexBufferObject;
+//    glGenBuffers(1, &vertexBufferObject);
+//    glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+//    glBufferData(GL_ARRAY_BUFFER, sizeof(texturedCubeVertexArray), texturedCubeVertexArray, GL_STATIC_DRAW);
+//
+//    glVertexAttribPointer(
+//        0,                   // attribute 0 matches aPos in Vertex Shader
+//        3,                   // size
+//        GL_FLOAT,            // type
+//        GL_FALSE,            // normalized?
+//        sizeof(TexturedColoredVertex), // stride 
+//        (void*)0             // array buffer offset
+//    );
+//    glEnableVertexAttribArray(0);
+//
+//
+//    glVertexAttribPointer(
+//        1,                            // attribute 1 matches aUV in Vertex Shader
+//        2,
+//        GL_FLOAT,
+//        GL_FALSE,
+//        sizeof(TexturedColoredVertex),
+//        (void*)(sizeof(glm::vec3))      // uv is offseted by 2 vec3 (comes after position and color)
+//    );
+//    glEnableVertexAttribArray(1);
+//    
+//
+//
+//    glVertexAttribPointer(
+//        2,                            // attribute 2 matches aNormal in Vertex Shader
+//        3,
+//        GL_FLOAT,
+//        GL_TRUE,
+//        sizeof(TexturedColoredVertex),
+//        (void*)(sizeof(glm::vec3)+sizeof(glm::vec2))     
+//    );
+//    glEnableVertexAttribArray(2);
+//
+//    return vertexArrayObject;
+//}
+
+//renderCube(render) renders a unit cube
+unsigned int cubeVAO = 0;
+unsigned int cubeVBO = 0;
+void renderCube(const GLenum render)
 {
-    glm::vec3 vertexArrayLine[] = {
-    glm::vec3(0.0f,  0.0f, 0.0f),  // one side
-    glm::vec3(1.0f,  0.0f, 0.0f),  // top center color (red)
-    glm::vec3(100.0f, 0.0f, 0.0f),  // the other
-    glm::vec3(0.0f,  1.0f, 0.0f),  // bottom right color (green)
-    };
-    // Create a vertex array
-    GLuint vertexArrayObject;
-    glGenVertexArrays(1, &vertexArrayObject);
-    glBindVertexArray(vertexArrayObject);
-    
-    
-    // Upload Vertex Buffer to the GPU, keep a reference to it (vertexBufferObject)
-    GLuint vertexBufferObject;
-    glGenBuffers(1, &vertexBufferObject);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-    //glBufferData(GL_ARRAY_BUFFER, sizeof(vertexArray), vertexArray, GL_STATIC_DRAW);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertexArrayLine), vertexArrayLine, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0,                   // attribute 0 matches aPos in Vertex Shader
-                          3,                   // size
-                          GL_FLOAT,            // type
-                          GL_FALSE,            // normalized?
-                          2*sizeof(glm::vec3), // stride - each vertex contain 2 vec3 (position, color)
-                          (void*)0             // array buffer offset
-                          );
-    glEnableVertexAttribArray(0);
-
-
-    glVertexAttribPointer(1,                            // attribute 1 matches aColor in Vertex Shader
-                          3,
-                          GL_FLOAT,
-                          GL_FALSE,
-                          2*sizeof(glm::vec3),
-                          (void*)sizeof(glm::vec3)      // color is offseted a vec3 (comes after position)
-                          );
-    glEnableVertexAttribArray(1);
-
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
-
-  return vertexArrayObject;
+    // initialize (if necessary)
+    if (cubeVAO == 0)
+    {
+        float vertices[] = {
+            // back face
+            -0.5f,-0.5f,-0.5f,  0.0f, 0.0f, -1.0f,0.0f,0.0f, // bottom-left
+             -0.5f,  -0.5f, 0.5f,  0.0f,  1.0f, -1.0f, 0.0f, 0.0f, // top-right
+             -0.5f, 0.5f, 0.5f,  1.0f,  1.0f, -1.0f, 0.0f, 0.0f, // bottom-right         
+             -0.5f,  -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // top-right
+            -0.5f, 0.5f, 0.5f,  1.0f,  1.0f, -1.0f, 0.0f, 0.0f, // bottom-left
+            -0.5f,  0.5f, -0.5f,  1.0f,  0.0f, -1.0f, 0.0f, 0.0f, // top-left
+            // front face
+            0.5f, 0.5f,  -0.5f,  1.0f,  1.0f,  0.0f, 0.0f, -1.0f, // bottom-left
+             -0.5f, -0.5f,  -0.5f,  0.0f,  0.0f,  0.0f, 0.0f, -1.0f, // bottom-right
+             -0.5f,  0.5f,  -0.5f,  0.0f,  1.0f,  0.0f, 0.0f, -1.0f, // top-right
+             0.5f,  0.5f,  -0.5f,  1.0f,  1.0f,  0.0f, 0.0f, -1.0f, // top-right
+            0.5f,  -0.5f,  -0.5f,  1.0f,  0.0f,  0.0f, 0.0f, -1.0f, // top-left
+            -0.5f, -0.5f,  -0.5f,  0.0f,  0.0f,  0.0f, 0.0f, -1.0f, // bottom-left
+            // left face
+            0.5f,  -0.5f,  0.5f, 1.0f,  1.0f,  0.0f, -1.0f, 0.0f, // top-right
+            -0.5f,  -0.5f, -0.5f, 0.0f,  0.0f,  0.0f, -1.0f, 0.0f, // top-left
+            0.5f, -0.5f, -0.5f, 1.0f,  0.0f,  0.0f, -1.0f, 0.0f, // bottom-left
+            0.5f, -0.5f, 0.5f, 1.0f,  1.0f,  0.0f, -1.0f, 0.0f, // bottom-left
+            -0.5f, -0.5f,  0.5f, 0.0f,  1.0f,  0.0f, -1.0f, 0.0f, // bottom-right
+            -0.5f,  -0.5f,  -0.5f, 0.0f,  0.0f,  0.0f, -1.0f, 0.0f, // top-right
+            // right face
+             -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
+             -0.5f, -0.5f, 0.5f,  0.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
+             0.5f,  -0.5f, 0.5f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // top-right         
+             0.5f, 0.5f, 0.5f,  1.0f,  1.0f,  0.0f, 0.0f, 1.0f, // bottom-right
+             -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
+             0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left     
+            // bottom face
+            0.5f, 0.5f, 0.5f,  1.0f, 1.0f,  1.0f, 0.0f, 0.0f, // top-right
+             0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  1.0f, 0.0f,0.0f, // top-left
+             0.5f, 0.5f,  -0.5f,  1.0f, 0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
+             0.5f, -0.5f,  -0.5f,  0.0f, 0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
+            0.5f, 0.5f,  0.5f,  1.0f, 1.0f,  1.0f, 0.0f, 0.0f, // bottom-right
+            0.5f, -0.5f, 0.5f,  0.0f, 1.0f,  1.0f, 0.0f, 0.0f, // top-right
+            // top face
+            0.5f,  0.5f, 0.5f,  1.0f,  1.0f,  0.0f, 1.0f, 0.0f, // top-left
+             0.5f,  0.5f , -0.5f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // bottom-right
+             -0.5f,  0.5f, -0.5f,  0.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right     
+             0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
+            -0.5f,  0.5f, -0.5f,  0.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
+            -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f  // bottom-left        
+        };
+        glGenVertexArrays(1, &cubeVAO);
+        glGenBuffers(1, &cubeVBO);
+        // fill buffer
+        glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        // link vertex attributes
+        glBindVertexArray(cubeVAO);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+    }
+    // render Cube
+    glBindVertexArray(cubeVAO);
+    glDrawArrays(render, 0, 36);
+    glBindVertexArray(0);
 }
-int createTexturedCubeVertexArrayObject()
+
+
+
+//renderGridLine() renders a line
+unsigned int gridLineVAO = 0;
+unsigned int gridLineVBO = 0;
+
+void renderGridLine()
 {
-    // Create a vertex array
-    GLuint vertexArrayObject;
-    glGenVertexArrays(1, &vertexArrayObject);
-    glBindVertexArray(vertexArrayObject);
+    if (gridLineVAO == 0)
+    {
+        glm::vec3 vertices[] = {
+        glm::vec3(0.0f,  0.0f, 0.0f),  // one side
+        glm::vec3(1.0f,  0.0f, 0.0f),  // top center color (red)
+        glm::vec3(100.0f, 0.0f, 0.0f),  // the other
+        glm::vec3(0.0f,  1.0f, 0.0f),  // bottom right color (green)
+        };
 
-    // Upload Vertex Buffer to the GPU, keep a reference to it (vertexBufferObject)
-    GLuint vertexBufferObject;
-    glGenBuffers(1, &vertexBufferObject);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(texturedCubeVertexArray), texturedCubeVertexArray, GL_STATIC_DRAW);
+        glGenVertexArrays(1, &gridLineVAO);
+        glGenBuffers(1, &gridLineVBO);
 
-    glVertexAttribPointer(
-        0,                   // attribute 0 matches aPos in Vertex Shader
-        3,                   // size
-        GL_FLOAT,            // type
-        GL_FALSE,            // normalized?
-        sizeof(TexturedColoredVertex), // stride 
-        (void*)0             // array buffer offset
-    );
-    glEnableVertexAttribArray(0);
+        //fill buffer
+        glBindBuffer(GL_ARRAY_BUFFER, gridLineVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        //link vertex attributes
+        glBindVertexArray(gridLineVAO);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3), (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec3), (void*)sizeof(glm::vec3));
 
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+    }
 
-    glVertexAttribPointer(
-        1,                            // attribute 1 matches aUV in Vertex Shader
-        2,
-        GL_FLOAT,
-        GL_FALSE,
-        sizeof(TexturedColoredVertex),
-        (void*)(sizeof(glm::vec3))      // uv is offseted by 2 vec3 (comes after position and color)
-    );
-    glEnableVertexAttribArray(1);
-    
-
-
-    glVertexAttribPointer(
-        2,                            // attribute 2 matches aNormal in Vertex Shader
-        3,
-        GL_FLOAT,
-        GL_TRUE,
-        sizeof(TexturedColoredVertex),
-        (void*)(sizeof(glm::vec3)+sizeof(glm::vec2))     
-    );
-    glEnableVertexAttribArray(2);
-
-    return vertexArrayObject;
+    //render gridLine
+    glBindVertexArray(gridLineVAO);
+    glDrawArrays(GL_LINES, 0, 2);
+    glBindVertexArray(0);
 }
 
 
-
-void setWorldMatrix(int shaderProgram, glm::mat4 worldMatrix)
-{
-    glUseProgram(shaderProgram);
-    GLuint worldMatrixLocation = glGetUniformLocation(shaderProgram, "worldMatrix");
-    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-}
-void setViewMatrix(int shaderProgram, glm::mat4 viewMatrix)
-{
-    glUseProgram(shaderProgram);
-    GLuint viewMatrixLocation = glGetUniformLocation(shaderProgram, "viewMatrix");
-    glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
-}
+//void setWorldMatrix(int shaderProgram, glm::mat4 worldMatrix)
+//{
+//    glUseProgram(shaderProgram);
+//    GLuint worldMatrixLocation = glGetUniformLocation(shaderProgram, "worldMatrix");
+//    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+//}
+//void setViewMatrix(int shaderProgram, glm::mat4 viewMatrix)
+//{
+//    glUseProgram(shaderProgram);
+//    GLuint viewMatrixLocation = glGetUniformLocation(shaderProgram, "viewMatrix");
+//    glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
+//}
 
 
 glm::vec3 baseVectorArray[4];
 glm::vec3 focalPoint = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 eyePosition = glm::vec3(0.0f, 40.0f, 0.0f);
 
+glm::mat4 translationMatrix;
+glm::mat4 rotationMatrix;
+glm::mat4 scalingMatrix;
+glm::mat4 worldMatrix;
+
+glm::vec3 lightPosition = { 0.0f,30.0f, 0.0f };
+
+
+GLenum render = GL_TRIANGLES;
+
+
+
+void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, const GLuint tiles)
+{
+    
+    scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    shader.setVec4("objectColor", greenColor);
+
+    for (int i = 0; i < 101; i++) {
+        translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-50.0f, 0.0f, -50.0f + i));
+        worldMatrix = translationMatrix * scalingMatrix;
+        shader.setMat4("worldMatrix", worldMatrix);
+        shader.setVec4("objectColor", greenColor);
+        renderGridLine();
+    }
+
+    rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    for (int i = 0; i < 101; i++) {
+        translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-50.0f + i, 0.0f, 50.0f));
+        worldMatrix = translationMatrix * scalingMatrix * rotationMatrix;
+
+        shader.setMat4("worldMatrix", worldMatrix);
+        shader.setVec4("objectColor", greenColor);
+        renderGridLine();
+    }
+
+    // + x bar
+    scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.05f, 1.0f, 1.0f));
+    rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(-1.0f, 0.0f, 0.0f));
+    worldMatrix = scalingMatrix * rotationMatrix;
+    shader.setMat4("worldMatrix", worldMatrix);
+    shader.setVec4("objectColor", whiteColor);
+    renderGridLine();
+
+    // + z bar
+    scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 0.05f));
+    rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    worldMatrix = scalingMatrix * rotationMatrix;
+    shader.setMat4("worldMatrix", worldMatrix);
+    shader.setVec4("objectColor", redColor);
+    renderGridLine();
+
+    // + y bar
+    scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 0.05f, 1.0f));
+    rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    worldMatrix = scalingMatrix * rotationMatrix;
+    shader.setMat4("worldMatrix", worldMatrix);
+    shader.setVec4("objectColor", blueColor);
+    renderGridLine();
+    shader.setVec4("objectColor", bitchColor);
+
+
+    //Draw Cubes
+
+    //Drawing cube around light source
+    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(lightPosition[0], lightPosition[1], lightPosition[2]));
+    scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(4, 4, 4));
+    worldMatrix = translationMatrix * scalingMatrix;
+    shader.setMat4("worldMatrix", worldMatrix);
+    shader.setVec4("objectColor", whiteColor);
+    renderCube(render);
+
+
+    //floor
+    if (textureState)
+    {
+        glBindTexture(GL_TEXTURE_2D, tiles);
+        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(100, 1, 100));
+        translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.5, 0));
+        worldMatrix = translationMatrix * scalingMatrix;
+        shader.setMat4("worldMatrix", worldMatrix);
+        renderCube(render);
+    }
+
+
+
+    glBindTexture(GL_TEXTURE_2D, brick);
+    scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
+
+
+    //wall 1
+    for (int y = 0; y < 10; y++) {
+        for (int x = 0; x < 10; x++) {
+            if (!((y == 3 && x == 3) || (y == 3 && x == 4) || (y == 3 && x == 5) || (y == 3 && x == 6) || (y == 3 && x == 7) || (y == 4 && x == 3) || (y == 4 && x == 7) || (y == 5 && x == 3) || (y == 5 && x == 7) || (y == 6 && x == 3) || (y == 6 && x == 4) || (y == 6 && x == 5) || (y == 6 && x == 6) || (y == 6 && x == 7) || (y == 7 && x == 3))) {
+
+                translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x + 40.5f, y + 0.5f, 35.5f));
+                worldMatrix = translationMatrix * scalingMatrix;
+                shader.setMat4("worldMatrix", worldMatrix);
+                shader.setVec4("objectColor", blueColor);
+                renderCube(render);
+            }
+        }
+    }
+
+    glBindTexture(GL_TEXTURE_2D, cement);
+    //Object-1
+    baseVectorArray[0] = { 45.5f, 2.5f, 45.5f };
+    baseVectorArray[0] += glm::vec3(movementOffsetX[0], movementOffsetY[0], movementOffsetZ[0]);
+    scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[0], scalingOffset[0], scalingOffset[0]));
+
+    for (int j = 0; j < 4; j++)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            int x = 0, y = 0, z = 0;
+
+            if (j == 0) {
+                x = i;
+            }
+            else if (j == 1) {
+                y = i;
+            }
+            else if (j == 2) {
+                z = i;
+            }
+            else if (j == 3) {
+                y = 3;
+                x = i;
+                z = i;
+            }
+
+            translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[0]);
+            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[0]), glm::vec3(1.0f, 0.0f, 0.0f));
+            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[0]), glm::vec3(0.0f, 1.0f, 0.0f));
+            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[0]), glm::vec3(0.0f, 0.0f, 1.0f));
+            translationMatrix = glm::translate(translationMatrix, glm::vec3(-x, y, -z) * scalingOffset[0]);
+
+            worldMatrix = translationMatrix * scalingMatrix;
+            shader.setMat4("worldMatrix", worldMatrix);
+            shader.setVec4("objectColor", whiteColor); 
+            renderCube(render);
+        }
+    }
+
+
+    for (int i = 0; i < 5; i++) {
+
+        translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[0]);
+        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[0]), glm::vec3(1.0f, 0.0f, 0.0f));
+        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[0]), glm::vec3(0.0f, 1.0f, 0.0f));
+        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[0]), glm::vec3(0.0f, 0.0f, 1.0f));
+        translationMatrix = glm::translate(translationMatrix, glm::vec3(-4.0f, i, 0.0f) * scalingOffset[0]);
+
+        worldMatrix = translationMatrix * scalingMatrix;
+        shader.setMat4("worldMatrix", worldMatrix);
+        shader.setVec4("objectColor", whiteColor);
+        renderCube(render);
+    }
+
+
+
+
+    glBindTexture(GL_TEXTURE_2D, brick);
+    //wall 2
+    scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
+
+    for (int y = 0; y < 10; y++) {
+        for (int x = 0; x < 10; x++) {
+            if (!((y == 2 && x == 6) || (y == 3 && x == 4) || (y == 3 && x == 6) || (y == 4 && x == 4) || (y == 4 && x == 6) || (y == 5 && x == 4) || (y == 5 && x == 5) || (y == 5 && x == 6) || (y == 5 && x == 7) || (y == 6 && x == 4) || (y == 6 && x == 7))) {
+
+                translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x + 40.5f), (y + 0.5f), -45.5f));
+                worldMatrix = translationMatrix * scalingMatrix;
+                shader.setMat4("worldMatrix", worldMatrix);
+                shader.setVec4("objectColor", blueColor);
+                renderCube(render);
+            }
+        }
+    }
+
+    glBindTexture(GL_TEXTURE_2D, cement);
+    //Object-2
+    baseVectorArray[1] = { 45.5f, 2.5f, -35.5f };
+    baseVectorArray[1] += glm::vec3(movementOffsetX[1], movementOffsetY[1], movementOffsetZ[1]);
+    scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[1], scalingOffset[1], scalingOffset[1]));
+
+    for (int j = 0; j < 4; j++) {
+        for (int i = 0; i < 4; i++) {
+
+            int x = 0, y = 0, z = 0;
+
+            if (j == 0) {
+                z = i;
+            }
+            else if (j == 1) {
+                y = i;
+                z = 2;
+            }
+            else if (j == 2) {
+                x = i;
+                y = 2;
+                z = 2;
+            }
+            else if (j == 3) {
+                x = 2;
+                y = 2 - i;
+                z = 2;
+            }
+
+            translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[1]);
+            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[1]), glm::vec3(1.0f, 0.0f, 0.0f));
+            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[1]), glm::vec3(0.0f, 1.0f, 0.0f));
+            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[1]), glm::vec3(0.0f, 0.0f, 1.0f));
+            translationMatrix = glm::translate(translationMatrix, glm::vec3(x, y, z) * scalingOffset[1]);
+
+            worldMatrix = translationMatrix * scalingMatrix;
+            shader.setMat4("worldMatrix", worldMatrix);
+            shader.setVec4("objectColor", whiteColor);
+            renderCube(render);
+        }
+    }
+
+    translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[1]);
+    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[1]), glm::vec3(1.0f, 0.0f, 0.0f));
+    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[1]), glm::vec3(0.0f, 1.0f, 0.0f));
+    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[1]), glm::vec3(0.0f, 0.0f, 1.0f));
+    translationMatrix = glm::translate(translationMatrix, glm::vec3(3.0f, 3.0f, 2.0f) * scalingOffset[1]);
+
+    worldMatrix = translationMatrix * scalingMatrix;
+    shader.setMat4("worldMatrix", worldMatrix);
+    shader.setVec4("objectColor", whiteColor);
+    renderCube(render);
+
+
+
+
+    glBindTexture(GL_TEXTURE_2D, brick);
+
+    //wall 3
+    scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
+
+    for (int y = 0; y < 10; y++) {
+        for (int x = 0; x < 10; x++) {
+            if (!((y == 2 && x == 5) || (y == 3 && x == 3) || (y == 3 && x == 4) || (y == 3 && x == 5) || (y == 3 && x == 6) || (y == 3 && x == 7) || (y == 4 && x == 4) || (y == 4 && x == 5) || (y == 4 && x == 6) || (y == 5 && x == 5))) {
+
+                translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - 49.5f), (y + 0.5f), 35.5f));
+                worldMatrix = translationMatrix * scalingMatrix;
+                shader.setMat4("worldMatrix", worldMatrix);
+                shader.setVec4("objectColor", blueColor);
+                renderCube(render);
+            }
+        }
+    }
+
+    glBindTexture(GL_TEXTURE_2D, cement);
+    //Object-3
+    baseVectorArray[2] = { -45.5f, 2.5f, 45.5f };
+    baseVectorArray[2] += glm::vec3(movementOffsetX[2], movementOffsetY[2], movementOffsetZ[2]);
+    scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[2], scalingOffset[2], scalingOffset[2]));
+
+    int k = 1;
+    for (int j = 0; j < 2; j++)
+    {
+        for (int i = -2; i <= 2; i++) {
+
+            translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[2]);
+            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[2]), glm::vec3(1.0f, 0.0f, 0.0f));
+            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[2]), glm::vec3(0.0f, 1.0f, 0.0f));
+            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[2]), glm::vec3(0.0f, 0.0f, 1.0f));
+            translationMatrix = glm::translate(translationMatrix, glm::vec3(i * k, 0.0f, -i) * scalingOffset[2]);
+
+
+            worldMatrix = translationMatrix * scalingMatrix;
+            shader.setMat4("worldMatrix", worldMatrix);
+            shader.setVec4("objectColor", whiteColor);
+            renderCube(render);
+        }
+        k = -1;
+    }
+
+    for (int i = -1; i < 3; i++) {
+
+        translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[2]);
+        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[2]), glm::vec3(1.0f, 0.0f, 0.0f));
+        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[2]), glm::vec3(0.0f, 1.0f, 0.0f));
+        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[2]), glm::vec3(0.0f, 0.0f, 1.0f));
+        translationMatrix = glm::translate(translationMatrix, glm::vec3(0.0f, i, 0.0f) * scalingOffset[2]);
+
+        worldMatrix = translationMatrix * scalingMatrix;
+        shader.setMat4("worldMatrix", worldMatrix);
+        shader.setVec4("objectColor", whiteColor);
+        renderCube(render);
+    }
+
+    int x3 = 1, z3 = 1;
+    for (int i = 0; i < 3; i++) {
+
+        if (i > 0 && i % 2 == 1)
+        {
+            x3 *= -1;
+        }
+        else if (i > 0 && i % 2 == 0) {
+            z3 *= -1;
+        }
+
+        translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[2]);
+        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[2]), glm::vec3(1.0f, 0.0f, 0.0f));
+        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[2]), glm::vec3(0.0f, 1.0f, 0.0f));
+        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[2]), glm::vec3(0.0f, 0.0f, 1.0f));
+        translationMatrix = glm::translate(translationMatrix, glm::vec3(x3, 1, z3) * scalingOffset[2]);
+
+
+        worldMatrix = translationMatrix * scalingMatrix;
+        shader.setMat4("worldMatrix", worldMatrix);
+        shader.setVec4("objectColor", whiteColor);
+        renderCube(render);
+    }
+
+
+    glBindTexture(GL_TEXTURE_2D, brick);
+
+    //wall 4
+    scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
+
+    for (int y = 0; y < 10; y++) {
+        for (int x = 0; x < 10; x++) {
+            if (!((y == 3 && x == 3) || (y == 3 && x == 5) || (y == 3 && x == 7) || (y == 4 && x == 4) || (y == 4 && x == 6) || (y == 5 && x == 5))) {
+
+                translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x - 4.5f, y + 0.5f, -10.5f));
+                worldMatrix = translationMatrix * scalingMatrix;
+                shader.setMat4("worldMatrix", worldMatrix);
+                shader.setVec4("objectColor", blueColor);
+                renderCube(render);
+            }
+        }
+    }
+    glBindTexture(GL_TEXTURE_2D, cement);
+    //Object-4
+    baseVectorArray[3] = { -0.5f, 2.5f, -0.5f };
+    baseVectorArray[3] += glm::vec3(movementOffsetX[3], movementOffsetY[3], movementOffsetZ[3]);
+    scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[3], scalingOffset[3], scalingOffset[3]));
+
+
+    for (int j = 0; j < 3; j++)
+    {
+        for (int i = -2; i <= 2; i++) {
+            if (abs(i % 2 == 0)) {
+
+                translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[3]);
+                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[3]), glm::vec3(1.0f, 0.0f, 0.0f));
+                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[3]), glm::vec3(0.0f, 1.0f, 0.0f));
+                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[3]), glm::vec3(0.0f, 0.0f, 1.0f));
+                translationMatrix = glm::translate(translationMatrix, glm::vec3(i, 0.0f, j) * scalingOffset[3]);
+
+                worldMatrix = translationMatrix * scalingMatrix;
+                shader.setMat4("worldMatrix", worldMatrix);
+                shader.setVec4("objectColor", whiteColor);
+                renderCube(render);
+            }
+        }
+    }
+
+    for (int j = 0; j < 2; j++)
+    {
+        for (int i = -2; i <= 2; i++) {
+            if (abs(i % 2) == 1) {
+
+                translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[3]);
+                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[3]), glm::vec3(1.0f, 0.0f, 0.0f));
+                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[3]), glm::vec3(0.0f, 1.0f, 0.0f));
+                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[3]), glm::vec3(0.0f, 0.0f, 1.0f));
+                translationMatrix = glm::translate(translationMatrix, glm::vec3(i, 1.0f, j) * scalingOffset[3]);
+
+                worldMatrix = translationMatrix * scalingMatrix;
+                shader.setMat4("worldMatrix", worldMatrix);
+                shader.setVec4("objectColor", whiteColor);
+                renderCube(render);
+            }
+        }
+    }
+
+    translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[3]);
+    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[3]), glm::vec3(1.0f, 0.0f, 0.0f));
+    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[3]), glm::vec3(0.0f, 1.0f, 0.0f));
+    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[3]), glm::vec3(0.0f, 0.0f, 1.0f));
+    translationMatrix = glm::translate(translationMatrix, glm::vec3(0.0f, 2.0f, 0.0f) * scalingOffset[3]);
+
+
+    worldMatrix = translationMatrix * scalingMatrix;
+    shader.setMat4("worldMatrix", worldMatrix);
+    shader.setVec4("objectColor", whiteColor);
+    renderCube(render);
+
+
+
+
+    glBindVertexArray(0);
+}
+
+bool shadows = true;
+bool shadowsKeyPressed = false;
 
 int main(int argc, char*argv[])
 {
@@ -521,6 +1039,11 @@ int main(int argc, char*argv[])
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 #endif
+
+
+    // Define and upload geometry to the GPU here ...
+    /*int vaoGridLine = createGridLineVertexArrayObject();
+    int texturedCubeVAO = createTexturedCubeVertexArrayObject();*/
 
     const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
@@ -555,14 +1078,15 @@ int main(int argc, char*argv[])
 
     // Black background
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+    Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
     
     // Compile and link shaders here ...
-    int texturedShaderProgram = compileAndLinkShaders(getTexturedVertexShaderSource(), getTexturedFragmentShaderSource());
-    int lightCubeShaderProgram = compileAndLinkShaders(getTexturedVertexShaderSource(), getTexturedFragmentShaderSource());
-
-    // Define and upload geometry to the GPU here ...
-    int vaoGridLine = createGridLineVertexArrayObject();
-    int texturedCubeVAO = createTexturedCubeVertexArrayObject();
+    //int texturedShaderProgram = compileAndLinkShaders(getTexturedVertexShaderSource(), getTexturedFragmentShaderSource());
+    //int lightCubeShaderProgram = compileAndLinkShaders(getTexturedVertexShaderSource(), getTexturedFragmentShaderSource());
+    Shader sceneShader("vertexShader.vs", "fragmentShader.fs");
+    Shader simpleDepthShader("point_shadows_depth.vs", "point_shadows_depth.fs", "point_shadows_depth.gs");
+    
     
     // Load Textures
 #if defined(PLATFORM_OSX)
@@ -575,6 +1099,37 @@ int main(int argc, char*argv[])
     GLuint tilesTextureID = loadTexture("../Assets/Textures/tiles.jpg");
 #endif
 
+    // configure depth map FBO
+    // -----------------------
+    const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+    unsigned int depthMapFBO;
+    glGenFramebuffers(1, &depthMapFBO);
+    // create depth cubemap texture
+    unsigned int depthCubemap;
+    glGenTextures(1, &depthCubemap);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
+    for (unsigned int i = 0; i < 6; ++i)
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    // attach depth texture as FBO's depth buffer
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthCubemap, 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+    // shader configuration
+    // --------------------
+    sceneShader.use();
+    sceneShader.setInt("diffuseTexture", 0);
+    sceneShader.setInt("depthMap", 1);
+
+
     
     // Disable Backface culling
     glDisable(GL_CULL_FACE);
@@ -583,18 +1138,14 @@ int main(int argc, char*argv[])
 
     float goesUp = 0;
     float goesUpTwo = 0;
-    GLenum render = GL_TRIANGLES;
 
     //enable depth test
     glEnable(GL_DEPTH_TEST);
 
-    glm::mat4 translationMatrix;
-    glm::mat4 rotationMatrix;
-    glm::mat4 scalingMatrix;
-    glm::mat4 worldMatrix;
-    GLuint worldMatrixLocation;
-    GLuint colorLocation;
+    
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    
 
     // Entering Main Loop
     while(!glfwWindowShouldClose(window))
@@ -603,8 +1154,9 @@ int main(int argc, char*argv[])
         // Each frame, reset color of each pixel to glClearColor and depth
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        GLuint StateOfTexture = glGetUniformLocation(texturedShaderProgram, "stateOfTexture");
-        glUniform1i(StateOfTexture, textureState);
+        sceneShader.setBool("stateOfTexture", textureState);
+
+
 
         // perspective Transform
         glm::mat4 projectionMatrix = glm::perspective(
@@ -614,8 +1166,8 @@ int main(int argc, char*argv[])
             100000.0f              // near and far (near > 0)
         );    
 
-        GLuint projectionMatrixLocation = glGetUniformLocation(texturedShaderProgram, "projectionMatrix");
-        glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, &projectionMatrix[0][0]);
+
+        sceneShader.setMat4("projectionMatrix", projectionMatrix);
        
       
 
@@ -627,426 +1179,72 @@ int main(int argc, char*argv[])
             glm::vec3(0.0f, 1.0f, 0.0f) // up
         );
 
-        setViewMatrix(texturedShaderProgram, viewMatrix);
+        sceneShader.setMat4("viewMatrix", viewMatrix);
+
         if (textureState)glBindTexture(GL_TEXTURE_2D, brickTextureID);
 
-        GLuint viewMatrixLocation = glGetUniformLocation(texturedShaderProgram, "viewMatrix");
-        glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
-
+        sceneShader.setMat4("viewMatrix", viewMatrix);
 
 
         //Setting up light source
-        GLuint LightColor = glGetUniformLocation(texturedShaderProgram, "lightColor");
-        glUniform4fv(LightColor, 1, whiteColor);
 
-        GLuint LightPos = glGetUniformLocation(texturedShaderProgram, "lightPos");
-        GLfloat lightPosition[3] = { 0.0f, 30.0f, 0.0f };
-        glUniform3fv(LightPos, 1, lightPosition);
+        sceneShader.setVec4("lightColor", whiteColor);
 
-        GLuint ViewPos = glGetUniformLocation(texturedShaderProgram, "viewPos");
-        GLfloat viewPostion[3] = { eyePosition.x, eyePosition.y, eyePosition.z };
-        glUniform3fv(ViewPos, 1, viewPostion);
+        sceneShader.setVec3("lightPos", lightPosition);
 
 
-        // Draw Grid
-        glUseProgram(texturedShaderProgram);
-        worldMatrixLocation = glGetUniformLocation(texturedShaderProgram, "worldMatrix");
-        colorLocation = glGetUniformLocation(texturedShaderProgram, "objectColor");
-
-        glBindVertexArray(vaoGridLine);
-        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
-        glUniform4fv(colorLocation, 1, greenColor);
-
-        for (int i = 0; i < 101; i++) {
-             translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-50.0f, 0.0f, -50.0f + i));
-             worldMatrix = translationMatrix * scalingMatrix;
-
-             glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-             glDrawArrays(GL_LINES, 0, 2);
-        }
-
-        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        for (int i = 0; i < 101; i++) {
-            translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-50.0f + i, 0.0f, 50.0f));
-            worldMatrix = translationMatrix * scalingMatrix * rotationMatrix;
-
-            glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-            
-            glDrawArrays(GL_LINES, 0, 2);
-        }
-       
-        // + x bar
-        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.05f, 1.0f, 1.0f));
-        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(-1.0f, 0.0f, 0.0f));
-        worldMatrix = scalingMatrix * rotationMatrix;
-        glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-        glUniform4fv(colorLocation, 1, whiteColor);
-        glDrawArrays(GL_LINES, 0, 2);
-        
-        // + z bar
-        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 0.05f));
-        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        worldMatrix = scalingMatrix * rotationMatrix;
-        glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-        glUniform4fv(colorLocation, 1, redColor);
-        glDrawArrays(GL_LINES, 0, 2);
-      
-        // + y bar
-        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 0.05f, 1.0f));
-        rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-        worldMatrix = scalingMatrix * rotationMatrix;
-        glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-        glUniform4fv(colorLocation, 1, blueColor);
-        glDrawArrays(GL_LINES, 0, 2);
-
-
-        glBindVertexArray(0);
-        glUniform4fv(colorLocation, 1, bitchColor);
-
-
-        //Draw Cubes
-        
-        glBindVertexArray(texturedCubeVAO);
-
-        glUseProgram(texturedShaderProgram);
-        worldMatrixLocation = glGetUniformLocation(texturedShaderProgram, "worldMatrix");
-        colorLocation = glGetUniformLocation(texturedShaderProgram, "objectColor");
-
-
-        //Drawing cube around light source
-        translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(lightPosition[0], lightPosition[1], lightPosition[2]));
-        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(4, 4, 4));
-        worldMatrix = translationMatrix * scalingMatrix;
-        glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-        glUniform4fv(colorLocation, 1, whiteColor);
-        glDrawArrays(GL_TRIANGLES, 0, 36);        
+        glm::vec3 viewPosition = { eyePosition.x, eyePosition.y, eyePosition.z };
+        sceneShader.setVec3("viewPos", viewPosition);
 
         
-        //floor
-        if (textureState)
-        {
-            glBindTexture(GL_TEXTURE_2D, tilesTextureID);
-            scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(100, 1, 100));
-            translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.5, 0));
-            worldMatrix = translationMatrix * scalingMatrix;
-            glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
+        // 0. create depth cubemap transformation matrices
+        // -----------------------------------------------
+        float near_plane = 1.0f;
+        float far_plane = 25.0f;
+        glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, near_plane, far_plane);
+        std::vector<glm::mat4> shadowTransforms;
+        shadowTransforms.push_back(shadowProj * glm::lookAt(lightPosition, lightPosition + glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+        shadowTransforms.push_back(shadowProj * glm::lookAt(lightPosition, lightPosition + glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+        shadowTransforms.push_back(shadowProj * glm::lookAt(lightPosition, lightPosition + glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
+        shadowTransforms.push_back(shadowProj * glm::lookAt(lightPosition, lightPosition + glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f)));
+        shadowTransforms.push_back(shadowProj * glm::lookAt(lightPosition, lightPosition + glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+        shadowTransforms.push_back(shadowProj * glm::lookAt(lightPosition, lightPosition + glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f)));
+
+        // 1. render scene to depth cubemap
+        // --------------------------------
+        glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        simpleDepthShader.use();
+        for (unsigned int i = 0; i < 6; ++i)
+            simpleDepthShader.setMat4("shadowMatrices[" + std::to_string(i) + "]", shadowTransforms[i]);
+        simpleDepthShader.setFloat("far_plane", far_plane);
+        simpleDepthShader.setVec3("lightPos", lightPosition);
+        renderScene(simpleDepthShader, brickTextureID, cementTextureID, tilesTextureID);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        // 2. render scene as normal 
+        // -------------------------
+        glViewport(0, 0, WindowWidth, WindowHeight);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        sceneShader.use();
+        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)WindowWidth / (float)WindowHeight, 0.1f, 100.0f);
+        glm::mat4 view = camera.GetViewMatrix();
+        sceneShader.setMat4("projection", projection);
+        sceneShader.setMat4("view", view);
+        // set lighting uniforms
+        sceneShader.setVec3("lightPos", lightPosition);
+        sceneShader.setVec3("viewPos", camera.Position);
+        sceneShader.setInt("shadows", shadows); // enable/disable shadows by pressing 'SPACE'
+        sceneShader.setFloat("far_plane", far_plane);/*
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, tilesTextureID);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);*/
+        renderScene(sceneShader, brickTextureID, cementTextureID, tilesTextureID);
 
 
 
-        glBindTexture(GL_TEXTURE_2D, brickTextureID);
-        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
-        
-        
-        //wall 1
-        for (int y = 0; y < 10; y++) {
-            for (int x = 0; x < 10; x++) {
-                if (!((y == 3 && x == 3) || (y == 3 && x == 4) || (y == 3 && x == 5) || (y == 3 && x == 6) || (y == 3 && x == 7) || (y == 4 && x == 3) || (y == 4 && x == 7) || (y == 5 && x == 3) || (y == 5 && x == 7) || (y == 6 && x == 3) || (y == 6 && x == 4) || (y == 6 && x == 5) || (y == 6 && x == 6) || (y == 6 && x == 7) || (y == 7 && x == 3))) {
-
-                    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x + 40.5f, y + 0.5f, 35.5f));
-                    worldMatrix = translationMatrix * scalingMatrix;
-                    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-                    glUniform4fv(colorLocation, 1, blueColor);
-                    glDrawArrays(GL_TRIANGLES, 0, 36);
-                }
-            }
-        }
-
-        glBindTexture(GL_TEXTURE_2D, cementTextureID);
-        //Object-1
-        baseVectorArray[0] = { 45.5f, 2.5f, 45.5f };
-        baseVectorArray[0] += glm::vec3(movementOffsetX[0], movementOffsetY[0], movementOffsetZ[0]);
-        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[0], scalingOffset[0], scalingOffset[0]));
-
-        for (int j = 0; j < 4; j++)
-        {
-            for (int i = 0; i < 4; i++)
-            {
-                int x = 0, y = 0, z = 0;
-                
-                if (j == 0) {
-                    x = i;
-                }
-                else if (j == 1) {
-                    y = i;
-                }
-                else if (j == 2) {
-                    z = i;
-                }
-                else if (j == 3) {
-                    y = 3;
-                    x = i;
-                    z = i;
-                }
-                
-                translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[0]);
-                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[0]), glm::vec3(1.0f, 0.0f, 0.0f));
-                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[0]), glm::vec3(0.0f, 1.0f, 0.0f));
-                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[0]), glm::vec3(0.0f, 0.0f, 1.0f));
-                translationMatrix = glm::translate(translationMatrix, glm::vec3(-x, y, -z) * scalingOffset[0]);
-
-                worldMatrix = translationMatrix * scalingMatrix;
-
-                glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-                glUniform4fv(colorLocation, 1, whiteColor);
-                glDrawArrays(render, 0, 36);
-            }
-        }
-
-        
-        for (int i = 0; i < 5; i++) {
-
-            translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[0]);
-            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[0]), glm::vec3(1.0f, 0.0f, 0.0f));
-            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[0]), glm::vec3(0.0f, 1.0f, 0.0f));
-            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[0]), glm::vec3(0.0f, 0.0f, 1.0f));
-            translationMatrix = glm::translate(translationMatrix, glm::vec3(-4.0f, i, 0.0f) * scalingOffset[0]);
-
-            worldMatrix = translationMatrix * scalingMatrix;
-            glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-            glUniform4fv(colorLocation, 1, whiteColor);
-            glDrawArrays(render, 0, 36);
-        }
-
-        
-
-      
-        glBindTexture(GL_TEXTURE_2D, brickTextureID);
-        //wall 2
-        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
-
-        for (int y = 0; y < 10; y++) {
-            for (int x = 0; x < 10; x++) {
-                if (!((y == 2 && x == 6) || (y == 3 && x == 4) || (y == 3 && x == 6) || (y == 4 && x == 4) || (y == 4 && x == 6) || (y == 5 && x == 4) || (y == 5 && x == 5) || (y == 5 && x == 6) || (y == 5 && x == 7) || (y == 6 && x == 4) || (y == 6 && x == 7))) {
-
-                    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x + 40.5f) , (y + 0.5f) , -45.5f) );
-                    worldMatrix = translationMatrix * scalingMatrix;
-                    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-                    glUniform4fv(colorLocation, 1, blueColor);
-                    glDrawArrays(GL_TRIANGLES, 0, 36);
-                }
-            }
-        }
-
-        glBindTexture(GL_TEXTURE_2D, cementTextureID);
-        //Object-2
-        baseVectorArray[1] = { 45.5f, 2.5f, -35.5f };
-        baseVectorArray[1] += glm::vec3(movementOffsetX[1], movementOffsetY[1], movementOffsetZ[1]);
-        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[1], scalingOffset[1], scalingOffset[1]));
-        
-        for (int j = 0; j < 4; j++) {
-            for (int i = 0; i < 4; i++) {
-
-                int x = 0, y = 0, z = 0;
-                
-                if (j == 0) {
-                    z = i;
-                }
-                else if (j == 1) {
-                    y = i;
-                    z = 2;
-                }
-                else if (j == 2) {
-                    x = i;
-                    y = 2;
-                    z = 2;
-                }
-                else if (j == 3) {
-                    x = 2;
-                    y = 2 - i;
-                    z = 2;
-                }
-
-                translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[1]);
-                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[1]), glm::vec3(1.0f, 0.0f, 0.0f));
-                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[1]), glm::vec3(0.0f, 1.0f, 0.0f));
-                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[1]), glm::vec3(0.0f, 0.0f, 1.0f));
-                translationMatrix = glm::translate(translationMatrix, glm::vec3(x, y, z) * scalingOffset[1]);
-
-                worldMatrix = translationMatrix * scalingMatrix;
-                
-                glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-                glUniform4fv(colorLocation, 1, whiteColor);
-                glDrawArrays(render, 0, 36);
-            }
-        }
-
-        translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[1]);
-        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[1]), glm::vec3(1.0f, 0.0f, 0.0f));
-        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[1]), glm::vec3(0.0f, 1.0f, 0.0f));
-        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[1]), glm::vec3(0.0f, 0.0f, 1.0f));
-        translationMatrix = glm::translate(translationMatrix, glm::vec3(3.0f, 3.0f, 2.0f) * scalingOffset[1]);
-
-        worldMatrix = translationMatrix * scalingMatrix;
-        glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-        glUniform4fv(colorLocation, 1, whiteColor);
-        glDrawArrays(render, 0, 36);
-
-
-
-
-        glBindTexture(GL_TEXTURE_2D, brickTextureID);
-
-        //wall 3
-        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
-
-        for (int y = 0; y < 10; y++) {
-            for (int x = 0; x < 10; x++) {
-                if (!((y == 2 && x == 5) || (y == 3 && x == 3) || (y == 3 && x == 4) || (y == 3 && x == 5) || (y == 3 && x == 6) || (y == 3 && x == 7) || (y == 4 && x == 4) || (y == 4 && x == 5) || (y == 4 && x == 6) || (y == 5 && x == 5))) {
-
-                    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - 49.5f), (y + 0.5f), 35.5f));
-                    worldMatrix = translationMatrix * scalingMatrix;
-                    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-                    glUniform4fv(colorLocation, 1, blueColor);
-                    glDrawArrays(GL_TRIANGLES, 0, 36);
-                }
-            }
-        }
-
-        glBindTexture(GL_TEXTURE_2D, cementTextureID);
-        //Object-3
-        baseVectorArray[2] = { -45.5f, 2.5f, 45.5f };
-        baseVectorArray[2] += glm::vec3(movementOffsetX[2], movementOffsetY[2], movementOffsetZ[2]);
-        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[2], scalingOffset[2], scalingOffset[2]));
-
-        int k = 1;
-        for (int j = 0; j < 2; j++)
-        {
-            for (int i = -2; i <= 2; i++) {
-                
-                translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[2]);
-                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[2]), glm::vec3(1.0f, 0.0f, 0.0f));
-                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[2]), glm::vec3(0.0f, 1.0f, 0.0f));
-                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[2]), glm::vec3(0.0f, 0.0f, 1.0f));
-                translationMatrix = glm::translate(translationMatrix, glm::vec3(i * k, 0.0f, -i) * scalingOffset[2]);
-
-                
-                worldMatrix = translationMatrix * scalingMatrix;
-                glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-                glUniform4fv(colorLocation, 1, whiteColor);
-                glDrawArrays(render, 0, 36);
-            }
-            k = -1;
-        }
-
-        for (int i = -1; i < 3; i++) {
-            
-            translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[2]);
-            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[2]), glm::vec3(1.0f, 0.0f, 0.0f));
-            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[2]), glm::vec3(0.0f, 1.0f, 0.0f));
-            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[2]), glm::vec3(0.0f, 0.0f, 1.0f));
-            translationMatrix = glm::translate(translationMatrix, glm::vec3(0.0f, i, 0.0f) * scalingOffset[2]);
-
-            worldMatrix = translationMatrix * scalingMatrix;
-            glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-            glUniform4fv(colorLocation, 1, whiteColor);
-            glDrawArrays(render, 0, 36);
-        }
-
-        int x3 = 1, z3 = 1;
-        for (int i = 0; i < 3; i++) {
-
-            if (i > 0 && i % 2 == 1)
-            {
-                x3 *= -1;
-            }
-            else if (i > 0 && i % 2 == 0) {
-                z3 *= -1;
-            }
-
-            translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[2]);
-            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[2]), glm::vec3(1.0f, 0.0f, 0.0f));
-            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[2]), glm::vec3(0.0f, 1.0f, 0.0f));
-            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[2]), glm::vec3(0.0f, 0.0f, 1.0f));
-            translationMatrix = glm::translate(translationMatrix, glm::vec3(x3, 1, z3) * scalingOffset[2]);
-
-
-            worldMatrix = translationMatrix * scalingMatrix;
-            glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-            glUniform4fv(colorLocation, 1, whiteColor);
-            glDrawArrays(render, 0, 36);
-        }
-
-
-        glBindTexture(GL_TEXTURE_2D, brickTextureID);
-
-        //wall 4
-        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
-
-        for (int y = 0; y < 10; y++) {
-            for (int x = 0; x < 10; x++) {
-                if (!((y == 3 && x == 3) || (y == 3 && x == 5) || (y == 3 && x == 7) || (y == 4 && x == 4) || (y == 4 && x == 6) || (y == 5 && x == 5))) {
-
-                    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x - 4.5f, y + 0.5f, -10.5f) );
-                    worldMatrix = translationMatrix * scalingMatrix;
-                    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-                    glUniform4fv(colorLocation, 1, blueColor);
-                    glDrawArrays(GL_TRIANGLES, 0, 36);
-                }
-            }
-        }
-        glBindTexture(GL_TEXTURE_2D, cementTextureID);
-        //Object-4
-        baseVectorArray[3] = { -0.5f, 2.5f, -0.5f };
-        baseVectorArray[3] += glm::vec3(movementOffsetX[3], movementOffsetY[3], movementOffsetZ[3]);
-        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[3], scalingOffset[3], scalingOffset[3]));
-
- 
-        for (int j = 0; j < 3; j++)
-        {
-            for (int i = -2; i <= 2; i++) {
-                if (abs(i % 2 == 0)) {
-                    
-                    translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[3]);
-                    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[3]), glm::vec3(1.0f, 0.0f, 0.0f));
-                    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[3]), glm::vec3(0.0f, 1.0f, 0.0f));
-                    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[3]), glm::vec3(0.0f, 0.0f, 1.0f));
-                    translationMatrix = glm::translate(translationMatrix, glm::vec3(i, 0.0f, j) * scalingOffset[3]);
-
-                    worldMatrix = translationMatrix * scalingMatrix;
-                    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-                    glUniform4fv(colorLocation, 1, whiteColor);
-                    glDrawArrays(render, 0, 36);
-                }
-            }
-        }
-        
-        for (int j = 0; j < 2; j++)
-        {
-            for (int i = -2; i <= 2; i++) {
-                if (abs(i % 2) == 1) {
-                    
-                    translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[3]);
-                    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[3]), glm::vec3(1.0f, 0.0f, 0.0f));
-                    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[3]), glm::vec3(0.0f, 1.0f, 0.0f));
-                    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[3]), glm::vec3(0.0f, 0.0f, 1.0f));
-                    translationMatrix = glm::translate(translationMatrix, glm::vec3(i, 1.0f, j) * scalingOffset[3]);
-
-                    worldMatrix = translationMatrix * scalingMatrix;
-                    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-                    glUniform4fv(colorLocation, 1, whiteColor);
-                    glDrawArrays(render, 0, 36);
-                }
-            }
-        }
-              
-        translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[3]);
-        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[3]), glm::vec3(1.0f, 0.0f, 0.0f));
-        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[3]), glm::vec3(0.0f, 1.0f, 0.0f));
-        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[3]), glm::vec3(0.0f, 0.0f, 1.0f));
-        translationMatrix = glm::translate(translationMatrix, glm::vec3(0.0f, 2.0f, 0.0f) * scalingOffset[3]);
-
-
-        worldMatrix = translationMatrix * scalingMatrix;
-        glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-        glUniform4fv(colorLocation, 1, whiteColor);
-        glDrawArrays(render, 0, 36);
-        
-
-
-
-        glBindVertexArray(0);
 
         // End Frame
         glfwSwapBuffers(window);
@@ -1090,8 +1288,7 @@ int main(int argc, char*argv[])
                 glm::vec3(0.0f, 1.0f, 0.0f));// up
 
 
-            GLuint viewMatrixLocation = glGetUniformLocation(texturedShaderProgram, "viewMatrix");
-            glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
+            sceneShader.setMat4("viewMatrix", viewMatrix);
         }
 
         if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
@@ -1104,8 +1301,7 @@ int main(int argc, char*argv[])
                 glm::vec3(0.0f, 1.0f, 0.0f));// upad
 
 
-            GLuint viewMatrixLocation = glGetUniformLocation(texturedShaderProgram, "viewMatrix");
-            glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
+            sceneShader.setMat4("viewMatrix", viewMatrix);
         }
 
         if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
@@ -1118,8 +1314,7 @@ int main(int argc, char*argv[])
                 glm::vec3(0.0f, 1.0f, 0.0f));// up
 
 
-            GLuint viewMatrixLocation = glGetUniformLocation(texturedShaderProgram, "viewMatrix");
-            glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
+            sceneShader.setMat4("viewMatrix", viewMatrix);
         }
         if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
         {
@@ -1131,8 +1326,7 @@ int main(int argc, char*argv[])
                 glm::vec3(0.0f, 1.0f, 0.0f));// up
 
 
-            GLuint viewMatrixLocation = glGetUniformLocation(texturedShaderProgram, "viewMatrix");
-            glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
+            sceneShader.setMat4("viewMatrix", viewMatrix);
         }
 
         //reset the world orientation to origin
@@ -1151,8 +1345,7 @@ int main(int argc, char*argv[])
                 focalPoint += glm::vec3(deltaX, 0.0f, 0.0f),    //center
                 glm::vec3(0.0f, 1.0f, 0.0f));   // up
 
-            GLuint viewMatrixLocation = glGetUniformLocation(texturedShaderProgram, "viewMatrix");
-            glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
+            sceneShader.setMat4("viewMatrix", viewMatrix);
         }
 
         // tilt the camera in y axis
@@ -1163,8 +1356,7 @@ int main(int argc, char*argv[])
                 focalPoint += glm::vec3(0.0f, deltaY, 0.0f),    //center
                 glm::vec3(0.0f, 1.0f, 0.0f));// up
 
-            GLuint viewMatrixLocation = glGetUniformLocation(texturedShaderProgram, "viewMatrix");
-            glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
+            sceneShader.setMat4("viewMatrix", viewMatrix);
         }
 
         //continous translation along z axis
@@ -1279,6 +1471,12 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         movementOffsetX[currObject] = 0;
         movementOffsetY[currObject] = 0;
         movementOffsetZ[currObject] = 0;
+    }
+
+    else if (key == GLFW_KEY_LEFT_ALT && action == GLFW_PRESS && !shadowsKeyPressed)
+    {
+        shadows = !shadows;
+        shadowsKeyPressed = true;
     }
 }
 
