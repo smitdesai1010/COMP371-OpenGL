@@ -554,7 +554,7 @@ void renderCube(const GLenum render)
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
         glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
     }
@@ -685,15 +685,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
     shader.setVec4("objectColor", bitchColor);
 
 
-    //Draw Cubes
-
-    //Drawing cube around light source
-    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(lightPosition[0], lightPosition[1], lightPosition[2]));
-    scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(4, 4, 4));
-    worldMatrix = translationMatrix * scalingMatrix;
-    shader.setMat4("worldMatrix", worldMatrix);
-    shader.setVec4("objectColor", whiteColor);
-    renderCube(render);
+    
 
 
     //floor
@@ -707,6 +699,18 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
         renderCube(render);
     }
 
+
+
+
+    //Draw Cubes
+
+//Drawing cube around light source
+    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(lightPosition[0], lightPosition[1], lightPosition[2]));
+    scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(4, 4, 4));
+    worldMatrix = translationMatrix * scalingMatrix;
+    shader.setMat4("worldMatrix", worldMatrix);
+    shader.setVec4("objectColor", whiteColor);
+    renderCube(render);
 
 
     glBindTexture(GL_TEXTURE_2D, brick);
@@ -1079,7 +1083,7 @@ int main(int argc, char*argv[])
     // Black background
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-    Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+    //Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
     
     // Compile and link shaders here ...
     //int texturedShaderProgram = compileAndLinkShaders(getTexturedVertexShaderSource(), getTexturedFragmentShaderSource());
@@ -1157,7 +1161,7 @@ int main(int argc, char*argv[])
         sceneShader.setBool("stateOfTexture", textureState);
 
 
-
+        shadowsKeyPressed = false;
         // perspective Transform
         glm::mat4 projectionMatrix = glm::perspective(
             glm::radians(fov),     // field of view in degrees
@@ -1179,7 +1183,7 @@ int main(int argc, char*argv[])
             glm::vec3(0.0f, 1.0f, 0.0f) // up
         );
 
-        sceneShader.setMat4("viewMatrix", viewMatrix);
+        //sceneShader.setMat4("viewMatrix", viewMatrix);
 
         if (textureState)glBindTexture(GL_TEXTURE_2D, brickTextureID);
 
@@ -1195,6 +1199,7 @@ int main(int argc, char*argv[])
 
         glm::vec3 viewPosition = { eyePosition.x, eyePosition.y, eyePosition.z };
         sceneShader.setVec3("viewPos", viewPosition);
+
 
         
         // 0. create depth cubemap transformation matrices
@@ -1228,13 +1233,13 @@ int main(int argc, char*argv[])
         glViewport(0, 0, WindowWidth, WindowHeight);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         sceneShader.use();
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)WindowWidth / (float)WindowHeight, 0.1f, 100.0f);
-        glm::mat4 view = camera.GetViewMatrix();
-        sceneShader.setMat4("projection", projection);
-        sceneShader.setMat4("view", view);
+        //glm::mat4 projection = glm::perspective(glm::radians(fov), (float)WindowWidth / (float)WindowHeight, 0.1f, 100.0f);
+        //glm::mat4 view = camera.GetViewMatrix();
+        //sceneShader.setMat4("projectionMatrix", projection);
+        //sceneShader.setMat4("viewMatrix", view);
         // set lighting uniforms
-        sceneShader.setVec3("lightPos", lightPosition);
-        sceneShader.setVec3("viewPos", camera.Position);
+        //sceneShader.setVec3("lightPos", lightPosition);
+        //sceneShader.setVec3("viewPos", camera.Position);
         sceneShader.setInt("shadows", shadows); // enable/disable shadows by pressing 'SPACE'
         sceneShader.setFloat("far_plane", far_plane);/*
         glActiveTexture(GL_TEXTURE0);
