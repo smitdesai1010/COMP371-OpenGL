@@ -264,6 +264,7 @@ const char* getTexturedVertexShaderSource()
         "uniform mat4 viewMatrix = mat4(1.0);"  // default value for view matrix (identity)
         "uniform mat4 projectionMatrix = mat4(1.0);"
         ""
+        "out vec3 EyeDir;"
         "out vec3 FragPos;"
         "out vec3 Normal;"
         "out vec2 vertexUV;"
@@ -288,6 +289,7 @@ const char* getTexturedFragmentShaderSource()
         "uniform vec4 objectColor;"
         "uniform sampler2D textureSampler;"
         "uniform bool stateOfTexture;"
+        "uniform int shininess;"
         ""
         "in vec2 vertexUV;"
         "in vec3 Normal;"
@@ -296,7 +298,7 @@ const char* getTexturedFragmentShaderSource()
         "out vec4 FragColor;"
         "void main()"
         "{"
-        "   float ambientStrength = 0.3;"
+        "   float ambientStrength = 0.2;"
         "   vec3 ambient = ambientStrength * vec3(lightColor);"
         ""
         "   vec3 norm = normalize(Normal);"
@@ -304,16 +306,15 @@ const char* getTexturedFragmentShaderSource()
         "   float diff = max(dot(norm, lightDir), 0.0);"
         "   vec3 diffuse = diff * vec3(lightColor);"
         ""
-        "   float specularStrength = 0.9;"
+        "   float specularStrength = 1;"
         "   vec3 viewDir = normalize(viewPos - FragPos);"
         "   vec3 reflectDir = reflect(-lightDir, norm);"
-        "   float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);"
+        "   float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);"
         "   vec3 specular = specularStrength * spec * vec3(lightColor);"
         ""
         "   vec4 textureColor = texture( textureSampler, vertexUV );"
         "   vec3 result = (ambient + diffuse + specular) ;"
-        ""
-        "   if (stateOfTexture)FragColor = textureColor * vec4(result, 1.0); "
+        "   if (stateOfTexture)FragColor = textureColor * vec4(result  , 1.0);"
         "   else FragColor =  vec4(result * vec3(objectColor), 1.0);"
         "}";
 }
@@ -381,7 +382,7 @@ GLuint loadTexture(const char* filename)
         format = GL_RGB;
     else if (nrChannels == 4)
         format = GL_RGBA;
-    glTexImage2D(GL_TEXTURE_2D, 0, format, width/2, height/2,
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height,
         0, format, GL_UNSIGNED_BYTE, data);
 
     // Step5 Free resources
@@ -600,6 +601,8 @@ int main(int argc, char*argv[])
     while(!glfwWindowShouldClose(window))
     {
        
+        GLuint shhhh = glGetUniformLocation(texturedShaderProgram, "shininess");
+        glUniform1i(shhhh, 128);
         // Each frame, reset color of each pixel to glClearColor and depth
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -722,6 +725,8 @@ int main(int argc, char*argv[])
         glDrawArrays(GL_TRIANGLES, 0, 36);        
 
         
+        
+
         //floor
         if (textureState)
         {
@@ -739,6 +744,7 @@ int main(int argc, char*argv[])
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
         
         
+        glUniform1i(shhhh, 32);
         //wall 1
         for (int y = 0; y < 10; y++) {
             for (int x = 0; x < 10; x++) {
@@ -752,7 +758,54 @@ int main(int argc, char*argv[])
                 }
             }
         }
+        //wall 2
+        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
 
+        for (int y = 0; y < 10; y++) {
+            for (int x = 0; x < 10; x++) {
+                if (!((y == 2 && x == 6) || (y == 3 && x == 4) || (y == 3 && x == 6) || (y == 4 && x == 4) || (y == 4 && x == 6) || (y == 5 && x == 4) || (y == 5 && x == 5) || (y == 5 && x == 6) || (y == 5 && x == 7) || (y == 6 && x == 4) || (y == 6 && x == 7))) {
+
+                    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x + 40.5f), (y + 0.5f), -45.5f));
+                    worldMatrix = translationMatrix * scalingMatrix;
+                    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+                    glUniform4fv(colorLocation, 1, blueColor);
+                    glDrawArrays(GL_TRIANGLES, 0, 36);
+                }
+            }
+        }
+        //wall 3
+        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
+
+        for (int y = 0; y < 10; y++) {
+            for (int x = 0; x < 10; x++) {
+                if (!((y == 2 && x == 5) || (y == 3 && x == 3) || (y == 3 && x == 4) || (y == 3 && x == 5) || (y == 3 && x == 6) || (y == 3 && x == 7) || (y == 4 && x == 4) || (y == 4 && x == 5) || (y == 4 && x == 6) || (y == 5 && x == 5))) {
+
+                    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - 49.5f), (y + 0.5f), 35.5f));
+                    worldMatrix = translationMatrix * scalingMatrix;
+                    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+                    glUniform4fv(colorLocation, 1, blueColor);
+                    glDrawArrays(GL_TRIANGLES, 0, 36);
+                }
+            }
+        }
+
+        //wall 4
+        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
+
+        for (int y = 0; y < 10; y++) {
+            for (int x = 0; x < 10; x++) {
+                if (!((y == 3 && x == 3) || (y == 3 && x == 5) || (y == 3 && x == 7) || (y == 4 && x == 4) || (y == 4 && x == 6) || (y == 5 && x == 5))) {
+
+                    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x - 4.5f, y + 0.5f, -10.5f));
+                    worldMatrix = translationMatrix * scalingMatrix;
+                    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+                    glUniform4fv(colorLocation, 1, blueColor);
+                    glDrawArrays(GL_TRIANGLES, 0, 36);
+                }
+            }
+        }
+
+        glUniform1i(shhhh,128);
         glBindTexture(GL_TEXTURE_2D, cementTextureID);
         //Object-1
         baseVectorArray[0] = { 45.5f, 2.5f, 45.5f };
@@ -809,27 +862,7 @@ int main(int argc, char*argv[])
             glDrawArrays(render, 0, 36);
         }
 
-        
-
       
-        glBindTexture(GL_TEXTURE_2D, brickTextureID);
-        //wall 2
-        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
-
-        for (int y = 0; y < 10; y++) {
-            for (int x = 0; x < 10; x++) {
-                if (!((y == 2 && x == 6) || (y == 3 && x == 4) || (y == 3 && x == 6) || (y == 4 && x == 4) || (y == 4 && x == 6) || (y == 5 && x == 4) || (y == 5 && x == 5) || (y == 5 && x == 6) || (y == 5 && x == 7) || (y == 6 && x == 4) || (y == 6 && x == 7))) {
-
-                    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x + 40.5f) , (y + 0.5f) , -45.5f) );
-                    worldMatrix = translationMatrix * scalingMatrix;
-                    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-                    glUniform4fv(colorLocation, 1, blueColor);
-                    glDrawArrays(GL_TRIANGLES, 0, 36);
-                }
-            }
-        }
-
-        glBindTexture(GL_TEXTURE_2D, cementTextureID);
         //Object-2
         baseVectorArray[1] = { 45.5f, 2.5f, -35.5f };
         baseVectorArray[1] += glm::vec3(movementOffsetX[1], movementOffsetY[1], movementOffsetZ[1]);
@@ -884,27 +917,6 @@ int main(int argc, char*argv[])
         glDrawArrays(render, 0, 36);
 
 
-
-
-        glBindTexture(GL_TEXTURE_2D, brickTextureID);
-
-        //wall 3
-        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
-
-        for (int y = 0; y < 10; y++) {
-            for (int x = 0; x < 10; x++) {
-                if (!((y == 2 && x == 5) || (y == 3 && x == 3) || (y == 3 && x == 4) || (y == 3 && x == 5) || (y == 3 && x == 6) || (y == 3 && x == 7) || (y == 4 && x == 4) || (y == 4 && x == 5) || (y == 4 && x == 6) || (y == 5 && x == 5))) {
-
-                    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - 49.5f), (y + 0.5f), 35.5f));
-                    worldMatrix = translationMatrix * scalingMatrix;
-                    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-                    glUniform4fv(colorLocation, 1, blueColor);
-                    glDrawArrays(GL_TRIANGLES, 0, 36);
-                }
-            }
-        }
-
-        glBindTexture(GL_TEXTURE_2D, cementTextureID);
         //Object-3
         baseVectorArray[2] = { -45.5f, 2.5f, 45.5f };
         baseVectorArray[2] += glm::vec3(movementOffsetX[2], movementOffsetY[2], movementOffsetZ[2]);
@@ -969,24 +981,6 @@ int main(int argc, char*argv[])
         }
 
 
-        glBindTexture(GL_TEXTURE_2D, brickTextureID);
-
-        //wall 4
-        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
-
-        for (int y = 0; y < 10; y++) {
-            for (int x = 0; x < 10; x++) {
-                if (!((y == 3 && x == 3) || (y == 3 && x == 5) || (y == 3 && x == 7) || (y == 4 && x == 4) || (y == 4 && x == 6) || (y == 5 && x == 5))) {
-
-                    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x - 4.5f, y + 0.5f, -10.5f) );
-                    worldMatrix = translationMatrix * scalingMatrix;
-                    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-                    glUniform4fv(colorLocation, 1, blueColor);
-                    glDrawArrays(GL_TRIANGLES, 0, 36);
-                }
-            }
-        }
-        glBindTexture(GL_TEXTURE_2D, cementTextureID);
         //Object-4
         baseVectorArray[3] = { -0.5f, 2.5f, -0.5f };
         baseVectorArray[3] += glm::vec3(movementOffsetX[3], movementOffsetY[3], movementOffsetZ[3]);
