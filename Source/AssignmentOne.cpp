@@ -759,7 +759,6 @@ int main(int argc, char*argv[])
     // Disable Backface culling
     glDisable(GL_CULL_FACE);
 
-   
 
     float goesUp = 0;
     float goesUpTwo = 0;
