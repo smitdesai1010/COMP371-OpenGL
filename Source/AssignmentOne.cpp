@@ -30,28 +30,8 @@
 #include <list>
 #include <algorithm>
 
-
-
-
-// Cursor coordinates
-float lastX = 0, lastY = 0;
-float deltaX = 0;       //represents the change in X and Y since last mouse event
-float deltaY = 0;
 float fov = 45.0f;
 bool textureState = true;
-
-
-//Object - Offset Declaration
-float movementOffsetX[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-float movementOffsetY[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-float movementOffsetZ[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-float rotationOffsetX[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-float rotationOffsetY[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-float rotationOffsetZ[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-float scalingOffset[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-
-int currObject = 3;     // 0 index mapping
-
 
 //Window Size
 float WindowWidth = 1024.0f;
@@ -63,18 +43,11 @@ GLfloat greenColor[4] = { 0.0f, 1.0f, 0.0f, 1.0f };
 GLfloat blueColor[4] = { 0.0f, 0.0f, 1.0f, 1.0f };
 GLfloat whiteColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 GLfloat purpleColor[4] = { 1.0f, 0.0f, 1.0f, 1.0f };
-GLfloat bitchColor[4] = { 1.0f, 1.0f, 1.0f, 0.0f };
 
 
 // Input callback
-void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void window_size_callback(GLFWwindow* window, int width, int height);
-
-//calculate normal
-glm::vec3 calculateNormal(glm::vec3 a, glm::vec3 b, glm::vec3 c);
-
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 //replaces all vertices in cube with colored vertex for texture mapping
 struct TexturedColoredVertex
@@ -139,64 +112,6 @@ const TexturedColoredVertex texturedCubeVertexArray[] = {  // position,
     TexturedColoredVertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(0.0f,1.0f,0.0f))
 };
 
-
-/*TexturedColoredVertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(0.0f,0.0f,-1.0f)), //left - red
-    TexturedColoredVertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec2(1.0f, 0.0f), glm::vec3(0.0f,0.0f,-1.0f)),
-    TexturedColoredVertex(glm::vec3(0.5f, 0.5f, -0.5f),  glm::vec2(1.0f, 1.0f), glm::vec3(0.0f,0.0f,-1.0f)),
-
-    TexturedColoredVertex(glm::vec3(0.5f, 0.5f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(0.0f,0.0f,-1.0f)),
-    TexturedColoredVertex(glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(0.0f,0.0f,-1.0f)),
-    TexturedColoredVertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(0.0f,0.0f,-1.0f)),
-
-    TexturedColoredVertex(glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(0.0f,0.0f,1.0f)), // far - blue
-    TexturedColoredVertex(glm::vec3(0.5f, -0.5f,  0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(0.0f,0.0f,1.0f)),
-    TexturedColoredVertex(glm::vec3(0.5f, 0.5f,  0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(0.0f,0.0f,1.0f)),
-
-    TexturedColoredVertex(glm::vec3(0.5f, 0.5f,  0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(0.0f,0.0f,1.0f)),
-    TexturedColoredVertex(glm::vec3(-0.5f, 0.5f,  0.5f), glm::vec2(1.0f, 0.0f), glm::vec3(0.0f,0.0f,1.0f)),
-    TexturedColoredVertex(glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(0.0f,0.0f,1.0f)),
-
-
-
-
-
-    TexturedColoredVertex(glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(-1.0f,0.0f,0.0f)), // bottom - turquoise
-    TexturedColoredVertex(glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec2(1.0f, 0.0f), glm::vec3(-1.0f,0.0f,0.0f)),
-    TexturedColoredVertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(-1.0f,0.0f,0.0f)),
-
-    TexturedColoredVertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(-1.0f,0.0f,0.0f)),
-    TexturedColoredVertex(glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(-1.0f,0.0f,0.0f)),
-    TexturedColoredVertex(glm::vec3(-0.5f, 0.5f,  0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(-1.0f,0.0f,0.0f)),
-
-
-    TexturedColoredVertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(1.0f,0.0f,0.0f)), // near - green
-    TexturedColoredVertex(glm::vec3(0.5f, 0.5f, -0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(1.0f,0.0f,0.0f)),
-    TexturedColoredVertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec2(1.0f, 0.0f),glm::vec3(1.0f,0.0f,0.0f)),
-
-    TexturedColoredVertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(1.0f,0.0f,0.0f)),
-    TexturedColoredVertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(1.0f,0.0f,0.0f)),
-    TexturedColoredVertex(glm::vec3(0.5f, 0.5f,  0.5f), glm::vec2(1.0f, 0.0f), glm::vec3(1.0f,0.0f,0.0f)),
-
-
-
-
-
-
-    TexturedColoredVertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(0.0f,-1.0f,0.0f)), // right - purple
-    TexturedColoredVertex(glm::vec3(0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(0.0f,-1.0f,0.0f)),
-    TexturedColoredVertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec2(1.0f, 0.0f), glm::vec3(0.0f,-1.0f,0.0f)),
-
-    TexturedColoredVertex(glm::vec3(0.5f, -0.5f, 0.5f),  glm::vec2(0.0f, 0.0f), glm::vec3(0.0f,-1.0f,0.0f)),
-    TexturedColoredVertex(glm::vec3(0.5f, -0.5f, 0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(0.0f,-1.0f,0.0f)),
-    TexturedColoredVertex(glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(0.0f,-1.0f,0.0f)),
-
-    TexturedColoredVertex(glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(0.0f,1.0f,0.0f)), // top - yellow
-    TexturedColoredVertex(glm::vec3(0.5f, 0.5f, -0.5f), glm::vec2(1.0f, 0.0f), glm::vec3(0.0f,1.0f,0.0f)),
-    TexturedColoredVertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(0.0f,1.0f,0.0f)),
-
-    TexturedColoredVertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(0.0f,1.0f,0.0f)),
-    TexturedColoredVertex(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(0.0f,1.0f,0.0f)),
-    TexturedColoredVertex(glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(0.0f,1.0f,0.0f))*/
 
 int compileAndLinkShaders(const char* vertexShaderSource, const char* fragmentShaderSource)
 {
@@ -290,6 +205,7 @@ const char* getTexturedFragmentShaderSource()
         "uniform sampler2D textureSampler;"
         "uniform bool stateOfTexture;"
         "uniform int shininess;"
+        "uniform bool ambientOn;"
         ""
         "in vec2 vertexUV;"
         "in vec3 Normal;"
@@ -298,7 +214,9 @@ const char* getTexturedFragmentShaderSource()
         "out vec4 FragColor;"
         "void main()"
         "{"
-        "   float ambientStrength = 0.2;"
+        "float ambientStrength;"
+        "if (ambientOn) ambientStrength = 0.2;"
+        "else ambientStrength = 0;"
         "   vec3 ambient = ambientStrength * vec3(lightColor);"
         ""
         "   vec3 norm = normalize(Normal);"
@@ -319,37 +237,6 @@ const char* getTexturedFragmentShaderSource()
         "}";
 }
 
-const char* getLightCubeVertexShaderSource()
-{
-    // For now, you use a string for your shader code, in the assignment, shaders will be stored in .glsl files
-    return
-        "#version 330 core\n"
-        "layout (location = 0) in vec3 aPos;"
-        ""
-        "uniform mat4 worldMatrix;"
-        "uniform mat4 viewMatrix = mat4(1.0);"
-        "uniform mat4 projectionMatrix = mat4(1.0);"
-        ""
-        "void main()"
-        "{"
-        "   mat4 modelViewProjection = projectionMatrix * viewMatrix * worldMatrix;"
-        "   gl_Position = modelViewProjection * vec4(aPos.x, aPos.y, aPos.z, 1.0);"
-        "}";
-}
-const char* getLightCubeFragmentShaderSource()
-{
-    return
-        "#version 330 core\n"
-        "#define LINE_WIDTH 2.5 \n"
-        ""
-        "uniform vec4 objectColor; \n"
-        "out vec4 FragColor;"
-        ""
-        "void main()"
-        "{"
-        "   FragColor = objectColor; "
-        "}";
-}
 
 GLuint loadTexture(const char* filename)
 {
@@ -501,11 +388,13 @@ void setViewMatrix(int shaderProgram, glm::mat4 viewMatrix)
     glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
 }
 
-
-glm::vec3 baseVectorArray[4];
 glm::vec3 focalPoint = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 eyePosition = glm::vec3(0.0f, 40.0f, 0.0f);
+glm::vec3 positionOffset = glm::vec3(-12, 0, -2);
 
+int corner = 0;
+bool riding = false;
+bool ambientOn = true;
 
 int main(int argc, char*argv[])
 {
@@ -540,11 +429,9 @@ int main(int argc, char*argv[])
 
 
     // Setting input callbacks
-    glfwSetKeyCallback(window, key_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR);
-    glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetScrollCallback(window, scroll_callback);
     glfwSetWindowSizeCallback(window, window_size_callback);
+    glfwSetKeyCallback(window, key_callback);
+
 
     // Initialize GLEW
     glewExperimental = true; // Needed for core profile
@@ -571,19 +458,24 @@ int main(int argc, char*argv[])
     GLuint cementTextureID = loadTexture("Textures/cement.jpg");
     GLuint tilesTextureID = loadTexture("Textures/tiles.jpg");
 #else
-    GLuint brickTextureID = loadTexture("../Assets/Textures/brick.jpg");
+    
     GLuint cementTextureID = loadTexture("../Assets/Textures/cement.jpg");
     GLuint tilesTextureID = loadTexture("../Assets/Textures/tiles.jpg");
+    GLuint brickTextureID = loadTexture("../Assets/Textures/brick.jpg");
+    GLuint brickTwoTextureID = loadTexture("../Assets/Textures/brick2.jpg");
+    GLuint brickThreeTextureID = loadTexture("../Assets/Textures/brick3.jpg");
+    GLuint brickFourTextureID = loadTexture("../Assets/Textures/brick4.jpg");
+    GLuint wheelsTextureID = loadTexture("../Assets/Textures/wheels.jpg");
+    GLuint skateBoardTextureID = loadTexture("../Assets/Textures/board.jpg");
+    GLuint redTextureID = loadTexture("../Assets/Textures/red.jpg");
+    GLuint blueTextureID = loadTexture("../Assets/Textures/blue.jpg");
+    GLuint greenTextureID = loadTexture("../Assets/Textures/green.jpg");
 #endif
 
     
     // Disable Backface culling
     glDisable(GL_CULL_FACE);
 
-   
-
-    float goesUp = 0;
-    float goesUpTwo = 0;
     GLenum render = GL_TRIANGLES;
 
     //enable depth test
@@ -597,12 +489,18 @@ int main(int argc, char*argv[])
     GLuint colorLocation;
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+   
+
     // Entering Main Loop
     while(!glfwWindowShouldClose(window))
     {
        
         GLuint shhhh = glGetUniformLocation(texturedShaderProgram, "shininess");
         glUniform1i(shhhh, 128);
+        
+        GLuint ambi = glGetUniformLocation(texturedShaderProgram, "ambientOn");
+        glUniform1i(ambi, ambientOn);
+
         // Each frame, reset color of each pixel to glClearColor and depth
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -631,7 +529,7 @@ int main(int argc, char*argv[])
         );
 
         setViewMatrix(texturedShaderProgram, viewMatrix);
-        if (textureState)glBindTexture(GL_TEXTURE_2D, brickTextureID);
+       
 
         GLuint viewMatrixLocation = glGetUniformLocation(texturedShaderProgram, "viewMatrix");
         glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
@@ -639,16 +537,19 @@ int main(int argc, char*argv[])
 
 
         //Setting up light source
+        GLfloat lightPosition[3] = { 0.0f, 50.0f, 0.0f };
+        GLfloat viewPostion[3] = { eyePosition.x, eyePosition.y, eyePosition.z };
+        
         GLuint LightColor = glGetUniformLocation(texturedShaderProgram, "lightColor");
         glUniform4fv(LightColor, 1, whiteColor);
 
         GLuint LightPos = glGetUniformLocation(texturedShaderProgram, "lightPos");
-        GLfloat lightPosition[3] = { 0.0f, 30.0f, 0.0f };
         glUniform3fv(LightPos, 1, lightPosition);
 
         GLuint ViewPos = glGetUniformLocation(texturedShaderProgram, "viewPos");
-        GLfloat viewPostion[3] = { eyePosition.x, eyePosition.y, eyePosition.z };
         glUniform3fv(ViewPos, 1, viewPostion);
+
+        
 
 
         // Draw Grid
@@ -677,8 +578,10 @@ int main(int argc, char*argv[])
             
             glDrawArrays(GL_LINES, 0, 2);
         }
-       
+        glLineWidth(25);
+      
         // + x bar
+        glBindTexture(GL_TEXTURE_2D, redTextureID);
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.05f, 1.0f, 1.0f));
         rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(-1.0f, 0.0f, 0.0f));
         worldMatrix = scalingMatrix * rotationMatrix;
@@ -687,6 +590,7 @@ int main(int argc, char*argv[])
         glDrawArrays(GL_LINES, 0, 2);
         
         // + z bar
+        glBindTexture(GL_TEXTURE_2D, blueTextureID);
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 0.05f));
         rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         worldMatrix = scalingMatrix * rotationMatrix;
@@ -695,17 +599,17 @@ int main(int argc, char*argv[])
         glDrawArrays(GL_LINES, 0, 2);
       
         // + y bar
+        glBindTexture(GL_TEXTURE_2D, greenTextureID);
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 0.05f, 1.0f));
         rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
         worldMatrix = scalingMatrix * rotationMatrix;
         glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
         glUniform4fv(colorLocation, 1, blueColor);
         glDrawArrays(GL_LINES, 0, 2);
-
+        glLineWidth(1);
 
         glBindVertexArray(0);
-        glUniform4fv(colorLocation, 1, bitchColor);
-
+      
 
         //Draw Cubes
         
@@ -715,327 +619,137 @@ int main(int argc, char*argv[])
         worldMatrixLocation = glGetUniformLocation(texturedShaderProgram, "worldMatrix");
         colorLocation = glGetUniformLocation(texturedShaderProgram, "objectColor");
 
-
-        //Drawing cube around light source
-        translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(lightPosition[0], lightPosition[1], lightPosition[2]));
-        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(4, 4, 4));
+        //skycube
+        translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1000, 1000, 1000));
         worldMatrix = translationMatrix * scalingMatrix;
         glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
         glUniform4fv(colorLocation, 1, whiteColor);
-        glDrawArrays(GL_TRIANGLES, 0, 36);        
-
-        
-        
-
-        //floor
-        if (textureState)
-        {
-            glBindTexture(GL_TEXTURE_2D, tilesTextureID);
-            scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(100, 1, 100));
-            translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.5, 0));
-            worldMatrix = translationMatrix * scalingMatrix;
-            glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
-
-
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         glBindTexture(GL_TEXTURE_2D, brickTextureID);
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
         
         
         glUniform1i(shhhh, 32);
-        //wall 1
-        for (int y = 0; y < 10; y++) {
-            for (int x = 0; x < 10; x++) {
-                if (!((y == 3 && x == 3) || (y == 3 && x == 4) || (y == 3 && x == 5) || (y == 3 && x == 6) || (y == 3 && x == 7) || (y == 4 && x == 3) || (y == 4 && x == 7) || (y == 5 && x == 3) || (y == 5 && x == 7) || (y == 6 && x == 3) || (y == 6 && x == 4) || (y == 6 && x == 5) || (y == 6 && x == 6) || (y == 6 && x == 7) || (y == 7 && x == 3))) {
 
-                    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x + 40.5f, y + 0.5f, 35.5f));
-                    worldMatrix = translationMatrix * scalingMatrix;
-                    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-                    glUniform4fv(colorLocation, 1, blueColor);
-                    glDrawArrays(GL_TRIANGLES, 0, 36);
-                }
-            }
-        }
-        //wall 2
-        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
-
-        for (int y = 0; y < 10; y++) {
-            for (int x = 0; x < 10; x++) {
-                if (!((y == 2 && x == 6) || (y == 3 && x == 4) || (y == 3 && x == 6) || (y == 4 && x == 4) || (y == 4 && x == 6) || (y == 5 && x == 4) || (y == 5 && x == 5) || (y == 5 && x == 6) || (y == 5 && x == 7) || (y == 6 && x == 4) || (y == 6 && x == 7))) {
-
-                    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x + 40.5f), (y + 0.5f), -45.5f));
-                    worldMatrix = translationMatrix * scalingMatrix;
-                    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-                    glUniform4fv(colorLocation, 1, blueColor);
-                    glDrawArrays(GL_TRIANGLES, 0, 36);
-                }
-            }
-        }
-        //wall 3
-        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
-
-        for (int y = 0; y < 10; y++) {
-            for (int x = 0; x < 10; x++) {
-                if (!((y == 2 && x == 5) || (y == 3 && x == 3) || (y == 3 && x == 4) || (y == 3 && x == 5) || (y == 3 && x == 6) || (y == 3 && x == 7) || (y == 4 && x == 4) || (y == 4 && x == 5) || (y == 4 && x == 6) || (y == 5 && x == 5))) {
-
-                    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x - 49.5f), (y + 0.5f), 35.5f));
-                    worldMatrix = translationMatrix * scalingMatrix;
-                    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-                    glUniform4fv(colorLocation, 1, blueColor);
-                    glDrawArrays(GL_TRIANGLES, 0, 36);
-                }
-            }
-        }
-
-        //wall 4
-        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
-
-        for (int y = 0; y < 10; y++) {
-            for (int x = 0; x < 10; x++) {
-                if (!((y == 3 && x == 3) || (y == 3 && x == 5) || (y == 3 && x == 7) || (y == 4 && x == 4) || (y == 4 && x == 6) || (y == 5 && x == 5))) {
-
-                    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x - 4.5f, y + 0.5f, -10.5f));
-                    worldMatrix = translationMatrix * scalingMatrix;
-                    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-                    glUniform4fv(colorLocation, 1, blueColor);
-                    glDrawArrays(GL_TRIANGLES, 0, 36);
-                }
-            }
-        }
-
-        glUniform1i(shhhh,128);
-        glBindTexture(GL_TEXTURE_2D, cementTextureID);
-        //Object-1
-        baseVectorArray[0] = { 45.5f, 2.5f, 45.5f };
-        baseVectorArray[0] += glm::vec3(movementOffsetX[0], movementOffsetY[0], movementOffsetZ[0]);
-        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[0], scalingOffset[0], scalingOffset[0]));
-
-        for (int j = 0; j < 4; j++)
-        {
-            for (int i = 0; i < 4; i++)
-            {
-                int x = 0, y = 0, z = 0;
+        //skate board
+        glBindTexture(GL_TEXTURE_2D, skateBoardTextureID);
+        for (int z = 0; z <= 5; z++) {
+            for (int x = 0; x <= 25; x++) {
                 
-                if (j == 0) {
-                    x = i;
-                }
-                else if (j == 1) {
-                    y = i;
-                }
-                else if (j == 2) {
-                    z = i;
-                }
-                else if (j == 3) {
-                    y = 3;
-                    x = i;
-                    z = i;
-                }
-                
-                translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[0]);
-                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[0]), glm::vec3(1.0f, 0.0f, 0.0f));
-                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[0]), glm::vec3(0.0f, 1.0f, 0.0f));
-                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[0]), glm::vec3(0.0f, 0.0f, 1.0f));
-                translationMatrix = glm::translate(translationMatrix, glm::vec3(-x, y, -z) * scalingOffset[0]);
+                    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x , 2, z)+positionOffset);
+                    worldMatrix = translationMatrix * scalingMatrix;
+                    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+                    glUniform4fv(colorLocation, 1, blueColor);
+                    glDrawArrays(GL_TRIANGLES, 0, 36);
 
+            }
+        }
+        for (int z = 0; z <= 5; z++) {
+            for (int x = -3; x < 1; x++) {
+
+                translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x, 3, z) + positionOffset);
                 worldMatrix = translationMatrix * scalingMatrix;
-
                 glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-                glUniform4fv(colorLocation, 1, whiteColor);
-                glDrawArrays(render, 0, 36);
+                glUniform4fv(colorLocation, 1, blueColor);
+                glDrawArrays(GL_TRIANGLES, 0, 36);
+
             }
         }
+        for (int z = 0; z <= 5; z++) {
+            for (int x = 25; x < 29; x++) {
 
-        
-        for (int i = 0; i < 5; i++) {
-
-            translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[0]);
-            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[0]), glm::vec3(1.0f, 0.0f, 0.0f));
-            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[0]), glm::vec3(0.0f, 1.0f, 0.0f));
-            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[0]), glm::vec3(0.0f, 0.0f, 1.0f));
-            translationMatrix = glm::translate(translationMatrix, glm::vec3(-4.0f, i, 0.0f) * scalingOffset[0]);
-
-            worldMatrix = translationMatrix * scalingMatrix;
-            glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-            glUniform4fv(colorLocation, 1, whiteColor);
-            glDrawArrays(render, 0, 36);
-        }
-
-      
-        //Object-2
-        baseVectorArray[1] = { 45.5f, 2.5f, -35.5f };
-        baseVectorArray[1] += glm::vec3(movementOffsetX[1], movementOffsetY[1], movementOffsetZ[1]);
-        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[1], scalingOffset[1], scalingOffset[1]));
-        
-        for (int j = 0; j < 4; j++) {
-            for (int i = 0; i < 4; i++) {
-
-                int x = 0, y = 0, z = 0;
-                
-                if (j == 0) {
-                    z = i;
-                }
-                else if (j == 1) {
-                    y = i;
-                    z = 2;
-                }
-                else if (j == 2) {
-                    x = i;
-                    y = 2;
-                    z = 2;
-                }
-                else if (j == 3) {
-                    x = 2;
-                    y = 2 - i;
-                    z = 2;
-                }
-
-                translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[1]);
-                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[1]), glm::vec3(1.0f, 0.0f, 0.0f));
-                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[1]), glm::vec3(0.0f, 1.0f, 0.0f));
-                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[1]), glm::vec3(0.0f, 0.0f, 1.0f));
-                translationMatrix = glm::translate(translationMatrix, glm::vec3(x, y, z) * scalingOffset[1]);
-
+                translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x, 3, z) + positionOffset);
                 worldMatrix = translationMatrix * scalingMatrix;
-                
                 glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-                glUniform4fv(colorLocation, 1, whiteColor);
-                glDrawArrays(render, 0, 36);
+                glUniform4fv(colorLocation, 1, blueColor);
+                glDrawArrays(GL_TRIANGLES, 0, 36);
+
             }
         }
-
-        translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[1]);
-        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[1]), glm::vec3(1.0f, 0.0f, 0.0f));
-        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[1]), glm::vec3(0.0f, 1.0f, 0.0f));
-        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[1]), glm::vec3(0.0f, 0.0f, 1.0f));
-        translationMatrix = glm::translate(translationMatrix, glm::vec3(3.0f, 3.0f, 2.0f) * scalingOffset[1]);
-
+        glBindTexture(GL_TEXTURE_2D, wheelsTextureID);
+        //wheels
+        translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(1, 1, 0) + positionOffset);
         worldMatrix = translationMatrix * scalingMatrix;
         glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-        glUniform4fv(colorLocation, 1, whiteColor);
-        glDrawArrays(render, 0, 36);
-
-
-        //Object-3
-        baseVectorArray[2] = { -45.5f, 2.5f, 45.5f };
-        baseVectorArray[2] += glm::vec3(movementOffsetX[2], movementOffsetY[2], movementOffsetZ[2]);
-        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[2], scalingOffset[2], scalingOffset[2]));
-
-        int k = 1;
-        for (int j = 0; j < 2; j++)
-        {
-            for (int i = -2; i <= 2; i++) {
-                
-                translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[2]);
-                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[2]), glm::vec3(1.0f, 0.0f, 0.0f));
-                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[2]), glm::vec3(0.0f, 1.0f, 0.0f));
-                translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[2]), glm::vec3(0.0f, 0.0f, 1.0f));
-                translationMatrix = glm::translate(translationMatrix, glm::vec3(i * k, 0.0f, -i) * scalingOffset[2]);
-
-                
-                worldMatrix = translationMatrix * scalingMatrix;
-                glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-                glUniform4fv(colorLocation, 1, whiteColor);
-                glDrawArrays(render, 0, 36);
-            }
-            k = -1;
-        }
-
-        for (int i = -1; i < 3; i++) {
-            
-            translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[2]);
-            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[2]), glm::vec3(1.0f, 0.0f, 0.0f));
-            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[2]), glm::vec3(0.0f, 1.0f, 0.0f));
-            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[2]), glm::vec3(0.0f, 0.0f, 1.0f));
-            translationMatrix = glm::translate(translationMatrix, glm::vec3(0.0f, i, 0.0f) * scalingOffset[2]);
-
-            worldMatrix = translationMatrix * scalingMatrix;
-            glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-            glUniform4fv(colorLocation, 1, whiteColor);
-            glDrawArrays(render, 0, 36);
-        }
-
-        int x3 = 1, z3 = 1;
-        for (int i = 0; i < 3; i++) {
-
-            if (i > 0 && i % 2 == 1)
-            {
-                x3 *= -1;
-            }
-            else if (i > 0 && i % 2 == 0) {
-                z3 *= -1;
-            }
-
-            translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[2]);
-            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[2]), glm::vec3(1.0f, 0.0f, 0.0f));
-            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[2]), glm::vec3(0.0f, 1.0f, 0.0f));
-            translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[2]), glm::vec3(0.0f, 0.0f, 1.0f));
-            translationMatrix = glm::translate(translationMatrix, glm::vec3(x3, 1, z3) * scalingOffset[2]);
-
-
-            worldMatrix = translationMatrix * scalingMatrix;
-            glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-            glUniform4fv(colorLocation, 1, whiteColor);
-            glDrawArrays(render, 0, 36);
-        }
-
-
-        //Object-4
-        baseVectorArray[3] = { -0.5f, 2.5f, -0.5f };
-        baseVectorArray[3] += glm::vec3(movementOffsetX[3], movementOffsetY[3], movementOffsetZ[3]);
-        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[3], scalingOffset[3], scalingOffset[3]));
-
- 
-        for (int j = 0; j < 3; j++)
-        {
-            for (int i = -2; i <= 2; i++) {
-                if (abs(i % 2 == 0)) {
-                    
-                    translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[3]);
-                    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[3]), glm::vec3(1.0f, 0.0f, 0.0f));
-                    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[3]), glm::vec3(0.0f, 1.0f, 0.0f));
-                    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[3]), glm::vec3(0.0f, 0.0f, 1.0f));
-                    translationMatrix = glm::translate(translationMatrix, glm::vec3(i, 0.0f, j) * scalingOffset[3]);
-
-                    worldMatrix = translationMatrix * scalingMatrix;
-                    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-                    glUniform4fv(colorLocation, 1, whiteColor);
-                    glDrawArrays(render, 0, 36);
-                }
-            }
-        }
-        
-        for (int j = 0; j < 2; j++)
-        {
-            for (int i = -2; i <= 2; i++) {
-                if (abs(i % 2) == 1) {
-                    
-                    translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[3]);
-                    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[3]), glm::vec3(1.0f, 0.0f, 0.0f));
-                    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[3]), glm::vec3(0.0f, 1.0f, 0.0f));
-                    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[3]), glm::vec3(0.0f, 0.0f, 1.0f));
-                    translationMatrix = glm::translate(translationMatrix, glm::vec3(i, 1.0f, j) * scalingOffset[3]);
-
-                    worldMatrix = translationMatrix * scalingMatrix;
-                    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-                    glUniform4fv(colorLocation, 1, whiteColor);
-                    glDrawArrays(render, 0, 36);
-                }
-            }
-        }
-              
-        translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[3]);
-        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[3]), glm::vec3(1.0f, 0.0f, 0.0f));
-        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[3]), glm::vec3(0.0f, 1.0f, 0.0f));
-        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[3]), glm::vec3(0.0f, 0.0f, 1.0f));
-        translationMatrix = glm::translate(translationMatrix, glm::vec3(0.0f, 2.0f, 0.0f) * scalingOffset[3]);
-
-
+        glUniform4fv(colorLocation, 1, blueColor);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(1, 1, 5) + positionOffset);
         worldMatrix = translationMatrix * scalingMatrix;
         glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
-        glUniform4fv(colorLocation, 1, whiteColor);
-        glDrawArrays(render, 0, 36);
+        glUniform4fv(colorLocation, 1, blueColor);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(24, 1, 5) + positionOffset);
+        worldMatrix = translationMatrix * scalingMatrix;
+        glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+        glUniform4fv(colorLocation, 1, blueColor);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(24, 1, 0) + positionOffset);
+        worldMatrix = translationMatrix * scalingMatrix;
+        glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+        glUniform4fv(colorLocation, 1, blueColor);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        //numbers
+        //4
+        glBindTexture(GL_TEXTURE_2D, brickTextureID);
+        for (int y = 0; y < 25; y++) {
+            for (int x = 0; x < 25; x++) {
+                if (((y == 1 && x == 5) || (y == 2 && x == 5) || (y == 3 && x == 5) || (y == 4 && x == 5) || (y == 4 && x == 4) || (y == 4 && x == 3) || (y == 4 && x == 2) || (y == 4 && x == 1) || (y == 5 && x == 1) || (y == 5 && x == 5) || (y == 6 && x == 5) || (y == 6 && x == 1) || (y == 7 && x == 5) || (y == 7 && x == 1))) {
+
+                    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x , y+2 , 2) + positionOffset);
+                    worldMatrix = translationMatrix * scalingMatrix;
+                    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+                    glUniform4fv(colorLocation, 1, blueColor);
+                    glDrawArrays(GL_TRIANGLES, 0, 36);
+                }
+            }
+        }
+        //numbers
+        //0
+        glBindTexture(GL_TEXTURE_2D, brickTwoTextureID);
+        for (int y = 0; y < 25; y++) {
+            for (int x = 0; x < 25; x++) {
+                if (((y == 1 && x == 7) || (y == 1 && x == 8) || (y == 1 && x == 9) || (y == 1 && x ==10) || (y == 1 && x ==11) || (y == 2 && x == 7) || (y == 2 && x ==11) || (y == 3 && x == 7) || (y == 3 && x ==11) || (y == 4 && x == 7) || (y == 4 && x ==11) || (y == 5 && x == 7) || (y == 5 && x ==11) || (y == 6 && x == 7) || (y == 6 && x ==11) || (y == 7 && x == 7) || (y == 7 && x == 8) || (y == 7 && x == 9) || (y == 7 && x == 10) || (y == 7 && x == 11) || (y == 4 && x == 9))) {
+
+                    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x, y + 2, 2) + positionOffset);
+                    worldMatrix = translationMatrix * scalingMatrix;
+                    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+                    glUniform4fv(colorLocation, 1, blueColor);
+                    glDrawArrays(GL_TRIANGLES, 0, 36);
+                }
+            }
+        }
+        //numbers
+        //9
+        glBindTexture(GL_TEXTURE_2D, brickThreeTextureID);
+        for (int y = 0; y < 25; y++) {
+            for (int x = 0; x < 25; x++) {
+                if (((y == 1 && x == 14) || (y == 1 && x == 15) || (y == 1 && x == 16) || (y == 1 && x == 17) || (y == 2 && x == 17) || (y == 3 && x == 17) || (y == 4 && x == 13) || (y == 4 && x == 14) || (y == 4 && x == 15) || (y == 4 && x == 16) || (y == 4 && x == 17) || (y == 5 && x == 13) || (y == 5 && x == 17) || (y == 6 && x == 13) || (y == 6 && x == 17) || (y == 7 && x == 13) || (y == 7 && x == 14) || (y == 7 && x == 15) || (y == 7 && x == 16) || (y == 7 && x == 17))) {
+
+                    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x, y + 2, 2) + positionOffset);
+                    worldMatrix = translationMatrix * scalingMatrix;
+                    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+                    glUniform4fv(colorLocation, 1, blueColor);
+                    glDrawArrays(GL_TRIANGLES, 0, 36);
+                }
+            }
+        }
+        //numbers
+       //6
+        glBindTexture(GL_TEXTURE_2D, brickFourTextureID);
+        for (int y = 0; y < 25; y++) {
+            for (int x = 0; x < 25; x++) {
+                if (((y == 1 && x == 19) || (y == 1 && x == 20) || (y == 1 && x == 21) || (y == 1 && x == 22) || (y == 1 && x == 23) || (y == 2 && x == 19) || (y == 2 && x == 23) || (y == 3 && x == 19) || (y == 3 && x == 23) || (y == 4 && x == 19) || (y == 4 && x == 20) || (y == 4 && x == 21) || (y == 4 && x == 22) || (y == 4 && x == 23) || (y == 5 && x == 19) || (y == 6 && x == 19) || (y == 7 && x == 19) || (y == 7 && x == 20) || (y == 7 && x == 21) || (y == 7 && x == 22) || (y == 7 && x == 23))) {
+
+                    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x, y + 2, 2) + positionOffset);
+                    worldMatrix = translationMatrix * scalingMatrix;
+                    glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
+                    glUniform4fv(colorLocation, 1, blueColor);
+                    glDrawArrays(GL_TRIANGLES, 0, 36);
+                }
+            }
+        }
         
 
 
@@ -1051,255 +765,76 @@ int main(int argc, char*argv[])
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, true);
 
-
-        //Change render mode
-
-        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) 
-        {
-            render = GL_POINTS;
-        }
-        if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS) 
-        {
-            render = GL_LINES;
-        }
-        if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
-        {
-            render = GL_TRIANGLES;
-        }
-
-   
-
-
-        // WORLD-CAMERA INTERACTION
-
-        // backwards
-        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-        {
-            goesUp += 0.04;
+        //moving the skateboard
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+            positionOffset += glm::vec3(1, 0, 0);
+            if (riding) {
+                eyePosition = glm::vec3(12, 3, 5) + positionOffset;
+                focalPoint = glm::vec3(0, 0, -5) + eyePosition;
+            }
             
-            float radius = sqrt(pow((eyePosition - focalPoint).x, 2) + pow((eyePosition - focalPoint).z, 2));
-            eyePosition = glm::vec3((sin(goesUp) * radius) + focalPoint.x  ,eyePosition.y, (cos(goesUp) * radius)+focalPoint.z);
-            glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
-                focalPoint,  // center
-                glm::vec3(0.0f, 1.0f, 0.0f));// up
-
-
-            GLuint viewMatrixLocation = glGetUniformLocation(texturedShaderProgram, "viewMatrix");
-            glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
         }
-
-        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-        {
-            goesUp -= 0.04;
-            float radius = sqrt(pow((eyePosition - focalPoint).x, 2) + pow((eyePosition - focalPoint).z, 2));
-            eyePosition = glm::vec3((sin(goesUp) * radius) + focalPoint.x, eyePosition.y, (cos(goesUp) * radius) + focalPoint.z);
-            glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
-                focalPoint,  // center
-                glm::vec3(0.0f, 1.0f, 0.0f));// upad
-
-
-            GLuint viewMatrixLocation = glGetUniformLocation(texturedShaderProgram, "viewMatrix");
-            glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
+        
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+            positionOffset -= glm::vec3(1, 0, 0);
+            if (riding) {
+                eyePosition = glm::vec3(12, 3, 5) + positionOffset;
+                focalPoint = glm::vec3(0, 0, -5) + eyePosition;
+            }
         }
-
-        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-        {
-            goesUpTwo += 0.04;
-            float radius = sqrt(pow((eyePosition - focalPoint).y, 2) + pow((eyePosition - focalPoint).z, 2));
-            eyePosition = glm::vec3(eyePosition.x, (cos(goesUpTwo) * radius) + focalPoint.y, (-sin(goesUpTwo) * radius)+focalPoint.z);
-            glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
-                focalPoint,  // center
-                glm::vec3(0.0f, 1.0f, 0.0f));// up
-
-
-            GLuint viewMatrixLocation = glGetUniformLocation(texturedShaderProgram, "viewMatrix");
-            glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
-        }
-        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-        {
-            goesUpTwo -= 0.04;
-            float radius = sqrt(pow((eyePosition - focalPoint).y, 2) + pow((eyePosition - focalPoint).z, 2));
-            eyePosition = glm::vec3(eyePosition.x, (cos(goesUpTwo) * radius) + focalPoint.y, (-sin(goesUpTwo) * radius) + focalPoint.z);
-            glm::mat4 viewMatrix = glm::lookAt((eyePosition),  // eye
-                focalPoint,  // center
-                glm::vec3(0.0f, 1.0f, 0.0f));// up
-
-
-            GLuint viewMatrixLocation = glGetUniformLocation(texturedShaderProgram, "viewMatrix");
-            glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
-        }
-
-        //reset the world orientation to origin
-        if (glfwGetKey(window, GLFW_KEY_HOME) == GLFW_PRESS)
-        {
-            eyePosition = { 0.0f,40.0f,0.0f };
-            focalPoint = { 0.0f,0.0f,0.0f };
-        }
-
-
-        // pan the camera in x axis
-        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) 
-        {
-            glm::mat4 viewMatrix = glm::lookAt(
-                (eyePosition),  // eye
-                focalPoint += glm::vec3(deltaX, 0.0f, 0.0f),    //center
-                glm::vec3(0.0f, 1.0f, 0.0f));   // up
-
-            GLuint viewMatrixLocation = glGetUniformLocation(texturedShaderProgram, "viewMatrix");
-            glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
-        }
-
-        // tilt the camera in y axis
-        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS)
-        {
-            glm::mat4 viewMatrix = glm::lookAt(
-                (eyePosition),  // eye
-                focalPoint += glm::vec3(0.0f, deltaY, 0.0f),    //center
-                glm::vec3(0.0f, 1.0f, 0.0f));// up
-
-            GLuint viewMatrixLocation = glGetUniformLocation(texturedShaderProgram, "viewMatrix");
-            glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
-        }
-
-        //continous translation along z axis
-        if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)       
-            movementOffsetZ[currObject] += 1;
-
-        if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
-            movementOffsetZ[currObject] -= 1;
 
     }
 
-    
-  
     // Shutdown GLFWhh
     glfwTerminate();
     
     return 0;
 }
 
-
-//The callback will make the object move one unit at one press AND RELEASE
-//it WON'T move continuously till the key is press
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-    //object selection
+    //camera selection
     if (key == GLFW_KEY_1 && action == GLFW_PRESS)
     {
-        currObject = 0;
-        focalPoint = baseVectorArray[currObject];
-        eyePosition = focalPoint + glm::vec3(0.0f, 0.0f, 20.0f);
-
+        riding = false;
+        eyePosition = glm::vec3(0,40,40);
+        focalPoint = glm::vec3(0, 0, 0);
     }
-
-    else if (key == GLFW_KEY_2 && action == GLFW_PRESS)
+    if (key == GLFW_KEY_2 && action == GLFW_PRESS)
     {
-        currObject = 1;
-        focalPoint = baseVectorArray[currObject];
-        eyePosition = focalPoint + glm::vec3(0.0f, 0.0f, 20.0f);
+        riding = true;
+        eyePosition = glm::vec3(12, 3, 5) + positionOffset;
+        focalPoint = eyePosition + glm::vec3(0, 0, -5);
     }
-
-    else if (key == GLFW_KEY_3 && action == GLFW_PRESS)
+    if (key == GLFW_KEY_3 && action == GLFW_PRESS)
     {
-        currObject = 2;
-        focalPoint = baseVectorArray[currObject];
-        eyePosition = focalPoint + glm::vec3(0.0f, 0.0f, 20.0f);
+        riding = false;
+        corner++;
+        corner = corner % 4;
+        
+        switch (corner)
+        {
+        case 0:
+            eyePosition = glm::vec3(50, 50, 50);
+            break;
+        case 1:
+            eyePosition = glm::vec3(50, 50, -50);
+            break;
+        case 2:
+            eyePosition = glm::vec3(-50, 50, 50);
+            break;
+        case 3:
+            eyePosition = glm::vec3(-50, 50, -50);
+            break;
+        }
+        focalPoint =  glm::vec3(0, 0, 0);
     }
-
-    else if (key == GLFW_KEY_4 && action == GLFW_PRESS)
+    if (key == GLFW_KEY_Q && action == GLFW_PRESS)
     {
-        currObject = 3;
-        focalPoint = baseVectorArray[currObject];
-        eyePosition = focalPoint + glm::vec3(0.0f, 0.0f, 20.0f);
-    }
-    //switch texturing modes
-    else if (key == GLFW_KEY_C && action == GLFW_PRESS)
-    {
-        textureState = !textureState;
+        ambientOn = !ambientOn;
     }
 
-
-
-    //scaling
-    else if (key == GLFW_KEY_N && action == GLFW_PRESS)
-        scalingOffset[currObject] += 0.25;
-
-    else if (key == GLFW_KEY_M && action == GLFW_PRESS)
-        scalingOffset[currObject] = scalingOffset[currObject] > 0.25 ? scalingOffset[currObject] - 0.25 : 0.25;
-
-
-    //translation
-    else if (key == GLFW_KEY_W && action == GLFW_PRESS)
-        movementOffsetY[currObject] += 1;
-
-    else if (key == GLFW_KEY_S && action == GLFW_PRESS)
-        movementOffsetY[currObject] -= 1;
-
-    else if (key == GLFW_KEY_D && action == GLFW_PRESS)
-        movementOffsetX[currObject] += 1;
-
-    else if (key == GLFW_KEY_A && action == GLFW_PRESS)
-        movementOffsetX[currObject] -= 1;
-
-    else if (key == GLFW_KEY_Q && action == GLFW_PRESS)
-        movementOffsetZ[currObject] += 1;
-
-    else if (key == GLFW_KEY_E && action == GLFW_PRESS)
-        movementOffsetZ[currObject] -= 1;
-
-
-    //rotation
-    else if (key == GLFW_KEY_H && action == GLFW_PRESS) //x-axis
-        rotationOffsetX[currObject] += 20;
-
-    else if (key == GLFW_KEY_J && action == GLFW_PRESS)
-        rotationOffsetX[currObject] -= 20;
-
-    else if (key == GLFW_KEY_F && action == GLFW_PRESS) //y-axis
-        rotationOffsetY[currObject] += 20;
-
-    else if (key == GLFW_KEY_G && action == GLFW_PRESS)
-        rotationOffsetY[currObject] -= 20;
-
-    else if (key == GLFW_KEY_V && action == GLFW_PRESS) //z-axis
-        rotationOffsetZ[currObject] += 20;
-
-    else if (key == GLFW_KEY_B && action == GLFW_PRESS)
-        rotationOffsetZ[currObject] -= 20;
-
-
-    else if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
-    {
-        movementOffsetX[currObject] = 0;
-        movementOffsetY[currObject] = 0;
-        movementOffsetZ[currObject] = 0;
-    }
 }
-
-void mouse_callback(GLFWwindow* window, double xpos, double ypos)
-{
-    deltaX = xpos - lastX;
-    deltaY = lastY - ypos;
-    lastX = xpos;
-    lastY = ypos;
-
-    float sensitivity = 0.3f;
-    deltaX *= sensitivity;
-    deltaY *= sensitivity;
-}
-
-
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT)) // zoom in zoom out
-    {
-        fov -= (float)yoffset;
-
-        if (fov < 1.0f)
-            fov = 1.0f;
-    }
-}
-
 
 void window_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -1307,10 +842,3 @@ void window_size_callback(GLFWwindow* window, int width, int height)
     WindowHeight = height;
 }
 
-glm::vec3 calculateNormal(glm::vec3 a, glm::vec3 b, glm::vec3 c)
-{
-    glm::vec3 dir = glm::cross(b - a, c - b);
-    glm::vec3 norm = glm::normalize(dir);
-
-    return norm;
-}
