@@ -24,6 +24,9 @@
 #include <glm/gtc/matrix_transform.hpp> // include this to create transformation matrices
 #include <glm/common.hpp>
 
+#include <irrKlang.h>   // Sound library
+#pragma comment(lib, "irrKlang.lib")
+
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
@@ -85,6 +88,11 @@ bool shadowsKeyPressed = false;
 //render mode, default = triangles
 GLenum render = GL_TRIANGLES;
 
+
+//Sounds
+irrklang::ISoundEngine* soundEngine;
+void collisionSound();
+void successSound();
 
 //Coordinates for 0-9 numbers for text rendering
 //It is rendered using cubes, much like we did in QUIZ-2 by a 4*3 rectangle, (0,0) corresponds to bottom left
@@ -683,6 +691,9 @@ int main(int argc, char*argv[])
 {
     // Initialize GLFW and OpenGL version
     glfwInit();
+
+    // Sound Engine
+    soundEngine = irrklang::createIrrKlangDevice();
     
 #if defined(PLATFORM_OSX)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -734,11 +745,8 @@ int main(int argc, char*argv[])
     // Black background
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-    //Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
     
     // Compile and link shaders here ...
-    //int texturedShaderProgram = compileAndLinkShaders(getTexturedVertexShaderSource(), getTexturedFragmentShaderSource());
-    //int lightCubeShaderProgram = compileAndLinkShaders(getTexturedVertexShaderSource(), getTexturedFragmentShaderSource());
     Shader sceneShader("vertexShader.vs", "fragmentShader.fs");
     Shader simpleDepthShader("point_shadows_depth.vs", "point_shadows_depth.fs", "point_shadows_depth.gs");
     
@@ -765,6 +773,7 @@ int main(int argc, char*argv[])
     glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);
     for (unsigned int i = 0; i < 6; ++i)
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -799,12 +808,12 @@ int main(int argc, char*argv[])
     
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    
+    // playing sound
+    soundEngine->play2D("../Assets/Audio/background.mp3", true);
 
     // Entering Main Loop
     while(!glfwWindowShouldClose(window))
     {
-       
         // Each frame, reset color of each pixel to glClearColor and depth
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -1254,4 +1263,17 @@ void renderDigit(Shader shader, int X, int Y, int digit)
 
 
     shader.setBool("stateOfTexture", textureState);
+}
+
+
+void collisionSound()
+{
+    //soundEngine->stopAllSounds();
+    irrklang::createIrrKlangDevice()->play2D("../Assets/Audio/collision.wav", false);
+    //soundEngine->play2D("../Assets/Audio/collision.wav", true);
+}
+
+void successSound()
+{
+    irrklang::createIrrKlangDevice()->play2D("../Assets/Audio/sucess.wav", false);
 }
