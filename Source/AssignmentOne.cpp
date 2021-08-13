@@ -400,6 +400,7 @@ int main(int argc, char*argv[])
 {
     // Initialize GLFW and OpenGL version
     glfwInit();
+    float t = 0;
     
 #if defined(PLATFORM_OSX)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -483,6 +484,7 @@ int main(int argc, char*argv[])
 
     glm::mat4 translationMatrix;
     glm::mat4 rotationMatrix;
+    glm::mat4 skateBoardRotationMatrix;
     glm::mat4 scalingMatrix;
     glm::mat4 worldMatrix;
     GLuint worldMatrixLocation;
@@ -632,6 +634,8 @@ int main(int argc, char*argv[])
         
         
         glUniform1i(shhhh, 32);
+        float boardAngle = 0;
+        skateBoardRotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(boardAngle), glm::vec3(0.0f, 1.0f, 0.0f));
 
         //skate board
         glBindTexture(GL_TEXTURE_2D, skateBoardTextureID);
@@ -639,7 +643,7 @@ int main(int argc, char*argv[])
             for (int x = 0; x <= 25; x++) {
                 
                     translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x , 2, z)+positionOffset);
-                    worldMatrix = translationMatrix * scalingMatrix;
+                    worldMatrix = translationMatrix * scalingMatrix * skateBoardRotationMatrix;
                     glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
                     glUniform4fv(colorLocation, 1, blueColor);
                     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -650,7 +654,7 @@ int main(int argc, char*argv[])
             for (int x = -3; x < 1; x++) {
 
                 translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x, 3, z) + positionOffset);
-                worldMatrix = translationMatrix * scalingMatrix;
+                worldMatrix = translationMatrix * scalingMatrix * skateBoardRotationMatrix;
                 glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
                 glUniform4fv(colorLocation, 1, blueColor);
                 glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -661,7 +665,7 @@ int main(int argc, char*argv[])
             for (int x = 25; x < 29; x++) {
 
                 translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x, 3, z) + positionOffset);
-                worldMatrix = translationMatrix * scalingMatrix;
+                worldMatrix = translationMatrix * scalingMatrix * skateBoardRotationMatrix;
                 glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
                 glUniform4fv(colorLocation, 1, blueColor);
                 glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -671,22 +675,22 @@ int main(int argc, char*argv[])
         glBindTexture(GL_TEXTURE_2D, wheelsTextureID);
         //wheels
         translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(1, 1, 0) + positionOffset);
-        worldMatrix = translationMatrix * scalingMatrix;
+        worldMatrix = translationMatrix * scalingMatrix * skateBoardRotationMatrix;
         glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
         glUniform4fv(colorLocation, 1, blueColor);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(1, 1, 5) + positionOffset);
-        worldMatrix = translationMatrix * scalingMatrix;
+        worldMatrix = translationMatrix * scalingMatrix * skateBoardRotationMatrix;
         glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
         glUniform4fv(colorLocation, 1, blueColor);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(24, 1, 5) + positionOffset);
-        worldMatrix = translationMatrix * scalingMatrix;
+        worldMatrix = translationMatrix * scalingMatrix * skateBoardRotationMatrix;
         glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
         glUniform4fv(colorLocation, 1, blueColor);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(24, 1, 0) + positionOffset);
-        worldMatrix = translationMatrix * scalingMatrix;
+        worldMatrix = translationMatrix * scalingMatrix * skateBoardRotationMatrix;
         glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
         glUniform4fv(colorLocation, 1, blueColor);
         glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -698,7 +702,7 @@ int main(int argc, char*argv[])
                 if (((y == 1 && x == 5) || (y == 2 && x == 5) || (y == 3 && x == 5) || (y == 4 && x == 5) || (y == 4 && x == 4) || (y == 4 && x == 3) || (y == 4 && x == 2) || (y == 4 && x == 1) || (y == 5 && x == 1) || (y == 5 && x == 5) || (y == 6 && x == 5) || (y == 6 && x == 1) || (y == 7 && x == 5) || (y == 7 && x == 1))) {
 
                     translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x , y+2 , 2) + positionOffset);
-                    worldMatrix = translationMatrix * scalingMatrix;
+                    worldMatrix = translationMatrix * scalingMatrix * skateBoardRotationMatrix;
                     glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
                     glUniform4fv(colorLocation, 1, blueColor);
                     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -713,7 +717,7 @@ int main(int argc, char*argv[])
                 if (((y == 1 && x == 7) || (y == 1 && x == 8) || (y == 1 && x == 9) || (y == 1 && x ==10) || (y == 1 && x ==11) || (y == 2 && x == 7) || (y == 2 && x ==11) || (y == 3 && x == 7) || (y == 3 && x ==11) || (y == 4 && x == 7) || (y == 4 && x ==11) || (y == 5 && x == 7) || (y == 5 && x ==11) || (y == 6 && x == 7) || (y == 6 && x ==11) || (y == 7 && x == 7) || (y == 7 && x == 8) || (y == 7 && x == 9) || (y == 7 && x == 10) || (y == 7 && x == 11) || (y == 4 && x == 9))) {
 
                     translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x, y + 2, 2) + positionOffset);
-                    worldMatrix = translationMatrix * scalingMatrix;
+                    worldMatrix = translationMatrix * scalingMatrix * skateBoardRotationMatrix;
                     glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
                     glUniform4fv(colorLocation, 1, blueColor);
                     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -728,7 +732,7 @@ int main(int argc, char*argv[])
                 if (((y == 1 && x == 14) || (y == 1 && x == 15) || (y == 1 && x == 16) || (y == 1 && x == 17) || (y == 2 && x == 17) || (y == 3 && x == 17) || (y == 4 && x == 13) || (y == 4 && x == 14) || (y == 4 && x == 15) || (y == 4 && x == 16) || (y == 4 && x == 17) || (y == 5 && x == 13) || (y == 5 && x == 17) || (y == 6 && x == 13) || (y == 6 && x == 17) || (y == 7 && x == 13) || (y == 7 && x == 14) || (y == 7 && x == 15) || (y == 7 && x == 16) || (y == 7 && x == 17))) {
 
                     translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x, y + 2, 2) + positionOffset);
-                    worldMatrix = translationMatrix * scalingMatrix;
+                    worldMatrix = translationMatrix * scalingMatrix * skateBoardRotationMatrix;
                     glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
                     glUniform4fv(colorLocation, 1, blueColor);
                     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -743,7 +747,7 @@ int main(int argc, char*argv[])
                 if (((y == 1 && x == 19) || (y == 1 && x == 20) || (y == 1 && x == 21) || (y == 1 && x == 22) || (y == 1 && x == 23) || (y == 2 && x == 19) || (y == 2 && x == 23) || (y == 3 && x == 19) || (y == 3 && x == 23) || (y == 4 && x == 19) || (y == 4 && x == 20) || (y == 4 && x == 21) || (y == 4 && x == 22) || (y == 4 && x == 23) || (y == 5 && x == 19) || (y == 6 && x == 19) || (y == 7 && x == 19) || (y == 7 && x == 20) || (y == 7 && x == 21) || (y == 7 && x == 22) || (y == 7 && x == 23))) {
 
                     translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x, y + 2, 2) + positionOffset);
-                    worldMatrix = translationMatrix * scalingMatrix;
+                    worldMatrix = translationMatrix * scalingMatrix * skateBoardRotationMatrix;
                     glUniformMatrix4fv(worldMatrixLocation, 1, GL_FALSE, &worldMatrix[0][0]);
                     glUniform4fv(colorLocation, 1, blueColor);
                     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -777,6 +781,19 @@ int main(int argc, char*argv[])
         
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
             positionOffset -= glm::vec3(1, 0, 0);
+            if (riding) {
+                eyePosition = glm::vec3(12, 3, 5) + positionOffset;
+                focalPoint = glm::vec3(0, 0, -5) + eyePosition;
+            }
+        }
+        
+        if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+
+            float a = 20;
+            float b = 10;
+            t+=0.01;
+            positionOffset = glm::vec3(a * cos(t),0, b * sin(t));
+            
             if (riding) {
                 eyePosition = glm::vec3(12, 3, 5) + positionOffset;
                 focalPoint = glm::vec3(0, 0, -5) + eyePosition;
