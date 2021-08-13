@@ -27,13 +27,12 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#include <set>
 #include <list>
 #include <algorithm>
 #include <../VS2017/Shader.h>
 #include <vector>
 #include <../VS2017/Camera.h>
-
-
 
 
 // Cursor coordinates
@@ -80,10 +79,33 @@ glm::mat4 scalingMatrix;
 glm::mat4 worldMatrix;
 
 glm::vec3 lightPosition = { 0.0f,30.0f, 0.0f };
-bool shadows = true;
+bool shadows = false;
 bool shadowsKeyPressed = false;
 
+//render mode, default = triangles
 GLenum render = GL_TRIANGLES;
+
+
+//Coordinates for 0-9 numbers for text rendering
+//It is rendered using cubes, much like we did in QUIZ-2 by a 4*3 rectangle, (0,0) corresponds to bottom left
+std::set<std::pair<int, int>> setXY[10] = {
+   { {0,4}, {1,4}, {2,4}, {2,3}, {2,2}, {0,2}, {0,1}, {0,0}, {1,0}, {2,0}, {0,3}, {2,1} },        //0
+   { {1,4}, {1,3}, {1,2}, {1,1}, {1,0} },                                                         //1
+   { {0,4}, {1,4}, {2,4}, {2,3}, {2,2}, {1,2}, {0,2}, {0,1}, {0,0}, {1,0}, {2,0} },               //2
+   { {0,4}, {1,4}, {2,4}, {2,3}, {2,2}, {1,2}, {0,2}, {2,1}, {2,0}, {1,0}, {0,0} },               //3
+   { {0,4}, {0,3}, {0,2}, {1,2}, {2,2}, {2,3}, {2,4}, {2,1}, {2,0} },                             //4
+   { {0,4}, {1,4}, {2,4}, {0,3}, {0,2}, {1,2}, {2,2}, {2,1}, {2,0}, {1,0}, {0,0} },               //5
+   { {0,4}, {1,4}, {2,4}, {0,3}, {0,2}, {1,2}, {2,2}, {2,1}, {2,0}, {1,0}, {0,0}, {0,1} },        //6
+   { {0,4}, {1,4}, {2,4}, {2,3}, {2,2}, {2,1}, {2,0} },                                           //7
+   { {0,4}, {1,4}, {2,4}, {2,3}, {2,2}, {1,2}, {0,2}, {0,1}, {0,0}, {1,0}, {2,0}, {0,3}, {2,1} }, //8
+   { {0,4}, {1,4}, {2,4}, {0,3}, {0,2}, {1,2}, {2,2}, {2,1}, {2,0}, {1,0}, {0,0}, {2,3} }         //9
+};
+
+int score = 0;
+const int TOTALTIME = 180; //3 mins
+void renderDigit(Shader shader, int X, int Y, int digit);
+void renderScore(Shader shader);
+void renderTime(Shader shader);
 
 
 // Input callback
@@ -139,7 +161,6 @@ GLuint loadTexture(const char* filename)
 }
 
 
-
 unsigned int cubeVAO = 0;
 unsigned int cubeVBO = 0;
 
@@ -148,51 +169,51 @@ unsigned int gridLineVBO = 0;
 
 
 //renderCube(render) renders a unit cube
-void renderCube(const GLenum render)
+void renderCube()
 {
     // initialize (if necessary)
     if (cubeVAO == 0)
     {
         float vertices[] = {
             // back face
-            -0.5f,-0.5f,-0.5f,  0.0f, 0.0f, -1.0f,0.0f,0.0f, // bottom-left
-             -0.5f,  -0.5f, 0.5f,  0.0f,  1.0f, -1.0f, 0.0f, 0.0f, // top-right
-             -0.5f, 0.5f, 0.5f,  1.0f,  1.0f, -1.0f, 0.0f, 0.0f, // bottom-right         
-             -0.5f,  -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // top-right
-            -0.5f, 0.5f, 0.5f,  1.0f,  1.0f, -1.0f, 0.0f, 0.0f, // bottom-left
+            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
+            -0.5f, -0.5f,  0.5f,  0.0f,  1.0f, -1.0f, 0.0f, 0.0f, // top-right
+            -0.5f,  0.5f,  0.5f,  1.0f,  1.0f, -1.0f, 0.0f, 0.0f, // bottom-right         
+            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // top-right
+            -0.5f,  0.5f,  0.5f,  1.0f,  1.0f, -1.0f, 0.0f, 0.0f, // bottom-left
             -0.5f,  0.5f, -0.5f,  1.0f,  0.0f, -1.0f, 0.0f, 0.0f, // top-left
             // front face
-            0.5f, 0.5f,  -0.5f,  1.0f,  1.0f,  0.0f, 0.0f, -1.0f, // bottom-left
-             -0.5f, -0.5f,  -0.5f,  0.0f,  0.0f,  0.0f, 0.0f, -1.0f, // bottom-right
-             -0.5f,  0.5f,  -0.5f,  0.0f,  1.0f,  0.0f, 0.0f, -1.0f, // top-right
-             0.5f,  0.5f,  -0.5f,  1.0f,  1.0f,  0.0f, 0.0f, -1.0f, // top-right
-            0.5f,  -0.5f,  -0.5f,  1.0f,  0.0f,  0.0f, 0.0f, -1.0f, // top-left
-            -0.5f, -0.5f,  -0.5f,  0.0f,  0.0f,  0.0f, 0.0f, -1.0f, // bottom-left
+             0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f, 0.0f, -1.0f, // bottom-left
+            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  0.0f, 0.0f, -1.0f, // bottom-right
+            -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f, 0.0f, -1.0f, // top-right
+             0.5f,  0.5f, -0.5f,  1.0f,  1.0f,  0.0f, 0.0f, -1.0f, // top-right
+             0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f, 0.0f, -1.0f, // top-left
+            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  0.0f, 0.0f, -1.0f, // bottom-left
             // left face
-            0.5f,  -0.5f,  0.5f, 1.0f,  1.0f,  0.0f, -1.0f, 0.0f, // top-right
-            -0.5f,  -0.5f, -0.5f, 0.0f,  0.0f,  0.0f, -1.0f, 0.0f, // top-left
-            0.5f, -0.5f, -0.5f, 1.0f,  0.0f,  0.0f, -1.0f, 0.0f, // bottom-left
-            0.5f, -0.5f, 0.5f, 1.0f,  1.0f,  0.0f, -1.0f, 0.0f, // bottom-left
-            -0.5f, -0.5f,  0.5f, 0.0f,  1.0f,  0.0f, -1.0f, 0.0f, // bottom-right
-            -0.5f,  -0.5f,  -0.5f, 0.0f,  0.0f,  0.0f, -1.0f, 0.0f, // top-right
+             0.5f, -0.5f,  0.5f,  1.0f,  1.0f,  0.0f, -1.0f, 0.0f, // top-right
+            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  0.0f, -1.0f, 0.0f, // top-left
+             0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f, -1.0f, 0.0f, // bottom-left
+             0.5f, -0.5f,  0.5f,  1.0f,  1.0f,  0.0f, -1.0f, 0.0f, // bottom-left
+            -0.5f, -0.5f,  0.5f,  0.0f,  1.0f,  0.0f, -1.0f, 0.0f, // bottom-right
+            -0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  0.0f, -1.0f, 0.0f, // top-right
             // right face
-             -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
-             -0.5f, -0.5f, 0.5f,  0.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
-             0.5f,  -0.5f, 0.5f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // top-right         
-             0.5f, 0.5f, 0.5f,  1.0f,  1.0f,  0.0f, 0.0f, 1.0f, // bottom-right
-             -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
+            -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
+            -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
+             0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // top-right         
+             0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f, 0.0f, 1.0f, // bottom-right
+            -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
              0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left     
             // bottom face
-            0.5f, 0.5f, 0.5f,  1.0f, 1.0f,  1.0f, 0.0f, 0.0f, // top-right
-             0.5f, -0.5f, -0.5f,  0.0f, 0.0f,  1.0f, 0.0f,0.0f, // top-left
-             0.5f, 0.5f,  -0.5f,  1.0f, 0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
-             0.5f, -0.5f,  -0.5f,  0.0f, 0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
-            0.5f, 0.5f,  0.5f,  1.0f, 1.0f,  1.0f, 0.0f, 0.0f, // bottom-right
-            0.5f, -0.5f, 0.5f,  0.0f, 1.0f,  1.0f, 0.0f, 0.0f, // top-right
+             0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  1.0f, 0.0f, 0.0f, // top-right
+             0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // top-left
+             0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
+             0.5f, -0.5f, -0.5f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
+             0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  1.0f, 0.0f, 0.0f, // bottom-right
+             0.5f, -0.5f,  0.5f,  0.0f,  1.0f,  1.0f, 0.0f, 0.0f, // top-right
             // top face
-            0.5f,  0.5f, 0.5f,  1.0f,  1.0f,  0.0f, 1.0f, 0.0f, // top-left
-             0.5f,  0.5f , -0.5f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // bottom-right
-             -0.5f,  0.5f, -0.5f,  0.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right     
+             0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f, 1.0f, 0.0f, // top-left
+             0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // bottom-right
+            -0.5f,  0.5f, -0.5f,  0.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right     
              0.5f,  0.5f,  0.5f,  1.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
             -0.5f,  0.5f, -0.5f,  0.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
             -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f  // bottom-left        
@@ -204,12 +225,16 @@ void renderCube(const GLenum render)
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
         // link vertex attributes
         glBindVertexArray(cubeVAO);
+        
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+        
         glEnableVertexAttribArray(1);
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+
         glEnableVertexAttribArray(2);
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+        
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
     }
@@ -259,7 +284,11 @@ void renderGridLine()
 
 void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, const GLuint tiles)
 {
-    
+    //rendering score
+    renderScore(shader);
+    //rendring Time;
+    renderTime(shader);
+
     scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
     shader.setVec4("objectColor", greenColor);
 
@@ -318,7 +347,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
         translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.5, 0));
         worldMatrix = translationMatrix * scalingMatrix;
         shader.setMat4("worldMatrix", worldMatrix);
-        renderCube(render);
+        renderCube();
     }
 
 
@@ -327,17 +356,19 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
     //Draw Cubes
 
     //Drawing cube around light source
+    shader.setBool("lighting", false);
     translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(lightPosition[0], lightPosition[1], lightPosition[2]));
-    scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(4, 4, 4));
+    scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(2, 2, 2));
     worldMatrix = translationMatrix * scalingMatrix;
     shader.setMat4("worldMatrix", worldMatrix);
     shader.setVec4("objectColor", whiteColor);
-    renderCube(render);
+    renderCube();
+    shader.setBool("lighting", true);
+
 
 
     glBindTexture(GL_TEXTURE_2D, brick);
     scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
-
 
     //wall 1
     for (int y = 0; y < 10; y++) {
@@ -348,7 +379,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
                 worldMatrix = translationMatrix * scalingMatrix;
                 shader.setMat4("worldMatrix", worldMatrix);
                 shader.setVec4("objectColor", blueColor);
-                renderCube(render);
+                renderCube();
             }
         }
     }
@@ -389,7 +420,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
             worldMatrix = translationMatrix * scalingMatrix;
             shader.setMat4("worldMatrix", worldMatrix);
             shader.setVec4("objectColor", whiteColor); 
-            renderCube(render);
+            renderCube();
         }
     }
 
@@ -405,7 +436,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
         worldMatrix = translationMatrix * scalingMatrix;
         shader.setMat4("worldMatrix", worldMatrix);
         shader.setVec4("objectColor", whiteColor);
-        renderCube(render);
+        renderCube();
     }
 
 
@@ -423,7 +454,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
                 worldMatrix = translationMatrix * scalingMatrix;
                 shader.setMat4("worldMatrix", worldMatrix);
                 shader.setVec4("objectColor", blueColor);
-                renderCube(render);
+                renderCube();
             }
         }
     }
@@ -466,7 +497,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
             worldMatrix = translationMatrix * scalingMatrix;
             shader.setMat4("worldMatrix", worldMatrix);
             shader.setVec4("objectColor", whiteColor);
-            renderCube(render);
+            renderCube();
         }
     }
 
@@ -479,13 +510,12 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
     worldMatrix = translationMatrix * scalingMatrix;
     shader.setMat4("worldMatrix", worldMatrix);
     shader.setVec4("objectColor", whiteColor);
-    renderCube(render);
+    renderCube();
 
 
 
 
     glBindTexture(GL_TEXTURE_2D, brick);
-
     //wall 3
     scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
 
@@ -497,7 +527,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
                 worldMatrix = translationMatrix * scalingMatrix;
                 shader.setMat4("worldMatrix", worldMatrix);
                 shader.setVec4("objectColor", blueColor);
-                renderCube(render);
+                renderCube();
             }
         }
     }
@@ -523,7 +553,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
             worldMatrix = translationMatrix * scalingMatrix;
             shader.setMat4("worldMatrix", worldMatrix);
             shader.setVec4("objectColor", whiteColor);
-            renderCube(render);
+            renderCube();
         }
         k = -1;
     }
@@ -539,7 +569,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
         worldMatrix = translationMatrix * scalingMatrix;
         shader.setMat4("worldMatrix", worldMatrix);
         shader.setVec4("objectColor", whiteColor);
-        renderCube(render);
+        renderCube();
     }
 
     int x3 = 1, z3 = 1;
@@ -563,7 +593,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
         worldMatrix = translationMatrix * scalingMatrix;
         shader.setMat4("worldMatrix", worldMatrix);
         shader.setVec4("objectColor", whiteColor);
-        renderCube(render);
+        renderCube();
     }
 
 
@@ -580,7 +610,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
                 worldMatrix = translationMatrix * scalingMatrix;
                 shader.setMat4("worldMatrix", worldMatrix);
                 shader.setVec4("objectColor", blueColor);
-                renderCube(render);
+                renderCube();
             }
         }
     }
@@ -605,7 +635,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
                 worldMatrix = translationMatrix * scalingMatrix;
                 shader.setMat4("worldMatrix", worldMatrix);
                 shader.setVec4("objectColor", whiteColor);
-                renderCube(render);
+                renderCube();
             }
         }
     }
@@ -624,7 +654,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
                 worldMatrix = translationMatrix * scalingMatrix;
                 shader.setMat4("worldMatrix", worldMatrix);
                 shader.setVec4("objectColor", whiteColor);
-                renderCube(render);
+                renderCube();
             }
         }
     }
@@ -639,7 +669,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
     worldMatrix = translationMatrix * scalingMatrix;
     shader.setMat4("worldMatrix", worldMatrix);
     shader.setVec4("objectColor", whiteColor);
-    renderCube(render);
+    renderCube();
 
 
 
@@ -877,7 +907,7 @@ int main(int argc, char*argv[])
         
  
         // close window
-        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS || glfwGetTime() > 180)   //close window after 180s
             glfwSetWindowShouldClose(window, true);
 
 
@@ -1134,10 +1164,94 @@ void window_size_callback(GLFWwindow* window, int width, int height)
     WindowHeight = height;
 }
 
+
 glm::vec3 calculateNormal(glm::vec3 a, glm::vec3 b, glm::vec3 c)
 {
     glm::vec3 dir = glm::cross(b - a, c - b);
     glm::vec3 norm = glm::normalize(dir);
 
     return norm;
+}
+
+
+void renderScore(Shader shader)
+{
+    shader.setBool("stateOfTexture", false);
+
+    if (score > 9)  //double digits
+    {
+        renderDigit(shader, 19, 5, (score / 10) % 10);
+        renderDigit(shader, 22, 5, score % 10);
+    }
+
+    else
+        renderDigit(shader, 19, 5, score);
+    
+    shader.setBool("stateOfTexture", textureState);
+}
+
+
+void renderTime(Shader shader)
+{
+    //the window closes after 180s
+    int timeRemaining = TOTALTIME - glfwGetTime();
+
+    if (timeRemaining / 100 > 0)      //3 digits
+    {
+        int digitOne = timeRemaining % 10;  //one's place
+        int digitTwo = (timeRemaining / 10) % 10;   //ten's place
+        int digitThree = (timeRemaining / 100) % 10;    //hundred's place
+
+  
+        renderDigit(shader,-25,5, digitThree);
+        renderDigit(shader, -22, 5, digitTwo);
+        renderDigit(shader, -19, 5, digitOne);
+    }
+
+
+    if (timeRemaining / 10 > 0)      //2 digits
+    {
+        int digitOne = timeRemaining % 10;  //one's place
+        int digitTwo = (timeRemaining / 10) % 10;   //ten's place
+
+        renderDigit(shader, -22, 5, digitTwo);
+        renderDigit(shader, -19, 5, digitOne);
+    }
+
+
+    else
+        renderDigit(shader, -19, 5, timeRemaining);
+    
+
+}
+
+
+void renderDigit(Shader shader, int X, int Y, int digit)
+{
+    if (digit > 9)
+    {
+        std::cout << "DIGITS GREATER THAN 9 NOT ALLOWED\n";
+        return;
+    }
+
+    shader.setBool("stateOfTexture", false);
+    glm::vec3 scalingOffsetDigit = glm::vec3(0.5, 0.5, 0.5);
+
+    for (int i = 0; i < 4; ++i)
+        for (int j = 0; j < 5; ++j)
+        {
+            if (setXY[digit].find({ i,j }) == setXY[digit].end())
+                continue;
+
+            worldMatrix = glm::translate(glm::mat4(1), glm::vec3(X, Y, 0));
+            worldMatrix = glm::translate(worldMatrix, glm::vec3(i,j,0) * scalingOffsetDigit);
+            worldMatrix = glm::scale(worldMatrix, scalingOffsetDigit);
+
+            shader.setMat4("worldMatrix", worldMatrix);
+            shader.setVec4("objectColor", redColor);
+            renderCube();
+        }
+
+
+    shader.setBool("stateOfTexture", textureState);
 }

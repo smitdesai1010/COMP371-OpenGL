@@ -7,6 +7,7 @@ uniform vec3 lightPos;
 uniform vec3 viewPos;
 uniform vec4 lightColor;
 uniform vec4 objectColor;
+uniform bool lighting = true;   //for light cube
 
 uniform float far_plane;
 
@@ -23,7 +24,6 @@ in vec3 FragPos;
     
 float ShadowCalculation(vec3 fragPos)
 {
-    
     vec3 fragToLight = fragPos - lightPos;
         
     float closestDepth = texture(depthMap, fragToLight).r;
@@ -64,6 +64,11 @@ void main()
 
     vec3 result = (ambient + (1.0 - shadow)*(diffuse + specular)) ;
     
-    if (stateOfTexture)FragColor = textureColor * vec4(result, 1.0); 
-    else FragColor =  vec4(result * vec3(objectColor), 1.0);
+    if (stateOfTexture) 
+        FragColor = textureColor * vec4(result, 1.0); 
+    else 
+        FragColor =  objectColor * vec4(result, 1.0);
+
+    if (!lighting)
+        FragColor = objectColor;
 }
