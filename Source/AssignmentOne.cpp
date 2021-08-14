@@ -623,7 +623,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
 
         for (int y = 0; y < 10; y++) {
             for (int x = 0; x < 11; x++) {
-                if (!((y == 3 && x == 3) || (y == 3 && x == 5) || (y == 3 && x == 7) || (y == 4 && x == 4) || (y == 4 && x == 6) || (y == 5 && x == 5))) {
+                if (!((y == 3 && x == 3) || (y == 3 && x == 5) || (y == 3 && x == 7) || (y == 4 && x == 4) || (y == 4 && x == 6))) {
 
                     translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x + wallOffset, y , 0));
                     worldMatrix = translationMatrix * scalingMatrix;
@@ -834,11 +834,23 @@ int main(int argc, char*argv[])
     while(!glfwWindowShouldClose(window))
     {
 
-        if ((int)glfwGetTime() % 10 == 0)
+        if ((int)glfwGetTime() % 30 == 0)
         {
             int object = (rand() % 4);
 
             currObject = object;
+
+            int randInt = (rand() % 4)*90;
+            rotationOffsetX[object] += randInt;
+            
+            randInt = (rand() % 4) * 90;
+            rotationOffsetY[object] += randInt;
+
+            randInt = (rand() % 4) * 90;
+            rotationOffsetZ[object] += randInt;
+
+            baseVector = { 0.0f, 3.0f, 10.0f };
+
         }
 
         // Each frame, reset color of each pixel to glClearColor and depth
@@ -1055,7 +1067,7 @@ int main(int argc, char*argv[])
         if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
             movementOffset -= glm::vec3(0,0,1);
 
-        baseVector -= glm::vec3{ 0,0,0.001 };
+        baseVector -= glm::vec3{ 0,0,0.01 };
         focalPoint = baseVector;
     }
 
@@ -1072,37 +1084,8 @@ int main(int argc, char*argv[])
 //it WON'T move continuously till the key is press
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-    //object selection
-    if (key == GLFW_KEY_1 && action == GLFW_PRESS)
-    {
-        currObject = 0;
-        
-        eyePosition = focalPoint + glm::vec3(0.0f, 6, 27.0f);
-
-    }
-
-    else if (key == GLFW_KEY_2 && action == GLFW_PRESS)
-    {
-        currObject = 1;
-        
-        eyePosition = focalPoint + glm::vec3(0.0f, 6, 27.0f);
-    }
-
-    else if (key == GLFW_KEY_3 && action == GLFW_PRESS)
-    {
-        currObject = 2;
-        
-        eyePosition = focalPoint + glm::vec3(0.0f, 6, 27.0f);
-    }
-
-    else if (key == GLFW_KEY_4 && action == GLFW_PRESS)
-    {
-        currObject = 3;
-        
-        eyePosition = focalPoint + glm::vec3(0.0f, 6, 27.0f);
-    }
     //switch texturing modes
-    else if (key == GLFW_KEY_C && action == GLFW_PRESS)
+    if (key == GLFW_KEY_C && action == GLFW_PRESS)
     {
         textureState = !textureState;
     }
@@ -1139,22 +1122,22 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
     //rotation
     else if (key == GLFW_KEY_H && action == GLFW_PRESS) //x-axis
-        rotationOffsetX[currObject] += 20;
+        rotationOffsetX[currObject] += 90;
 
     else if (key == GLFW_KEY_J && action == GLFW_PRESS)
-        rotationOffsetX[currObject] -= 20;
+        rotationOffsetX[currObject] -= 90;
 
     else if (key == GLFW_KEY_F && action == GLFW_PRESS) //y-axis
-        rotationOffsetY[currObject] += 20;
+        rotationOffsetY[currObject] += 90;
 
     else if (key == GLFW_KEY_G && action == GLFW_PRESS)
-        rotationOffsetY[currObject] -= 20;
+        rotationOffsetY[currObject] -= 90;
 
     else if (key == GLFW_KEY_V && action == GLFW_PRESS) //z-axis
-        rotationOffsetZ[currObject] += 20;
+        rotationOffsetZ[currObject] += 90;
 
     else if (key == GLFW_KEY_B && action == GLFW_PRESS)
-        rotationOffsetZ[currObject] -= 20;
+        rotationOffsetZ[currObject] -= 90;
 
 
  
