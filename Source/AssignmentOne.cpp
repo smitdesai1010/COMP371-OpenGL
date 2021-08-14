@@ -833,6 +833,14 @@ int main(int argc, char*argv[])
     // Entering Main Loop
     while(!glfwWindowShouldClose(window))
     {
+
+        if ((int)glfwGetTime() % 10 == 0)
+        {
+            int object = (rand() % 4);
+
+            currObject = object;
+        }
+
         // Each frame, reset color of each pixel to glClearColor and depth
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -927,13 +935,11 @@ int main(int argc, char*argv[])
         renderScene(sceneShader, brickTextureID, cementTextureID, tilesTextureID);
 
 
-
-
         // End Frame
         glfwSwapBuffers(window);
         glfwPollEvents();
-        
- 
+
+
         // close window
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS || glfwGetTime() > 180)   //close window after 180s
             glfwSetWindowShouldClose(window, true);
