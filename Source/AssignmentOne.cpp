@@ -36,6 +36,7 @@
 #include <../VS2017/Shader.h>
 #include <vector>
 #include <../VS2017/Camera.h>
+#include "../VS2017/OBJloader.h"
 
 
 // Cursor coordinates
@@ -54,6 +55,11 @@ float rotationOffsetZ[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 float scalingOffset[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 int currObject = 3;     // 0 index mapping
+
+
+//
+int object3Vertices;
+GLuint object3VAO;
 
 
 //Window Size
@@ -287,7 +293,56 @@ void renderGridLine()
     glBindVertexArray(0);
 }
 
+GLuint setupModelVBO(std::string path, int& vertexCount) {
+    std::vector<glm::vec3> vertices;
+    std::vector<glm::vec3> normals;
+    std::vector<glm::vec2> UVs;
 
+    // read the vertex data from the model's OBJ file
+    loadOBJ(path.c_str(), vertices, normals, UVs);
+
+    GLuint VAO;
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);  // Becomes active VAO
+    // Bind the Vertex Array Object first, then bind and set vertex buffer(s) and
+    // attribute pointer(s).
+
+    // Vertex VBO setup
+    GLuint vertices_VBO;
+    glGenBuffers(1, &vertices_VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, vertices_VBO);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3),
+        &vertices.front(), GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat),
+        (GLvoid*)0);
+    glEnableVertexAttribArray(0);
+
+    // Normals VBO setup
+    GLuint normals_VBO;
+    glGenBuffers(1, &normals_VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, normals_VBO);
+    glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3),
+        &normals.front(), GL_STATIC_DRAW);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat),
+        (GLvoid*)0);
+    glEnableVertexAttribArray(1);
+
+    // UVs VBO setup
+    GLuint uvs_VBO;
+    glGenBuffers(1, &uvs_VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, uvs_VBO);
+    glBufferData(GL_ARRAY_BUFFER, UVs.size() * sizeof(glm::vec2), &UVs.front(),
+        GL_STATIC_DRAW);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat),
+        (GLvoid*)0);
+    glEnableVertexAttribArray(2);
+
+    glBindVertexArray(0);
+    // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent
+    // strange bugs, as we are using multiple VAOs)
+    vertexCount = vertices.size();
+    return VAO;
+}
 
 void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, const GLuint tiles)
 {
@@ -538,7 +593,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
 
         for (int y = 0; y < 10; y++) {
             for (int x = 0; x < 11; x++) {
-                if (!((y == 2 && x == 5) || (y == 3 && x == 3) || (y == 3 && x == 4) || (y == 3 && x == 5) || (y == 3 && x == 6) || (y == 3 && x == 7) || (y == 4 && x == 4) || (y == 4 && x == 5) || (y == 4 && x == 6) || (y == 5 && x == 5))) {
+                if (!((y == 2 && x == 5) || (y == 3 && x == 3) || (y == 3 && x == 4) || (y == 3 && x == 5) || (y == 3 && x == 6) || (y == 3 && x == 7) || (y == 4 && x == 4) || (y == 4 && x == 5) || (y == 4 && x == 6) || (y==5 && x==5))) {
 
                     translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x + wallOffset), (y ), 0));
                     worldMatrix = translationMatrix * scalingMatrix;
@@ -633,50 +688,25 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
                 }
             }
         }
-        glBindTexture(GL_TEXTURE_2D, cement);
+        
         //Object-4
        
         baseVector += movementOffset;
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scalingOffset[3], scalingOffset[3], scalingOffset[3]));
 
+        glBindVertexArray(object3VAO);
+        glBindTexture(GL_TEXTURE_2D, cement);
+        translationMatrix = glm::translate(glm::mat4(1.0f), baseVector);
+        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[3]), glm::vec3(1.0f, 0.0f, 0.0f));
+        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[3]), glm::vec3(0.0f, 1.0f, 0.0f));
+        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[3]), glm::vec3(0.0f, 0.0f, 1.0f));
+        translationMatrix = glm::translate(translationMatrix, glm::vec3(0.0f, 0.0f, 0.0f) * scalingOffset[3]);
 
-        for (int j = 0; j < 3; j++)
-        {
-            for (int i = -2; i <= 2; i++) {
-                if (abs(i % 2 == 0)) {
-
-                    translationMatrix = glm::translate(glm::mat4(1.0f), baseVector);
-                    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[3]), glm::vec3(1.0f, 0.0f, 0.0f));
-                    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[3]), glm::vec3(0.0f, 1.0f, 0.0f));
-                    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[3]), glm::vec3(0.0f, 0.0f, 1.0f));
-                    translationMatrix = glm::translate(translationMatrix, glm::vec3(i, 0.0f, j) * scalingOffset[3]);
-
-                    worldMatrix = translationMatrix * scalingMatrix;
-                    shader.setMat4("worldMatrix", worldMatrix);
-                    shader.setVec4("objectColor", whiteColor);
-                    renderCube();
-                }
-            }
-        }
-
-        for (int j = 0; j < 2; j++)
-        {
-            for (int i = -2; i <= 2; i++) {
-                if (abs(i % 2) == 1) {
-
-                    translationMatrix = glm::translate(glm::mat4(1.0f), baseVector);
-                    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[3]), glm::vec3(1.0f, 0.0f, 0.0f));
-                    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[3]), glm::vec3(0.0f, 1.0f, 0.0f));
-                    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[3]), glm::vec3(0.0f, 0.0f, 1.0f));
-                    translationMatrix = glm::translate(translationMatrix, glm::vec3(i, 1.0f, j) * scalingOffset[3]);
-
-                    worldMatrix = translationMatrix * scalingMatrix;
-                    shader.setMat4("worldMatrix", worldMatrix);
-                    shader.setVec4("objectColor", whiteColor);
-                    renderCube();
-                }
-            }
-        }
+        worldMatrix = translationMatrix * scalingMatrix;
+        shader.setMat4("worldMatrix", worldMatrix);
+        shader.setVec4("objectColor", whiteColor);
+        glDrawArrays(GL_QUADS, 0, object3Vertices);
+                    
     }
         break;
     }
@@ -764,6 +794,10 @@ int main(int argc, char*argv[])
     // Black background
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
+    //
+    object3Vertices;
+    object3VAO = setupModelVBO("../Assets/Models/object3.obj", object3Vertices);
+
     
     // Compile and link shaders here ...
     Shader sceneShader("vertexShader.vs", "fragmentShader.fs");
@@ -834,7 +868,7 @@ int main(int argc, char*argv[])
     while(!glfwWindowShouldClose(window))
     {
 
-        if ((int)glfwGetTime() % 30 == 0)
+        if ((int)glfwGetTime() % 10 == 0)
         {
             int object = (rand() % 4);
 

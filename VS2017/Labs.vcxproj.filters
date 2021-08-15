@@ -69,5 +69,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="OBJloader.h" />
   </ItemGroup>
 </Project>
