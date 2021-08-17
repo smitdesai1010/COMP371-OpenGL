@@ -54,7 +54,7 @@ float rotationOffsetY[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 float rotationOffsetZ[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 float scalingOffset[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-int currObject = 3;     // 0 index mapping
+int currObject = 2;     // 0 index mapping
 
 
 //
@@ -257,6 +257,7 @@ void renderCube()
     glBindVertexArray(0);
 }
 
+void nextRandModel();
 
 //renderGridLine() renders a line
 void renderGridLine()
@@ -481,7 +482,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
                     z = i;
                 }
 
-                translationMatrix = glm::translate(glm::mat4(1.0f), baseVector);
+                translationMatrix = glm::translate(glm::mat4(1.0f), baseVector+glm::vec3(2,0,0));
                 translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[0]), glm::vec3(1.0f, 0.0f, 0.0f));
                 translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[0]), glm::vec3(0.0f, 1.0f, 0.0f));
                 translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[0]), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -497,7 +498,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
 
         for (int i = 0; i < 5; i++) {
 
-            translationMatrix = glm::translate(glm::mat4(1.0f), baseVector);
+            translationMatrix = glm::translate(glm::mat4(1.0f), baseVector + glm::vec3(2, 0, 0));
             translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[0]), glm::vec3(1.0f, 0.0f, 0.0f));
             translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[0]), glm::vec3(0.0f, 1.0f, 0.0f));
             translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[0]), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -558,8 +559,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
                     y = 2 - i;
                     z = 2;
                 }
-
-                translationMatrix = glm::translate(glm::mat4(1.0f), baseVector);
+                translationMatrix = glm::translate(glm::mat4(1.0f), baseVector - glm::vec3(1, 0, 0));
                 translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[1]), glm::vec3(1.0f, 0.0f, 0.0f));
                 translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[1]), glm::vec3(0.0f, 1.0f, 0.0f));
                 translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[1]), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -572,7 +572,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
             }
         }
 
-        translationMatrix = glm::translate(glm::mat4(1.0f), baseVector);
+        translationMatrix = glm::translate(glm::mat4(1.0f), baseVector - glm::vec3(1, 0, 0));
         translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[1]), glm::vec3(1.0f, 0.0f, 0.0f));
         translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[1]), glm::vec3(0.0f, 1.0f, 0.0f));
         translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[1]), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -593,7 +593,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
 
         for (int y = 0; y < 10; y++) {
             for (int x = 0; x < 11; x++) {
-                if (!((y == 2 && x == 5) || (y == 3 && x == 3) || (y == 3 && x == 4) || (y == 3 && x == 5) || (y == 3 && x == 6) || (y == 3 && x == 7) || (y == 4 && x == 4) || (y == 4 && x == 5) || (y == 4 && x == 6) || (y==5 && x==5))) {
+                if (!((y == 2 && x == 5) || (y == 3 && x == 3) || (y == 3 && x == 4) || (y == 3 && x == 5) || (y == 3 && x == 6) || (y == 3 && x == 7) || (y == 3 && x == 8) || (y == 4 && x == 4) || (y == 4 && x == 5) || (y == 4 && x == 6) || (y==5 && x==5))) {
 
                     translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x + wallOffset), (y ), 0));
                     worldMatrix = translationMatrix * scalingMatrix;
@@ -667,6 +667,17 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
             shader.setVec4("objectColor", whiteColor);
             renderCube();
         }
+        translationMatrix = glm::translate(glm::mat4(1.0f), baseVector);
+        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[2]), glm::vec3(1.0f, 0.0f, 0.0f));
+        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[2]), glm::vec3(0.0f, 1.0f, 0.0f));
+        translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[2]), glm::vec3(0.0f, 0.0f, 1.0f));
+        translationMatrix = glm::translate(translationMatrix, glm::vec3(3, 0, 2) * scalingOffset[2]);
+
+
+        worldMatrix = translationMatrix * scalingMatrix;
+        shader.setMat4("worldMatrix", worldMatrix);
+        shader.setVec4("objectColor", whiteColor);
+        renderCube();
     }
         break;
     case 3:
@@ -868,23 +879,17 @@ int main(int argc, char*argv[])
     while(!glfwWindowShouldClose(window))
     {
 
-        if ((int)glfwGetTime() % 10 == 0)
-        {
-            int object = (rand() % 4);
-
-            currObject = object;
-
-            int randInt = (rand() % 4)*90;
-            rotationOffsetX[object] += randInt;
-            
-            randInt = (rand() % 4) * 90;
-            rotationOffsetY[object] += randInt;
-
-            randInt = (rand() % 4) * 90;
-            rotationOffsetZ[object] += randInt;
-
-            baseVector = { 0.0f, 3.0f, 10.0f };
-
+        if (baseVector.z < 0) {
+            std::string d = std::to_string(rotationOffsetX[currObject]) +"," + std::to_string(rotationOffsetY[currObject]) +","+ std::to_string(rotationOffsetZ[currObject]);
+            printf("%s\n", d.c_str());
+            if (((((int)rotationOffsetX[currObject] % 360) == 0)  && (((int)rotationOffsetY[currObject] % 360) == 0)  && (((int)rotationOffsetZ[currObject] % 360) == 0))
+                || ((((int)rotationOffsetX[currObject] % 360) == 180) && (((int)rotationOffsetY[currObject] % 360) == 180) && (((int)rotationOffsetZ[currObject] % 360) == 180))) {
+                score += 20;
+            }
+            else {
+                score -= 5;
+            }
+            nextRandModel();
         }
 
         // Each frame, reset color of each pixel to glClearColor and depth
@@ -1113,6 +1118,24 @@ int main(int argc, char*argv[])
     return 0;
 }
 
+void nextRandModel() {
+    
+        int object = (rand() % 4);
+
+        currObject = object;
+
+        int randInt = (rand() % 4) * 90;
+        rotationOffsetX[object] += randInt;
+
+        randInt = (rand() % 4) * 90;
+        rotationOffsetY[object] += randInt;
+
+        randInt = (rand() % 4) * 90;
+        rotationOffsetZ[object] += randInt;
+
+        baseVector = { 0.0f, 3.0f, 10.0f };
+
+}
 
 //The callback will make the object move one unit at one press AND RELEASE
 //it WON'T move continuously till the key is press
@@ -1135,6 +1158,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 
     //translation
+    /*
     else if (key == GLFW_KEY_W && action == GLFW_PRESS)
         movementOffset += glm::vec3(0, 1, 0);
 
@@ -1143,34 +1167,33 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
     else if (key == GLFW_KEY_D && action == GLFW_PRESS)
         movementOffset += glm::vec3(1, 0, 0);
-
+    
     else if (key == GLFW_KEY_A && action == GLFW_PRESS)
         movementOffset -= glm::vec3(1, 0, 0);
-
+   
     else if (key == GLFW_KEY_Q && action == GLFW_PRESS)
         movementOffset += glm::vec3(0, 0, 1);
 
     else if (key == GLFW_KEY_E && action == GLFW_PRESS)
         movementOffset -= glm::vec3(0, 0, 1);
-
-
+    */
     //rotation
-    else if (key == GLFW_KEY_H && action == GLFW_PRESS) //x-axis
+    else if (key == GLFW_KEY_W && action == GLFW_PRESS) //x-axis
         rotationOffsetX[currObject] += 90;
 
-    else if (key == GLFW_KEY_J && action == GLFW_PRESS)
+    else if (key == GLFW_KEY_S && action == GLFW_PRESS)
         rotationOffsetX[currObject] -= 90;
 
-    else if (key == GLFW_KEY_F && action == GLFW_PRESS) //y-axis
+    else if (key == GLFW_KEY_E && action == GLFW_PRESS) //y-axis
         rotationOffsetY[currObject] += 90;
 
-    else if (key == GLFW_KEY_G && action == GLFW_PRESS)
+    else if (key == GLFW_KEY_Q && action == GLFW_PRESS)
         rotationOffsetY[currObject] -= 90;
 
-    else if (key == GLFW_KEY_V && action == GLFW_PRESS) //z-axis
+    else if (key == GLFW_KEY_D && action == GLFW_PRESS) //z-axis
         rotationOffsetZ[currObject] += 90;
 
-    else if (key == GLFW_KEY_B && action == GLFW_PRESS)
+    else if (key == GLFW_KEY_A && action == GLFW_PRESS)
         rotationOffsetZ[currObject] -= 90;
 
 
