@@ -99,7 +99,7 @@ irrklang::ISoundEngine* soundEngine;
 void collisionSound();
 void successSound();
 
-//Coordinates for 0-9 numbers for text rendering
+//Coordinates for 0-9 numbers for timer and score rendering
 //It is rendered using cubes, much like we did in QUIZ-2 by a 4*3 rectangle, (0,0) corresponds to bottom left
 std::set<std::pair<int, int>> setXY[10] = {
    { {0,4}, {1,4}, {2,4}, {2,3}, {2,2}, {0,2}, {0,1}, {0,0}, {1,0}, {2,0}, {0,3}, {2,1} },        //0
@@ -354,24 +354,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
 
     scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
     shader.setVec4("objectColor", greenColor);
-    /*
-    for (int i = 0; i < 101; i++) {
-        translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-50.0f, 0.0f, -50.0f + i));
-        worldMatrix = translationMatrix * scalingMatrix;
-        shader.setMat4("worldMatrix", worldMatrix);
-        shader.setVec4("objectColor", greenColor);
-        renderGridLine();
-    }
-
-    rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    for (int i = 0; i < 101; i++) {
-        translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-50.0f + i, 0.0f, 50.0f));
-        worldMatrix = translationMatrix * scalingMatrix * rotationMatrix;
-
-        shader.setMat4("worldMatrix", worldMatrix);
-        shader.setVec4("objectColor", greenColor);
-        renderGridLine();
-    }*/
+  
 
     // + x bar
     scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.05f, 1.0f, 1.0f));
@@ -723,25 +706,6 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
     }
     movementOffset = glm::vec3(0, 0, 0);
 
-   
-
-
-    /*
-    translationMatrix = glm::translate(glm::mat4(1.0f), baseVectorArray[3]);
-    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetX[3]), glm::vec3(1.0f, 0.0f, 0.0f));
-    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetY[3]), glm::vec3(0.0f, 1.0f, 0.0f));
-    translationMatrix = glm::rotate(translationMatrix, glm::radians(rotationOffsetZ[3]), glm::vec3(0.0f, 0.0f, 1.0f));
-    translationMatrix = glm::translate(translationMatrix, glm::vec3(0.0f, 2.0f, 0.0f) * scalingOffset[3]);
-
-
-    worldMatrix = translationMatrix * scalingMatrix;
-    shader.setMat4("worldMatrix", worldMatrix);
-    shader.setVec4("objectColor", whiteColor);
-    renderCube();*/
-
-
-
-
     glBindVertexArray(0);
 }
 
@@ -766,10 +730,6 @@ int main(int argc, char*argv[])
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 #endif
 
-
-    // Define and upload geometry to the GPU here ...
-    /*int vaoGridLine = createGridLineVertexArrayObject();
-    int texturedCubeVAO = createTexturedCubeVertexArrayObject();*/
 
     const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
@@ -909,8 +869,6 @@ int main(int argc, char*argv[])
             0.01f, 
             100000.0f              // near and far (near > 0)
         );    
-
-
         sceneShader.setMat4("projectionMatrix", projectionMatrix);
        
       
@@ -923,20 +881,16 @@ int main(int argc, char*argv[])
             glm::vec3(0.0f, 1.0f, 0.0f) // up
         );
 
-        //sceneShader.setMat4("viewMatrix", viewMatrix);
-
-        if (textureState)glBindTexture(GL_TEXTURE_2D, brickTextureID);
-
         sceneShader.setMat4("viewMatrix", viewMatrix);
 
 
+        if (textureState)
+            glBindTexture(GL_TEXTURE_2D, brickTextureID);
+
+        
         //Setting up light source
-
         sceneShader.setVec4("lightColor", whiteColor);
-
         sceneShader.setVec3("lightPos", lightPosition);
-
-
         glm::vec3 viewPosition = { eyePosition.x, eyePosition.y, eyePosition.z };
         sceneShader.setVec3("viewPos", viewPosition);
 
@@ -973,19 +927,8 @@ int main(int argc, char*argv[])
         glViewport(0, 0, WindowWidth, WindowHeight);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         sceneShader.use();
-        //glm::mat4 projection = glm::perspective(glm::radians(fov), (float)WindowWidth / (float)WindowHeight, 0.1f, 100.0f);
-        //glm::mat4 view = camera.GetViewMatrix();
-        //sceneShader.setMat4("projectionMatrix", projection);
-        //sceneShader.setMat4("viewMatrix", view);
-        // set lighting uniforms
-        //sceneShader.setVec3("lightPos", lightPosition);
-        //sceneShader.setVec3("viewPos", camera.Position);
         sceneShader.setInt("shadows", shadows); // enable/disable shadows by pressing 'SPACE'
-        sceneShader.setFloat("far_plane", far_plane);/*
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, tilesTextureID);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, depthCubemap);*/
+        sceneShader.setFloat("far_plane", far_plane);
         renderScene(sceneShader, brickTextureID, cementTextureID, tilesTextureID);
 
 
@@ -1149,37 +1092,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     {
         textureState = !textureState;
     }
-
-
-
-    //scaling
-    else if (key == GLFW_KEY_N && action == GLFW_PRESS)
-        scalingOffset[currObject] += 0.25;
-
-    else if (key == GLFW_KEY_M && action == GLFW_PRESS)
-        scalingOffset[currObject] = scalingOffset[currObject] > 0.25 ? scalingOffset[currObject] - 0.25 : 0.25;
-
-
-    //translation
-    /*
-    else if (key == GLFW_KEY_W && action == GLFW_PRESS)
-        movementOffset += glm::vec3(0, 1, 0);
-
-    else if (key == GLFW_KEY_S && action == GLFW_PRESS)
-        movementOffset -= glm::vec3(0, 1, 0);
-
-    else if (key == GLFW_KEY_D && action == GLFW_PRESS)
-        movementOffset += glm::vec3(1, 0, 0);
     
-    else if (key == GLFW_KEY_A && action == GLFW_PRESS)
-        movementOffset -= glm::vec3(1, 0, 0);
-   
-    else if (key == GLFW_KEY_Q && action == GLFW_PRESS)
-        movementOffset += glm::vec3(0, 0, 1);
-
-    else if (key == GLFW_KEY_E && action == GLFW_PRESS)
-        movementOffset -= glm::vec3(0, 0, 1);
-    */
     //rotation
     else if (key == GLFW_KEY_W && action == GLFW_PRESS) //x-axis
         rotationOffsetX[currObject] += 90;
@@ -1199,8 +1112,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     else if (key == GLFW_KEY_A && action == GLFW_PRESS)
         rotationOffsetZ[currObject] -= 90;
 
-
- 
 
     else if (key == GLFW_KEY_LEFT_ALT && action == GLFW_PRESS && !shadowsKeyPressed)
     {
@@ -1333,9 +1244,7 @@ void renderDigit(Shader shader, int X, int Y, int digit)
 
 void collisionSound()
 {
-    //soundEngine->stopAllSounds();
     irrklang::createIrrKlangDevice()->play2D("../Assets/Audio/collision.wav", false);
-    //soundEngine->play2D("../Assets/Audio/collision.wav", true);
 }
 
 void successSound()
