@@ -886,7 +886,7 @@ int main(int argc, char*argv[])
                 || ((((int)rotationOffsetX[currObject] % 360) == 180) && (((int)rotationOffsetY[currObject] % 360) == 180) && (((int)rotationOffsetZ[currObject] % 360) == 180))) {
                 score += 20;
             }
-            else if (score>0) {
+            else /*if (score>0)*/ {
                 score -= 5;
             }
             nextRandModel();
