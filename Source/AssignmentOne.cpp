@@ -354,7 +354,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
 
     scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
     shader.setVec4("objectColor", greenColor);
-
+    /*
     for (int i = 0; i < 101; i++) {
         translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-50.0f, 0.0f, -50.0f + i));
         worldMatrix = translationMatrix * scalingMatrix;
@@ -371,7 +371,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
         shader.setMat4("worldMatrix", worldMatrix);
         shader.setVec4("objectColor", greenColor);
         renderGridLine();
-    }
+    }*/
 
     // + x bar
     scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.05f, 1.0f, 1.0f));
@@ -407,7 +407,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
     {
         glBindTexture(GL_TEXTURE_2D, tiles);
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(100, 1, 100));
-        translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.5, 0));
+        translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0, -1.5, 0));
         worldMatrix = translationMatrix * scalingMatrix;
         shader.setMat4("worldMatrix", worldMatrix);
         renderCube();
