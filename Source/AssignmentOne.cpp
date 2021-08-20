@@ -885,9 +885,12 @@ int main(int argc, char*argv[])
             if (((((int)rotationOffsetX[currObject] % 360) == 0)  && (((int)rotationOffsetY[currObject] % 360) == 0)  && (((int)rotationOffsetZ[currObject] % 360) == 0))
                 || ((((int)rotationOffsetX[currObject] % 360) == 180) && (((int)rotationOffsetY[currObject] % 360) == 180) && (((int)rotationOffsetZ[currObject] % 360) == 180))) {
                 score += 20;
+                successSound();
             }
-            else if (score>0) {
-                score -= 5;
+            else {
+                if (score>0) 
+                    score -= 5;
+                collisionSound();
             }
             nextRandModel();
         }
