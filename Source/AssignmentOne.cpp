@@ -72,7 +72,7 @@ glm::vec4 greenColor = { 0.0f, 1.0f, 0.0f, 1.0f };
 glm::vec4 blueColor = { 0.0f, 0.0f, 1.0f, 1.0f };
 glm::vec4 whiteColor = { 1.0f, 1.0f, 1.0f, 1.0f };
 glm::vec4 purpleColor = { 1.0f, 0.0f, 1.0f, 1.0f };
-glm::vec4 bitchColor = { 1.0f, 1.0f, 1.0f, 0.0f };
+glm::vec4 yellowColor = { 1.0f, 234.0f/255.0f, 0, 1.0f };
 
 
 //uniform variables
@@ -115,8 +115,8 @@ std::set<std::pair<int, int>> setXY[10] = {
 };
 
 int score = 0;
-const int TOTALTIME = 180; //3 mins
-void renderDigit(Shader shader, int X, int Y, int digit);
+const int TOTALTIME = 90; 
+void renderDigit(Shader shader, int X, int Y, int digit, glm::vec4 color);
 void renderScore(Shader shader);
 void renderTime(Shader shader);
 
@@ -164,7 +164,7 @@ GLuint loadTexture(const char* filename)
         format = GL_RGB;
     else if (nrChannels == 4)
         format = GL_RGBA;
-    glTexImage2D(GL_TEXTURE_2D, 0, format, width/2, height/2,
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height,
         0, format, GL_UNSIGNED_BYTE, data);
 
     // Step5 Free resources
@@ -355,51 +355,25 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
     scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
     shader.setVec4("objectColor", greenColor);
   
-
-    // + x bar
-    scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(0.05f, 1.0f, 1.0f));
-    rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(-1.0f, 0.0f, 0.0f));
-    worldMatrix = scalingMatrix * rotationMatrix;
+    //Draw Cubes
+    //bounding cube
+    shader.setBool("stateOfTexture", true);
+    glBindTexture(GL_TEXTURE_2D, loadTexture("../Assets/Textures/sky.jpg"));
+    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.5f, 0.0f));
+    scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(100.0f, 100.0f, 100.0f));
+    worldMatrix = scalingMatrix * translationMatrix;
     shader.setMat4("worldMatrix", worldMatrix);
-    shader.setVec4("objectColor", whiteColor);
-    renderGridLine();
-
-    // + z bar
-    scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 0.05f));
-    rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    worldMatrix = scalingMatrix * rotationMatrix;
-    shader.setMat4("worldMatrix", worldMatrix);
-    shader.setVec4("objectColor", redColor);
-    renderGridLine();
-
-    // + y bar
-    scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 0.05f, 1.0f));
-    rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    worldMatrix = scalingMatrix * rotationMatrix;
-    shader.setMat4("worldMatrix", worldMatrix);
-    shader.setVec4("objectColor", blueColor);
-    renderGridLine();
-    shader.setVec4("objectColor", bitchColor);
-
-
-    
-
+    renderCube();
 
     //floor
-    if (textureState)
-    {
-        glBindTexture(GL_TEXTURE_2D, tiles);
-        scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(100, 1, 100));
-        translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0, -1.5, 0));
-        worldMatrix = translationMatrix * scalingMatrix;
-        shader.setMat4("worldMatrix", worldMatrix);
-        renderCube();
-    }
+    glBindTexture(GL_TEXTURE_2D, loadTexture("../Assets/Textures/ss.jpg"));
+    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.1, 0));
+    scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(100, 1, 100));
+    worldMatrix = scalingMatrix * translationMatrix;
+    shader.setMat4("worldMatrix", worldMatrix);
+    renderCube();
+    
 
-
-
-
-    //Draw Cubes
 
     //Drawing cube around light source
     shader.setBool("lighting", false);
@@ -413,11 +387,12 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
 
 
 
+
     glBindTexture(GL_TEXTURE_2D, brick);
     scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
     int z3 = 0, x3 = 0 , k = 0;
     if (nextModel) {
-        baseVector = glm::vec3{ 0,3,10 };
+        baseVector = glm::vec3{ 0,8,10 };
         nextModel = false;
     }
     
@@ -425,12 +400,13 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
     switch(currObject){
     case 0:
     {
+        glBindTexture(GL_TEXTURE_2D, tiles);
         //wall 1
         for (int y = 0; y < 10; y++) {
             for (int x = 0; x < 11; x++) {
                 if (!((y == 3 && x == 3) || (y == 3 && x == 4) || (y == 3 && x == 5) || (y == 3 && x == 6) || (y == 3 && x == 7) || (y == 4 && x == 3) || (y == 4 && x == 7) || (y == 5 && x == 3) || (y == 5 && x == 7) || (y == 6 && x == 3) || (y == 6 && x == 4) || (y == 6 && x == 5) || (y == 6 && x == 6) || (y == 6 && x == 7) || (y == 7 && x == 3))) {
 
-                    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x+ wallOffset, y ,0));
+                    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x+ wallOffset, y+5 ,0));
                     worldMatrix = translationMatrix * scalingMatrix;
                     shader.setMat4("worldMatrix", worldMatrix);
                     shader.setVec4("objectColor", blueColor);
@@ -498,7 +474,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
         break;
     case 1:
     {
-        glBindTexture(GL_TEXTURE_2D, brick);
+        glBindTexture(GL_TEXTURE_2D, tiles);
         //wall 2
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
 
@@ -506,7 +482,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
             for (int x = 0; x < 11; x++) {
                 if (!((y == 2 && x == 6) || (y == 3 && x == 4) || (y == 3 && x == 6) || (y == 4 && x == 4) || (y == 4 && x == 6) || (y == 5 && x == 4) || (y == 5 && x == 5) || (y == 5 && x == 6) || (y == 5 && x == 7) || (y == 6 && x == 4) || (y == 6 && x == 7))) {
 
-                    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x + wallOffset, y , 0));
+                    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x + wallOffset, y+5 , 0));
                     worldMatrix = translationMatrix * scalingMatrix;
                     shader.setMat4("worldMatrix", worldMatrix);
                     shader.setVec4("objectColor", blueColor);
@@ -570,7 +546,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
         break;
     case 2:
     {
-        glBindTexture(GL_TEXTURE_2D, brick);
+        glBindTexture(GL_TEXTURE_2D, tiles);
         //wall 3
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
 
@@ -578,7 +554,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
             for (int x = 0; x < 11; x++) {
                 if (!((y == 2 && x == 5) || (y == 3 && x == 3) || (y == 3 && x == 4) || (y == 3 && x == 5) || (y == 3 && x == 6) || (y == 3 && x == 7) || (y == 3 && x == 8) || (y == 4 && x == 4) || (y == 4 && x == 5) || (y == 4 && x == 6) || (y==5 && x==5))) {
 
-                    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x + wallOffset), (y ), 0));
+                    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3((x + wallOffset), (y+5), 0));
                     worldMatrix = translationMatrix * scalingMatrix;
                     shader.setMat4("worldMatrix", worldMatrix);
                     shader.setVec4("objectColor", blueColor);
@@ -665,7 +641,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
         break;
     case 3:
     {
-        glBindTexture(GL_TEXTURE_2D, brick);
+        glBindTexture(GL_TEXTURE_2D, tiles);
 
         //wall 4
         scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
@@ -674,7 +650,7 @@ void renderScene(const Shader &shader, const GLuint brick, const GLuint cement, 
             for (int x = 0; x < 11; x++) {
                 if (!((y == 3 && x == 3) || (y == 3 && x == 5) || (y == 3 && x == 7) || (y == 4 && x == 4) || (y == 4 && x == 6))) {
 
-                    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x + wallOffset, y , 0));
+                    translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(x + wallOffset, y+5 , 0));
                     worldMatrix = translationMatrix * scalingMatrix;
                     shader.setMat4("worldMatrix", worldMatrix);
                     shader.setVec4("objectColor", blueColor);
@@ -1052,7 +1028,7 @@ int main(int argc, char*argv[])
         if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
             movementOffset -= glm::vec3(0,0,1);
 
-        baseVector -= glm::vec3{ 0,0,0.01 };
+        baseVector -= glm::vec3{ 0,0,0.05 };
         focalPoint = baseVector;
     }
 
@@ -1079,7 +1055,7 @@ void nextRandModel() {
         randInt = (rand() % 4) * 90;
         rotationOffsetZ[object] += randInt;
 
-        baseVector = { 0.0f, 3.0f, 10.0f };
+        baseVector = { 0.0f, 8.0f, 10.0f };
 
 }
 
@@ -1165,12 +1141,12 @@ void renderScore(Shader shader)
 
     if (score > 9)  //double digits
     {
-        renderDigit(shader, 19, 5, (score / 10) % 10);
-        renderDigit(shader, 22, 5, score % 10);
+        renderDigit(shader, 19, 10, (score / 10) % 10, whiteColor);
+        renderDigit(shader, 22, 10, score % 10, whiteColor);
     }
 
     else
-        renderDigit(shader, 19, 5, score);
+        renderDigit(shader, 19, 10, score, whiteColor);
     
     shader.setBool("stateOfTexture", textureState);
 }
@@ -1188,9 +1164,9 @@ void renderTime(Shader shader)
         int digitThree = (timeRemaining / 100) % 10;    //hundred's place
 
   
-        renderDigit(shader,-25,5, digitThree);
-        renderDigit(shader, -22, 5, digitTwo);
-        renderDigit(shader, -19, 5, digitOne);
+        renderDigit(shader,-25, 10, digitThree, yellowColor);
+        renderDigit(shader, -22, 10, digitTwo, yellowColor);
+        renderDigit(shader, -19, 10, digitOne, yellowColor);
     }
 
 
@@ -1199,19 +1175,17 @@ void renderTime(Shader shader)
         int digitOne = timeRemaining % 10;  //one's place
         int digitTwo = (timeRemaining / 10) % 10;   //ten's place
 
-        renderDigit(shader, -22, 5, digitTwo);
-        renderDigit(shader, -19, 5, digitOne);
+        renderDigit(shader, -22, 10, digitTwo, yellowColor);
+        renderDigit(shader, -19, 10, digitOne, yellowColor);
     }
 
 
     else
-        renderDigit(shader, -19, 5, timeRemaining);
-    
-
+        renderDigit(shader, -19, 10, timeRemaining, yellowColor);
 }
 
 
-void renderDigit(Shader shader, int X, int Y, int digit)
+void renderDigit(Shader shader, int X, int Y, int digit, glm::vec4 color)
 {
     if (digit > 9)
     {
@@ -1233,7 +1207,7 @@ void renderDigit(Shader shader, int X, int Y, int digit)
             worldMatrix = glm::scale(worldMatrix, scalingOffsetDigit);
 
             shader.setMat4("worldMatrix", worldMatrix);
-            shader.setVec4("objectColor", redColor);
+            shader.setVec4("objectColor", color);
             renderCube();
         }
 

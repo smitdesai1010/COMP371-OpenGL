@@ -43,7 +43,7 @@ float ShadowCalculation(vec3 fragPos)
 
 void main()
 {
-    float ambientStrength = 0.3;
+    float ambientStrength = 0.6;
     vec3 ambient = ambientStrength * vec3(lightColor);
         
     vec3 norm = normalize(Normal);
